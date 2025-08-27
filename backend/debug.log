@@ -1,0 +1,1238 @@
+Watching for file changes with StatReloader
+"OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+"POST /api/auth/register/ HTTP/1.1" 201 47
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"OPTIONS /api/auth/user/profile/ HTTP/1.1" 200 0
+"PATCH /api/auth/user/profile/ HTTP/1.1" 200 129
+"OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"OPTIONS /api/students/ HTTP/1.1" 200 0
+"GET /api/students/ HTTP/1.1" 200 200
+"OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6001
+"OPTIONS /materials/ HTTP/1.1" 200 0
+"GET /materials/ HTTP/1.1" 200 2
+文件保存成功 - 文件名: Lab1.pdf, 大小: 207376字节
+"POST /materials/ HTTP/1.1" 201 328
+"GET /materials/ HTTP/1.1" 200 330
+"OPTIONS /materials/1/ HTTP/1.1" 200 0
+"PUT /materials/1/ HTTP/1.1" 200 330
+"GET /materials/ HTTP/1.1" 200 332
+"OPTIONS /api/notices/ HTTP/1.1" 200 0
+"GET /api/notices/ HTTP/1.1" 200 2
+"POST /api/notices/ HTTP/1.1" 201 236
+"GET /api/notices/ HTTP/1.1" 200 238
+"POST /api/notices/ HTTP/1.1" 201 237
+"GET /api/notices/ HTTP/1.1" 200 476
+"GET /materials/ HTTP/1.1" 200 332
+文件保存成功 - 文件名: 23371488-陈利雅-Lab0实验报告.pdf, 大小: 141943字节
+"POST /materials/ HTTP/1.1" 201 495
+"GET /materials/ HTTP/1.1" 200 828
+"GET /materials/ HTTP/1.1" 200 828
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/notices/ HTTP/1.1" 200 476
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/notices/ HTTP/1.1" 200 476
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"POST /api/forum/questions/ HTTP/1.1" 201 279
+"POST /api/forum/questions/ HTTP/1.1" 201 279
+"GET /api/forum/questions/ HTTP/1.1" 200 561
+"POST /api/forum/questions/ HTTP/1.1" 201 279
+"GET /api/forum/questions/ HTTP/1.1" 200 841
+"POST /api/forum/questions/ HTTP/1.1" 201 291
+"GET /api/forum/questions/ HTTP/1.1" 200 1133
+"GET /api/forum/questions/ HTTP/1.1" 200 1133
+"GET /api/forum/questions/ HTTP/1.1" 200 1133
+"POST /api/forum/questions/ HTTP/1.1" 201 281
+"GET /api/forum/questions/ HTTP/1.1" 200 1415
+"OPTIONS /api/forum/questions/1/ HTTP/1.1" 200 0
+"DELETE /api/forum/questions/1/ HTTP/1.1" 204 0
+"OPTIONS /api/forum/questions/2/ HTTP/1.1" 200 0
+"DELETE /api/forum/questions/2/ HTTP/1.1" 204 0
+"OPTIONS /api/forum/questions/3/ HTTP/1.1" 200 0
+"DELETE /api/forum/questions/3/ HTTP/1.1" 204 0
+"OPTIONS /api/forum/questions/4/ HTTP/1.1" 200 0
+"DELETE /api/forum/questions/4/ HTTP/1.1" 204 0
+"OPTIONS /api/forum/questions/5/ HTTP/1.1" 200 0
+"DELETE /api/forum/questions/5/ HTTP/1.1" 204 0
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"POST /api/forum/questions/ HTTP/1.1" 201 288
+"GET /api/forum/questions/ HTTP/1.1" 200 290
+"GET /materials/ HTTP/1.1" 200 828
+"GET /api/forum/questions/ HTTP/1.1" 200 290
+Unauthorized: /api/experiments/experiments/
+"GET /api/experiments/experiments/ HTTP/1.1" 401 172
+"OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+Unauthorized: /api/notices/unread_count/
+"GET /api/notices/unread_count/ HTTP/1.1" 401 172
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+"POST /api/auth/login/ HTTP/1.1" 200 959
+"POST /api/auth/login/ HTTP/1.1" 200 959
+"OPTIONS /materials/ HTTP/1.1" 200 0
+"GET /materials/ HTTP/1.1" 200 2
+"OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+"GET /api/forum/questions/ HTTP/1.1" 200 290
+"POST /api/auth/login/ HTTP/1.1" 200 839
+"POST /api/auth/login/ HTTP/1.1" 200 839
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 476
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/2/mark_as_read/ HTTP/1.1" 200 0
+"POST /api/notices/2/mark_as_read/ HTTP/1.1" 200 35
+"GET /api/notices/ HTTP/1.1" 200 475
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/1/mark_as_read/ HTTP/1.1" 200 0
+"POST /api/notices/1/mark_as_read/ HTTP/1.1" 200 35
+"GET /api/notices/ HTTP/1.1" 200 474
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 828
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 474
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 828
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 474
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 828
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 474
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 828
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6001
+"GET /api/forum/questions/ HTTP/1.1" 200 290
+"POST /api/forum/questions/ HTTP/1.1" 201 301
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/forum/questions/ HTTP/1.1" 200 592
+"OPTIONS /api/forum/questions/7/comments/ HTTP/1.1" 200 0
+"POST /api/forum/questions/7/comments/ HTTP/1.1" 201 144
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/forum/questions/ HTTP/1.1" 200 736
+"GET /api/forum/questions/ HTTP/1.1" 200 736
+"GET /api/forum/questions/ HTTP/1.1" 200 736
+"GET /api/forum/questions/ HTTP/1.1" 200 736
+"GET /api/forum/questions/ HTTP/1.1" 200 736
+"GET /api/forum/questions/ HTTP/1.1" 200 736
+"POST /api/forum/questions/ HTTP/1.1" 201 304
+"GET /api/forum/questions/ HTTP/1.1" 200 1041
+"GET /api/forum/questions/ HTTP/1.1" 200 1041
+"GET /api/forum/questions/ HTTP/1.1" 200 1041
+"GET /api/forum/questions/ HTTP/1.1" 200 1041
+"POST /api/forum/questions/ HTTP/1.1" 201 277
+"OPTIONS /api/forum/questions/9/comments/ HTTP/1.1" 200 0
+"POST /api/forum/questions/9/comments/ HTTP/1.1" 201 156
+"GET /api/forum/questions/ HTTP/1.1" 200 1475
+"GET /api/forum/questions/ HTTP/1.1" 200 1475
+"GET /api/forum/questions/ HTTP/1.1" 200 1475
+"GET /api/forum/questions/ HTTP/1.1" 200 1475
+"POST /api/forum/questions/9/comments/ HTTP/1.1" 201 156
+"OPTIONS /api/forum/comments/3/ HTTP/1.1" 200 0
+"DELETE /api/forum/comments/3/ HTTP/1.1" 204 0
+"GET /api/forum/questions/ HTTP/1.1" 200 1475
+"OPTIONS /api/forum/questions/6/toggle-sticky/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/6/toggle-sticky/ HTTP/1.1" 200 18
+"PATCH /api/forum/questions/6/toggle-sticky/ HTTP/1.1" 200 19
+"PATCH /api/forum/questions/6/toggle-sticky/ HTTP/1.1" 200 18
+"GET /api/forum/questions/ HTTP/1.1" 200 1474
+"PATCH /api/forum/questions/6/toggle-sticky/ HTTP/1.1" 200 19
+"GET /api/forum/questions/ HTTP/1.1" 200 1475
+"OPTIONS /api/forum/questions/9/ HTTP/1.1" 200 0
+"DELETE /api/forum/questions/9/ HTTP/1.1" 204 0
+"OPTIONS /api/forum/questions/8/ HTTP/1.1" 200 0
+"DELETE /api/forum/questions/8/ HTTP/1.1" 204 0
+"OPTIONS /api/forum/questions/6/ HTTP/1.1" 200 0
+"DELETE /api/forum/questions/6/ HTTP/1.1" 204 0
+"POST /api/forum/questions/ HTTP/1.1" 201 330
+"OPTIONS /api/forum/questions/7/toggle-sticky/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/7/toggle-sticky/ HTTP/1.1" 200 18
+"GET /api/forum/questions/ HTTP/1.1" 200 777
+"POST /api/forum/questions/ HTTP/1.1" 201 281
+"OPTIONS /api/forum/questions/11/toggle-like/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/11/toggle-like/ HTTP/1.1" 200 30
+"PATCH /api/forum/questions/11/toggle-like/ HTTP/1.1" 200 31
+"PATCH /api/forum/questions/11/toggle-like/ HTTP/1.1" 200 30
+"GET /api/forum/questions/ HTTP/1.1" 200 1058
+"OPTIONS /api/forum/questions/7/toggle-like/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/7/toggle-like/ HTTP/1.1" 200 30
+"GET /api/forum/questions/ HTTP/1.1" 200 1057
+"PATCH /api/forum/questions/7/toggle-like/ HTTP/1.1" 200 31
+"GET /api/forum/questions/ HTTP/1.1" 200 1058
+"GET /api/forum/questions/ HTTP/1.1" 200 1059
+"GET /api/forum/questions/ HTTP/1.1" 200 1059
+"GET /api/forum/questions/ HTTP/1.1" 200 1058
+"GET /api/forum/questions/ HTTP/1.1" 200 1058
+"OPTIONS /api/forum/questions/10/toggle-sticky/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/10/toggle-sticky/ HTTP/1.1" 200 18
+"PATCH /api/forum/questions/7/toggle-sticky/ HTTP/1.1" 200 19
+"PATCH /api/forum/questions/10/toggle-sticky/ HTTP/1.1" 200 19
+"OPTIONS /api/forum/questions/11/toggle-sticky/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/11/toggle-sticky/ HTTP/1.1" 200 18
+"PATCH /api/forum/questions/11/toggle-like/ HTTP/1.1" 200 31
+"GET /api/forum/questions/ HTTP/1.1" 200 1059
+"GET /api/forum/questions/ HTTP/1.1" 200 1059
+"GET /api/forum/questions/ HTTP/1.1" 200 1059
+"GET /api/forum/questions/ HTTP/1.1" 200 1059
+"PATCH /api/forum/questions/11/toggle-like/ HTTP/1.1" 200 30
+"PATCH /api/forum/questions/11/toggle-like/ HTTP/1.1" 200 31
+"GET /api/forum/questions/ HTTP/1.1" 200 1059
+"PATCH /api/forum/questions/7/toggle-like/ HTTP/1.1" 200 30
+"GET /api/forum/questions/ HTTP/1.1" 200 1059
+"OPTIONS /api/forum/questions/7/toggle-like/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/7/toggle-like/ HTTP/1.1" 200 30
+"GET /api/forum/questions/ HTTP/1.1" 200 1058
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/forum/questions/11/toggle-like/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/11/toggle-like/ HTTP/1.1" 200 30
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/forum/questions/ HTTP/1.1" 200 1057
+"GET /api/forum/questions/ HTTP/1.1" 200 1058
+"PATCH /api/forum/questions/7/toggle-sticky/ HTTP/1.1" 200 18
+"GET /api/forum/questions/ HTTP/1.1" 200 1057
+"PATCH /api/forum/questions/11/toggle-sticky/ HTTP/1.1" 200 19
+"OPTIONS /api/forum/questions/11/ HTTP/1.1" 200 0
+"DELETE /api/forum/questions/11/ HTTP/1.1" 204 0
+"PATCH /api/forum/questions/7/toggle-sticky/ HTTP/1.1" 200 19
+"GET /api/notices/ HTTP/1.1" 200 476
+"GET /materials/ HTTP/1.1" 200 828
+"GET /api/forum/questions/ HTTP/1.1" 200 777
+"GET /materials/ HTTP/1.1" 200 828
+文件保存成功 - 文件名: videotest.mp4, 大小: 513589字节
+"POST /materials/ HTTP/1.1" 201 327
+"GET /materials/ HTTP/1.1" 200 1156
+"GET /api/notices/ HTTP/1.1" 200 476
+"GET /materials/ HTTP/1.1" 200 1156
+"GET /api/notices/ HTTP/1.1" 200 476
+"GET /api/students/ HTTP/1.1" 200 200
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6001
+"GET /api/notices/ HTTP/1.1" 200 476
+"GET /api/students/ HTTP/1.1" 200 200
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6001
+"POST /api/experiments/experiments/ HTTP/1.1" 201 555
+"OPTIONS /api/experiments/experiments/13/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/13/ HTTP/1.1" 200 555
+"POST /api/notices/ HTTP/1.1" 201 463
+"OPTIONS /api/experiments/choice-problems/ HTTP/1.1" 200 0
+"POST /api/experiments/choice-problems/ HTTP/1.1" 201 118
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/forum/questions/ HTTP/1.1" 200 777
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 938
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/3/mark_as_read/ HTTP/1.1" 200 0
+"POST /api/notices/3/mark_as_read/ HTTP/1.1" 200 35
+"GET /api/notices/ HTTP/1.1" 200 937
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 1156
+"GET /materials/ HTTP/1.1" 200 1156
+"OPTIONS /materials/3/ HTTP/1.1" 200 0
+"DELETE /materials/3/ HTTP/1.1" 204 0
+"GET /materials/ HTTP/1.1" 200 828
+"OPTIONS /materials/2/ HTTP/1.1" 200 0
+"DELETE /materials/2/ HTTP/1.1" 204 0
+"GET /materials/ HTTP/1.1" 200 332
+"DELETE /materials/1/ HTTP/1.1" 204 0
+"GET /materials/ HTTP/1.1" 200 2
+D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\materials\views.py changed, reloading.
+Watching for file changes with StatReloader
+"OPTIONS /materials/ HTTP/1.1" 200 0
+Unauthorized: /materials/
+"GET /materials/ HTTP/1.1" 401 172
+"GET /materials/ HTTP/1.1" 200 2
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+"GET /materials/ HTTP/1.1" 200 2
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/students/ HTTP/1.1" 200 0
+Forbidden: /api/students/
+"GET /api/students/ HTTP/1.1" 403 63
+"OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /materials/ HTTP/1.1" 200 2
+Forbidden: /materials/
+"POST /materials/ HTTP/1.1" 403 63
+Forbidden: /materials/
+"POST /materials/ HTTP/1.1" 403 63
+D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\materials\views.py changed, reloading.
+Watching for file changes with StatReloader
+文件保存成功 - 文件名: 23371488-陈利雅-Lab0实验报告.pdf, 大小: 141943字节
+"POST /materials/ HTTP/1.1" 201 485
+"GET /materials/ HTTP/1.1" 200 487
+文件保存成功 - 文件名: videotest.mp4, 大小: 513589字节
+"POST /materials/ HTTP/1.1" 201 329
+"GET /materials/ HTTP/1.1" 200 817
+"GET /materials/ HTTP/1.1" 200 817
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\materials\views.py changed, reloading.
+Watching for file changes with StatReloader
+D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\materials\serializers.py changed, reloading.
+Watching for file changes with StatReloader
+"OPTIONS /materials/ HTTP/1.1" 200 0
+"OPTIONS /materials/ HTTP/1.1" 200 0
+Unauthorized: /materials/
+"GET /materials/ HTTP/1.1" 401 172
+Unauthorized: /materials/
+"GET /materials/ HTTP/1.1" 401 172
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+"POST /api/auth/login/ HTTP/1.1" 200 959
+"POST /api/auth/login/ HTTP/1.1" 200 959
+"GET /materials/ HTTP/1.1" 200 2
+"POST /api/auth/login/ HTTP/1.1" 200 839
+"POST /api/auth/login/ HTTP/1.1" 200 839
+"OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 817
+"GET /materials/ HTTP/1.1" 200 817
+Unauthorized: /
+"GET / HTTP/1.1" 401 9822
+Unauthorized: /
+"GET / HTTP/1.1" 401 9822
+Unauthorized: /
+"GET / HTTP/1.1" 401 9822
+Unauthorized: /api/experiments/
+"GET /api/experiments/ HTTP/1.1" 401 9995
+Not Found: /api/
+"GET /api/ HTTP/1.1" 404 6528
+Not Found: /api/materials
+"GET /api/materials HTTP/1.1" 404 6555
+Not Found: /api/materials/
+"GET /api/materials/ HTTP/1.1" 404 6558
+Not Found: /materials/2025/06/08/videotest.mp4
+"GET /materials/2025/06/08/videotest.mp4 HTTP/1.1" 404 6516
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 817
+"GET /materials/ HTTP/1.1" 200 817
+Not Found: /materials/2025/06/08/videotest.mp4
+"GET /materials/2025/06/08/videotest.mp4 HTTP/1.1" 404 6516
+Not Found: /materials/2025/06/08/videotest.mp4
+"GET /materials/2025/06/08/videotest.mp4 HTTP/1.1" 404 6516
+Not Found: /materials/2025/06/08/videotest.mp4
+"GET /materials/2025/06/08/videotest.mp4 HTTP/1.1" 404 6516
+"GET /materials/ HTTP/1.1" 200 817
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 200 513589
+"GET /media/materials/2025/06/08/23371488-%E9%99%88%E5%88%A9%E9%9B%85-Lab0%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A.pdf HTTP/1.1" 200 141943
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 6447
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 200 513589
+"GET /materials/ HTTP/1.1" 200 817
+"GET /materials/ HTTP/1.1" 200 817
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 304 0
+"GET /materials/ HTTP/1.1" 200 817
+Not Found: /api/materials/4/download/
+"GET /api/materials/4/download/ HTTP/1.1" 404 6591
+Not Found: /api/materials/4/download/
+"GET /api/materials/4/download/ HTTP/1.1" 404 6591
+Not Found: /api/materials/4/download/
+"GET /api/materials/4/download/ HTTP/1.1" 404 6591
+D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\materials\views.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /materials/ HTTP/1.1" 200 817
+"GET /materials/ HTTP/1.1" 200 817
+"GET /materials/ HTTP/1.1" 200 817
+"GET /materials/ HTTP/1.1" 200 817
+Not Found: /media/materials/2025/06/08/videotest.mp4
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 404 6809
+"GET /materials/ HTTP/1.1" 200 817
+Not Found: /media/materials/2025/06/08/videotest.mp4
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 404 6809
+"OPTIONS /materials/5/ HTTP/1.1" 200 0
+"DELETE /materials/5/ HTTP/1.1" 204 0
+"GET /materials/ HTTP/1.1" 200 487
+"OPTIONS /materials/4/ HTTP/1.1" 200 0
+"DELETE /materials/4/ HTTP/1.1" 204 0
+"GET /materials/ HTTP/1.1" 200 2
+"GET /materials/ HTTP/1.1" 200 2
+文件保存成功 - 文件名: 北航2025年春季“形势与政策（4）”课程作业模板.pdf, 大小: 382579字节
+"POST /materials/ HTTP/1.1" 201 669
+"GET /materials/ HTTP/1.1" 200 671
+文件保存成功 - 文件名: videotest.mp4, 大小: 513589字节
+"POST /materials/ HTTP/1.1" 201 340
+"GET /materials/ HTTP/1.1" 200 1012
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 200 513589
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 200 513589
+"GET /media/materials/2025/06/08/%E5%8C%97%E8%88%AA2025%E5%B9%B4%E6%98%A5%E5%AD%A3%E5%BD%A2%E5%8A%BF%E4%B8%8E%E6%94%BF%E7%AD%964%E8%AF%BE%E7%A8%8B%E4%BD%9C%E4%B8%9A%E6%A8%A1%E6%9D%BF.pdf HTTP/1.1" 200 382579
+"GET /media/materials/2025/06/08/%E5%8C%97%E8%88%AA2025%E5%B9%B4%E6%98%A5%E5%AD%A3%E5%BD%A2%E5%8A%BF%E4%B8%8E%E6%94%BF%E7%AD%964%E8%AF%BE%E7%A8%8B%E4%BD%9C%E4%B8%9A%E6%A8%A1%E6%9D%BF.pdf HTTP/1.1" 200 382579
+"OPTIONS /materials/?type=pdf HTTP/1.1" 200 0
+"GET /materials/?type=pdf HTTP/1.1" 200 1012
+"OPTIONS /materials/?type=video HTTP/1.1" 200 0
+"GET /materials/?type=video HTTP/1.1" 200 1012
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 200 513589
+文件保存成功 - 文件名: 屏幕截图 2025-06-08 043339.png, 大小: 104043字节
+"POST /materials/ HTTP/1.1" 201 441
+"GET /materials/?type=video HTTP/1.1" 200 1454
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 304 0
+"GET /materials/ HTTP/1.1" 200 1454
+"GET /media/materials/2025/06/08/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-06-08_043339.png HTTP/1.1" 200 104043
+"GET /media/materials/2025/06/08/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-06-08_043339.png HTTP/1.1" 200 104043
+文件保存成功 - 文件名: 23371488-陈利雅-2025春军事理论大作业-虚拟仿真.docx, 大小: 1444821字节
+"POST /materials/ HTTP/1.1" 201 672
+"GET /materials/ HTTP/1.1" 200 2127
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 304 0
+"OPTIONS /materials/9/ HTTP/1.1" 200 0
+"DELETE /materials/9/ HTTP/1.1" 204 0
+"GET /materials/ HTTP/1.1" 200 1454
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 304 0
+Not Found: /materials/2025/06/08/videotest.mp4
+"GET /materials/2025/06/08/videotest.mp4 HTTP/1.1" 404 6516
+"GET /materials/ HTTP/1.1" 200 1454
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /media/materials/2025/06/08/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-06-08_043339.png HTTP/1.1" 304 0
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+Internal Server Error: /experiment/13/
+Traceback (most recent call last):
+  File "D:\Anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\views.py", line 121, in get
+    "choice": [{"id": q.id, "title": q.title, "options": q.options} for q in choice_problems],
+                                     ^^^^^^^
+AttributeError: 'ChoiceProblem' object has no attribute 'title'
+"GET /experiment/13/ HTTP/1.1" 500 99946
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+"GET /api/forum/questions/ HTTP/1.1" 200 777
+Not Found: /upload
+"POST /upload HTTP/1.1" 404 6433
+"OPTIONS /api/notices/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 937
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 1454
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 304 0
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/forum/questions/ HTTP/1.1" 200 777
+"GET /api/forum/questions/ HTTP/1.1" 200 777
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 937
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 1454
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/forum/questions/ HTTP/1.1" 200 777
+"OPTIONS /api/auth/user/profile/ HTTP/1.1" 200 0
+"PATCH /api/auth/user/profile/ HTTP/1.1" 200 121
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 1454
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /media/materials/2025/06/08/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-06-08_043339.png HTTP/1.1" 304 0
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 304 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 1454
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 1454
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /media/materials/2025/06/08/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE_2025-06-08_043339.png HTTP/1.1" 304 0
+"GET /media/materials/2025/06/08/videotest.mp4 HTTP/1.1" 304 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 1454
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+Watching for file changes with StatReloader
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+"OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+"POST /api/auth/register/ HTTP/1.1" 201 47
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"POST /api/auth/login/ HTTP/1.1" 200 868
+"OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 940
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"OPTIONS /api/experiments/experiments/12/problems/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"GET /api/experiments/experiments/12/coding/98/ HTTP/1.1" 200 266
+"OPTIONS /api/experiments/judge/ HTTP/1.1" 200 0
+Internal Server Error: /api/experiments/judge/
+Traceback (most recent call last):
+  File "D:\Anaconda3\Lib\site-packages\docker\api\client.py", line 223, in _retrieve_server_version
+    return self.version(api_version=False)["ApiVersion"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\api\daemon.py", line 181, in version
+    return self._result(self._get(url), json=True)
+                        ^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\utils\decorators.py", line 44, in inner
+    return f(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\api\client.py", line 246, in _get
+    return self.get(url, **self._set_request_timeout(kwargs))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\requests\sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\requests\adapters.py", line 667, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\urllib3\connectionpool.py", line 493, in _make_request
+    conn.request(
+  File "D:\Anaconda3\Lib\site-packages\urllib3\connection.py", line 445, in request
+    self.endheaders()
+  File "D:\Anaconda3\Lib\http\client.py", line 1331, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "D:\Anaconda3\Lib\http\client.py", line 1091, in _send_output
+    self.send(msg)
+  File "D:\Anaconda3\Lib\http\client.py", line 1035, in send
+    self.connect()
+  File "D:\Anaconda3\Lib\site-packages\docker\transport\npipeconn.py", line 25, in connect
+    sock.connect(self.npipe_path)
+  File "D:\Anaconda3\Lib\site-packages\docker\transport\npipesocket.py", line 25, in wrapped
+    return f(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\transport\npipesocket.py", line 76, in connect
+    raise e
+  File "D:\Anaconda3\Lib\site-packages\docker\transport\npipesocket.py", line 54, in connect
+    handle = win32file.CreateFile(
+             ^^^^^^^^^^^^^^^^^^^^^
+pywintypes.error: (2, 'CreateFile', '系统找不到指定的文件。')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\views.py", line 111, in post
+    judge = DockerJudge()
+            ^^^^^^^^^^^^^
+  File "D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\docker_execute.py", line 11, in __init__
+    self.client = docker.from_env()
+                  ^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\client.py", line 94, in from_env
+    return cls(
+           ^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\client.py", line 45, in __init__
+    self.api = APIClient(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\api\client.py", line 207, in __init__
+    self._version = self._retrieve_server_version()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\api\client.py", line 230, in _retrieve_server_version
+    raise DockerException(
+docker.errors.DockerException: Error while fetching server API version: (2, 'CreateFile', '系统找不到指定的文件。')
+"POST /api/experiments/judge/ HTTP/1.1" 500 208869
+"OPTIONS /materials/ HTTP/1.1" 200 0
+"OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+Unauthorized: /materials/
+Unauthorized: /api/notices/unread_count/
+"GET /api/notices/unread_count/ HTTP/1.1" 401 172
+"GET /materials/ HTTP/1.1" 401 172
+Internal Server Error: /api/experiments/judge/
+Traceback (most recent call last):
+  File "D:\Anaconda3\Lib\site-packages\docker\api\client.py", line 275, in _raise_for_status
+    response.raise_for_status()
+  File "D:\Anaconda3\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: http+docker://localnpipe/v1.48/containers/create
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\views.py", line 116, in post
+    result = judge.run_code(problem_config, code)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\docker_execute.py", line 31, in run_code
+    result = self._run_container(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\docker_execute.py", line 59, in _run_container
+    container = self.client.containers.run(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\models\containers.py", line 876, in run
+    container = self.create(image=image, command=command,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\models\containers.py", line 935, in create
+    resp = self.client.api.create_container(**create_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\api\container.py", line 440, in create_container
+    return self.create_container_from_config(config, name, platform)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\api\container.py", line 457, in create_container_from_config
+    return self._result(res, True)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\api\client.py", line 281, in _result
+    self._raise_for_status(response)
+  File "D:\Anaconda3\Lib\site-packages\docker\api\client.py", line 277, in _raise_for_status
+    raise create_api_error_from_http_exception(e) from e
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\errors.py", line 39, in create_api_error_from_http_exception
+    raise cls(e, response=response, explanation=explanation) from e
+docker.errors.APIError: 400 Client Error for http+docker://localnpipe/v1.48/containers/create: Bad Request ("Minimum memory limit allowed is 6MB")
+"POST /api/experiments/judge/ HTTP/1.1" 500 159813
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"OPTIONS /api/experiments/experiments/13/problems/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/13/problems/ HTTP/1.1" 200 409
+"OPTIONS /submit/experiment/ HTTP/1.1" 200 0
+"POST /submit/experiment/ HTTP/1.1" 200 168
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6674
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6674
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6674
+"OPTIONS /api/experiments/experiments/8/problems/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/8/problems/ HTTP/1.1" 200 722
+"POST /submit/experiment/ HTTP/1.1" 200 271
+"POST /submit/experiment/ HTTP/1.1" 200 271
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6673
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6673
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"GET /api/experiments/experiments/12/coding/98/ HTTP/1.1" 200 266
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+"POST /api/auth/login/ HTTP/1.1" 200 959
+"POST /api/auth/login/ HTTP/1.1" 200 959
+"OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+"OPTIONS /api/experiments/submissions/ HTTP/1.1" 200 0
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1701
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/2/ HTTP/1.1" 200 646
+"OPTIONS /api/experiments/submissions/2/review_answers/ HTTP/1.1" 200 0
+"PATCH /api/experiments/submissions/2/review_answers/ HTTP/1.1" 200 44
+"GET /api/experiments/submissions/2/ HTTP/1.1" 200 645
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1700
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/2/ HTTP/1.1" 200 645
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1700
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/2/ HTTP/1.1" 200 645
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1700
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/1/ HTTP/1.1" 200 405
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1700
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/3/ HTTP/1.1" 200 646
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1700
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/1/ HTTP/1.1" 200 405
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1700
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+"POST /api/auth/login/ HTTP/1.1" 200 941
+"POST /api/auth/login/ HTTP/1.1" 200 941
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"OPTIONS /api/experiments/experiments/7/problems/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/7/problems/ HTTP/1.1" 200 2222
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"OPTIONS /api/experiments/experiments/13/problems/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/13/problems/ HTTP/1.1" 200 409
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"OPTIONS /api/experiments/experiments/12/problems/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"OPTIONS /api/experiments/experiments/8/problems/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/8/problems/ HTTP/1.1" 200 722
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"OPTIONS /api/students/ HTTP/1.1" 200 0
+"GET /api/students/ HTTP/1.1" 200 269
+"OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"OPTIONS /api/experiments/experiments/12/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/12/ HTTP/1.1" 200 1219
+"PUT /api/experiments/experiments/12/ HTTP/1.1" 200 1219
+"OPTIONS /api/experiments/fill-problems/43/ HTTP/1.1" 200 0
+"OPTIONS /api/experiments/choice-problems/21/ HTTP/1.1" 200 0
+"OPTIONS /api/experiments/coding-problems/98/ HTTP/1.1" 200 0
+"PUT /api/experiments/fill-problems/43/ HTTP/1.1" 200 122
+"PUT /api/experiments/choice-problems/21/ HTTP/1.1" 200 229
+"PUT /api/experiments/coding-problems/98/ HTTP/1.1" 200 219
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1700
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6673
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"POST /submit/experiment/ HTTP/1.1" 200 259
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 2362
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"GET /api/experiments/experiments/12/coding/98/ HTTP/1.1" 200 266
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6672
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"GET /api/experiments/experiments/12/coding/98/ HTTP/1.1" 200 266
+"OPTIONS /api/notices/ HTTP/1.1" 200 0
+"GET /api/notices/ HTTP/1.1" 200 940
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 940
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/1/mark_as_read/ HTTP/1.1" 200 0
+"POST /api/notices/1/mark_as_read/ HTTP/1.1" 200 35
+"GET /api/notices/ HTTP/1.1" 200 939
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/3/ HTTP/1.1" 200 0
+"PUT /api/notices/3/ HTTP/1.1" 200 477
+"GET /api/notices/ HTTP/1.1" 200 954
+"GET /api/experiments/experiments/12/coding/98/ HTTP/1.1" 200 266
+"GET /api/experiments/experiments/12/coding/98/ HTTP/1.1" 200 266
+"GET /api/notices/ HTTP/1.1" 200 954
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 953
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 2362
+"GET /api/experiments/submissions/1/ HTTP/1.1" 200 405
+"GET /api/experiments/submissions/1/ HTTP/1.1" 200 405
+"GET /api/experiments/experiments/12/coding/98/ HTTP/1.1" 200 266
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 953
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 2362
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 2362
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"GET /api/experiments/experiments/12/coding/98/ HTTP/1.1" 200 266
+"OPTIONS /api/experiments/judge/ HTTP/1.1" 200 0
+Internal Server Error: /api/experiments/judge/
+Traceback (most recent call last):
+  File "D:\Anaconda3\Lib\site-packages\docker\api\client.py", line 275, in _raise_for_status
+    response.raise_for_status()
+  File "D:\Anaconda3\Lib\site-packages\requests\models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: http+docker://localnpipe/v1.48/containers/create
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Anaconda3\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\Anaconda3\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\views.py", line 116, in post
+    result = judge.run_code(problem_config, code)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\docker_execute.py", line 31, in run_code
+    result = self._run_container(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\docker_execute.py", line 59, in _run_container
+    container = self.client.containers.run(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\models\containers.py", line 876, in run
+    container = self.create(image=image, command=command,
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\models\containers.py", line 935, in create
+    resp = self.client.api.create_container(**create_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\api\container.py", line 440, in create_container
+    return self.create_container_from_config(config, name, platform)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\api\container.py", line 457, in create_container_from_config
+    return self._result(res, True)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\api\client.py", line 281, in _result
+    self._raise_for_status(response)
+  File "D:\Anaconda3\Lib\site-packages\docker\api\client.py", line 277, in _raise_for_status
+    raise create_api_error_from_http_exception(e) from e
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Anaconda3\Lib\site-packages\docker\errors.py", line 39, in create_api_error_from_http_exception
+    raise cls(e, response=response, explanation=explanation) from e
+docker.errors.APIError: 400 Client Error for http+docker://localnpipe/v1.48/containers/create: Bad Request ("Minimum memory limit allowed is 6MB")
+"POST /api/experiments/judge/ HTTP/1.1" 500 157100
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"OPTIONS /submit/experiment/ HTTP/1.1" 200 0
+"POST /submit/experiment/ HTTP/1.1" 200 168
+"GET /api/experiments/experiments/12/coding/98/ HTTP/1.1" 200 266
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 2790
+"GET /api/experiments/submissions/5/ HTTP/1.1" 200 427
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 2790
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6674
+"GET /api/experiments/experiments/13/problems/ HTTP/1.1" 200 409
+"POST /submit/experiment/ HTTP/1.1" 200 168
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 3196
+D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\views.py changed, reloading.
+Watching for file changes with StatReloader
+D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\serializers.py changed, reloading.
+Watching for file changes with StatReloader
+D:\DjangoProject\lab-platform(latest)\lab-platform\backend-master\server\experiments\serializers.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /api/experiments/submissions/1/ HTTP/1.1" 200 405
+"GET /api/students/ HTTP/1.1" 200 269
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6672
+"GET /api/experiments/experiments/12/problems/ HTTP/1.1" 200 1029
+"POST /submit/experiment/ HTTP/1.1" 200 302
+"POST /submit/experiment/ HTTP/1.1" 200 311
+"POST /submit/experiment/ HTTP/1.1" 200 306
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 953
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/students/ HTTP/1.1" 200 269
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/notices/ HTTP/1.1" 200 953
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 5189
+"GET /api/experiments/submissions/9/ HTTP/1.1" 200 663
+"OPTIONS /api/experiments/submissions/9/review_answers/ HTTP/1.1" 200 0
+"PATCH /api/experiments/submissions/9/review_answers/ HTTP/1.1" 200 44
+"GET /api/experiments/submissions/9/ HTTP/1.1" 200 662
+"GET /api/experiments/submissions/9/ HTTP/1.1" 200 662
+"GET /api/experiments/experiments/ HTTP/1.1" 200 6675
+"GET /api/experiments/submissions/ HTTP/1.1" 200 5188
+"GET /api/experiments/submissions/9/ HTTP/1.1" 200 662
+"GET /api/experiments/submissions/ HTTP/1.1" 200 5188
+Watching for file changes with StatReloader
+"OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+"POST /api/auth/register/ HTTP/1.1" 201 47
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+"POST /api/auth/login/ HTTP/1.1" 200 835
+"POST /api/auth/login/ HTTP/1.1" 200 835
+"OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/auth/user/profile/ HTTP/1.1" 200 0
+"PATCH /api/auth/user/profile/ HTTP/1.1" 200 120
+"OPTIONS /api/notices/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 2
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /materials/ HTTP/1.1" 200 0
+"GET /materials/ HTTP/1.1" 200 2
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2
+"GET /api/experiments/submissions/ HTTP/1.1" 200 2
+"OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/notices/ HTTP/1.1" 200 2
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"POST /api/auth/register/ HTTP/1.1" 201 47
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+"POST /api/auth/login/ HTTP/1.1" 200 926
+"POST /api/auth/login/ HTTP/1.1" 200 926
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+"POST /api/auth/login/ HTTP/1.1" 200 828
+"POST /api/auth/login/ HTTP/1.1" 200 828
+"POST /api/auth/login/ HTTP/1.1" 200 828
+"POST /api/auth/login/ HTTP/1.1" 200 828
+"OPTIONS /api/auth/user/profile/ HTTP/1.1" 200 0
+"PATCH /api/auth/user/profile/ HTTP/1.1" 200 118
+"OPTIONS /api/notices/ HTTP/1.1" 200 0
+"GET /api/notices/ HTTP/1.1" 200 2
+"OPTIONS /materials/ HTTP/1.1" 200 0
+"GET /materials/ HTTP/1.1" 200 2
+"OPTIONS /api/students/ HTTP/1.1" 200 0
+"GET /api/students/ HTTP/1.1" 200 61
+"OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2
+"OPTIONS /api/experiments/submissions/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2
+"GET /api/experiments/submissions/ HTTP/1.1" 200 2
+"OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/notices/ HTTP/1.1" 200 2
+"POST /api/notices/ HTTP/1.1" 201 1116
+"GET /api/notices/ HTTP/1.1" 200 1118
+"GET /materials/ HTTP/1.1" 200 2
+"GET /api/notices/ HTTP/1.1" 200 1118
+"OPTIONS /api/notices/1/ HTTP/1.1" 200 0
+"DELETE /api/notices/1/ HTTP/1.1" 204 0
+"GET /api/notices/ HTTP/1.1" 200 2
+"GET /api/students/ HTTP/1.1" 200 61
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2
+"GET /api/experiments/submissions/ HTTP/1.1" 200 2
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+"POST /api/auth/register/ HTTP/1.1" 201 47
+"POST /api/auth/register/ HTTP/1.1" 201 47
+"POST /api/auth/register/ HTTP/1.1" 201 47
+"OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+"POST /api/auth/register/ HTTP/1.1" 201 47
+"POST /api/auth/register/ HTTP/1.1" 201 47
+"POST /api/auth/register/ HTTP/1.1" 201 47
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+"POST /api/auth/login/ HTTP/1.1" 200 830
+"POST /api/auth/login/ HTTP/1.1" 200 830
+"OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/auth/user/profile/ HTTP/1.1" 200 0
+"PATCH /api/auth/user/profile/ HTTP/1.1" 200 118
+"POST /api/auth/login/ HTTP/1.1" 200 830
+"POST /api/auth/login/ HTTP/1.1" 200 830
+"PATCH /api/auth/user/profile/ HTTP/1.1" 200 118
+"PATCH /api/auth/user/profile/ HTTP/1.1" 200 118
+"OPTIONS /api/notices/ HTTP/1.1" 200 0
+"GET /api/notices/ HTTP/1.1" 200 2
+"POST /api/notices/ HTTP/1.1" 201 1119
+"GET /api/notices/ HTTP/1.1" 200 1121
+"OPTIONS /materials/ HTTP/1.1" 200 0
+"GET /materials/ HTTP/1.1" 200 2
+Bad Request: /materials/
+"POST /materials/ HTTP/1.1" 400 48
+文件保存成功 - 文件名: 学期课表_2.pdf, 大小: 58107字节
+"POST /materials/ HTTP/1.1" 201 401
+"GET /materials/ HTTP/1.1" 200 403
+"OPTIONS /materials/1/ HTTP/1.1" 200 0
+"DELETE /materials/1/ HTTP/1.1" 204 0
+"GET /materials/ HTTP/1.1" 200 2
+文件保存成功 - 文件名: 学期课表_2.pdf, 大小: 58107字节
+"POST /materials/ HTTP/1.1" 201 401
+"GET /materials/ HTTP/1.1" 200 403
+文件保存成功 - 文件名: 学习资料.mp4, 大小: 22463413字节
+"POST /materials/ HTTP/1.1" 201 400
+"GET /materials/ HTTP/1.1" 200 804
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 200 22463413
+"OPTIONS /api/students/ HTTP/1.1" 200 0
+"GET /api/students/ HTTP/1.1" 200 359
+"OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2
+"POST /api/experiments/experiments/ HTTP/1.1" 201 532
+"OPTIONS /api/experiments/experiments/1/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/1/ HTTP/1.1" 200 532
+"POST /api/notices/ HTTP/1.1" 201 432
+"OPTIONS /api/experiments/choice-problems/ HTTP/1.1" 200 0
+"OPTIONS /api/experiments/fill-problems/ HTTP/1.1" 200 0
+"OPTIONS /api/experiments/coding-problems/ HTTP/1.1" 200 0
+"POST /api/experiments/choice-problems/ HTTP/1.1" 201 192
+"POST /api/experiments/coding-problems/ HTTP/1.1" 201 221
+"POST /api/experiments/fill-problems/ HTTP/1.1" 201 103
+"GET /api/experiments/experiments/ HTTP/1.1" 200 1050
+"GET /api/notices/ HTTP/1.1" 200 1554
+"GET /materials/ HTTP/1.1" 200 804
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 304 0
+"GET /api/students/ HTTP/1.1" 200 359
+"GET /api/experiments/experiments/ HTTP/1.1" 200 1050
+"POST /api/experiments/experiments/ HTTP/1.1" 201 526
+"OPTIONS /api/experiments/experiments/2/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/2/ HTTP/1.1" 200 526
+"POST /api/notices/ HTTP/1.1" 201 432
+Bad Request: /api/experiments/choice-problems/
+"POST /api/experiments/choice-problems/ HTTP/1.1" 400 51
+"POST /api/experiments/fill-problems/ HTTP/1.1" 201 88
+"POST /api/experiments/coding-problems/ HTTP/1.1" 201 182
+"POST /api/experiments/experiments/ HTTP/1.1" 201 526
+"OPTIONS /api/experiments/experiments/3/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/3/ HTTP/1.1" 200 526
+"POST /api/notices/ HTTP/1.1" 201 432
+"POST /api/experiments/fill-problems/ HTTP/1.1" 201 88
+"POST /api/experiments/choice-problems/ HTTP/1.1" 201 163
+"POST /api/experiments/coding-problems/ HTTP/1.1" 201 182
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2807
+"GET /api/notices/ HTTP/1.1" 200 2420
+"OPTIONS /api/notices/5/ HTTP/1.1" 200 0
+"DELETE /api/notices/5/ HTTP/1.1" 204 0
+"GET /api/notices/ HTTP/1.1" 200 1987
+"GET /materials/ HTTP/1.1" 200 804
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 304 0
+"GET /api/students/ HTTP/1.1" 200 359
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2807
+"GET /api/experiments/experiments/2/ HTTP/1.1" 200 796
+"GET /api/experiments/experiments/3/ HTTP/1.1" 200 959
+"OPTIONS /api/experiments/experiments/2/ HTTP/1.1" 200 0
+"DELETE /api/experiments/experiments/2/ HTTP/1.1" 204 0
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2010
+"GET /api/experiments/experiments/3/ HTTP/1.1" 200 959
+"PUT /api/experiments/experiments/3/ HTTP/1.1" 200 961
+"OPTIONS /api/experiments/choice-problems/2/ HTTP/1.1" 200 0
+"OPTIONS /api/experiments/fill-problems/3/ HTTP/1.1" 200 0
+"OPTIONS /api/experiments/coding-problems/3/ HTTP/1.1" 200 0
+"PUT /api/experiments/fill-problems/3/ HTTP/1.1" 200 88
+"PUT /api/experiments/choice-problems/2/ HTTP/1.1" 200 163
+"PUT /api/experiments/coding-problems/3/ HTTP/1.1" 200 182
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2012
+"GET /api/experiments/experiments/3/ HTTP/1.1" 200 961
+"POST /api/experiments/experiments/ HTTP/1.1" 201 526
+"OPTIONS /api/experiments/experiments/4/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/4/ HTTP/1.1" 200 526
+"POST /api/notices/ HTTP/1.1" 201 426
+"POST /api/experiments/fill-problems/ HTTP/1.1" 201 88
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+"OPTIONS /api/experiments/submissions/ HTTP/1.1" 200 0
+"GET /api/experiments/submissions/ HTTP/1.1" 200 2
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+"OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"GET /api/forum/questions/ HTTP/1.1" 200 2
+"POST /api/forum/questions/ HTTP/1.1" 201 276
+"OPTIONS /api/forum/questions/1/toggle-like/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/1/toggle-like/ HTTP/1.1" 200 30
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+"POST /api/auth/login/ HTTP/1.1" 200 921
+"POST /api/auth/login/ HTTP/1.1" 200 921
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 2414
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/6/mark_as_read/ HTTP/1.1" 200 0
+"POST /api/notices/6/mark_as_read/ HTTP/1.1" 200 35
+"GET /api/notices/ HTTP/1.1" 200 2413
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/4/mark_as_read/ HTTP/1.1" 200 0
+"POST /api/notices/4/mark_as_read/ HTTP/1.1" 200 35
+"GET /api/notices/ HTTP/1.1" 200 2412
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/3/mark_as_read/ HTTP/1.1" 200 0
+"POST /api/notices/3/mark_as_read/ HTTP/1.1" 200 35
+"GET /api/notices/ HTTP/1.1" 200 2411
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/2/mark_as_read/ HTTP/1.1" 200 0
+"POST /api/notices/2/mark_as_read/ HTTP/1.1" 200 35
+"GET /api/notices/ HTTP/1.1" 200 2410
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /materials/ HTTP/1.1" 200 0
+"GET /materials/ HTTP/1.1" 200 804
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 200 22463413
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 200 22463413
+"GET /media/materials/2025/06/08/%E5%AD%A6%E6%9C%9F%E8%AF%BE%E8%A1%A8_2.pdf HTTP/1.1" 200 58107
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 6447
+"GET /media/materials/2025/06/08/%E5%AD%A6%E6%9C%9F%E8%AF%BE%E8%A1%A8_2.pdf HTTP/1.1" 200 58107
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+"OPTIONS /api/experiments/experiments/1/problems/ HTTP/1.1" 200 0
+"GET /api/experiments/experiments/1/problems/ HTTP/1.1" 200 717
+"GET /api/experiments/experiments/1/coding/1/ HTTP/1.1" 200 271
+"OPTIONS /api/experiments/judge/ HTTP/1.1" 200 0
+"POST /api/experiments/judge/ HTTP/1.1" 200 260
+"POST /api/experiments/judge/ HTTP/1.1" 200 260
+"GET /api/experiments/experiments/1/problems/ HTTP/1.1" 200 1111
+"OPTIONS /submit/experiment/ HTTP/1.1" 200 0
+"POST /submit/experiment/ HTTP/1.1" 200 363
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1267
+"OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+"GET /api/forum/questions/ HTTP/1.1" 200 278
+"OPTIONS /api/forum/questions/1/toggle-like/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/1/toggle-like/ HTTP/1.1" 200 30
+"OPTIONS /api/forum/questions/1/comments/ HTTP/1.1" 200 0
+"POST /api/forum/questions/1/comments/ HTTP/1.1" 201 142
+"GET /api/forum/questions/ HTTP/1.1" 200 419
+"GET /api/notices/ HTTP/1.1" 200 2414
+"GET /materials/ HTTP/1.1" 200 804
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 304 0
+"GET /api/students/ HTTP/1.1" 200 359
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1267
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+"GET /api/experiments/submissions/1/ HTTP/1.1" 200 1265
+"OPTIONS /api/experiments/submissions/1/review_answers/ HTTP/1.1" 200 0
+"PATCH /api/experiments/submissions/1/review_answers/ HTTP/1.1" 200 44
+"GET /api/experiments/submissions/1/ HTTP/1.1" 200 1266
+"GET /api/notices/ HTTP/1.1" 200 2414
+"GET /materials/ HTTP/1.1" 200 804
+"GET /api/students/ HTTP/1.1" 200 359
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1268
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+"GET /api/forum/questions/ HTTP/1.1" 200 419
+"GET /api/notices/ HTTP/1.1" 200 2414
+"OPTIONS /api/notices/6/ HTTP/1.1" 200 0
+"PUT /api/notices/6/ HTTP/1.1" 200 427
+"GET /api/notices/ HTTP/1.1" 200 2415
+"GET /materials/ HTTP/1.1" 200 804
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 304 0
+"OPTIONS /materials/3/ HTTP/1.1" 200 0
+"PUT /materials/3/ HTTP/1.1" 200 400
+"GET /materials/ HTTP/1.1" 200 804
+"GET /api/students/ HTTP/1.1" 200 359
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1268
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+"GET /api/forum/questions/ HTTP/1.1" 200 419
+"GET /api/forum/questions/ HTTP/1.1" 200 419
+Watching for file changes with StatReloader
+Bad Request: /api/auth/login/
+"POST /api/auth/login/ HTTP/1.1" 400 84
+"POST /api/auth/login/ HTTP/1.1" 200 921
+"POST /api/auth/login/ HTTP/1.1" 200 921
+"OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /materials/ HTTP/1.1" 200 804
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 200 22463413
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 200 22463413
+"GET /materials/ HTTP/1.1" 200 804
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 200 22463413
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 200 22463413
+"GET /materials/ HTTP/1.1" 200 804
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /media/materials/2025/06/08/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99.mp4 HTTP/1.1" 200 22463413
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2626
+"GET /api/experiments/experiments/1/problems/ HTTP/1.1" 200 1304
+"OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+"POST /api/auth/login/ HTTP/1.1" 200 921
+"POST /api/auth/login/ HTTP/1.1" 200 921
+"OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /api/notices/ HTTP/1.1" 200 0
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 2411
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"GET /api/notices/ HTTP/1.1" 200 2411
+"GET /api/notices/unread_count/ HTTP/1.1" 200 11
+"OPTIONS /materials/ HTTP/1.1" 200 0
+"GET /materials/ HTTP/1.1" 200 804
+"GET /api/experiments/experiments/ HTTP/1.1" 200 2626
+"GET /api/experiments/submissions/ HTTP/1.1" 200 1268
+"OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+"GET /api/forum/questions/ HTTP/1.1" 200 419
+"OPTIONS /api/forum/questions/1/toggle-like/ HTTP/1.1" 200 0
+"PATCH /api/forum/questions/1/toggle-like/ HTTP/1.1" 200 31
+"OPTIONS /api/forum/comments/1/ HTTP/1.1" 200 0
+"DELETE /api/forum/comments/1/ HTTP/1.1" 204 0
