@@ -66,7 +66,7 @@ jobs:
             # 2. 设置Python路径，确保能找到你的项目
             PYTHONPATH: ${{ github.workspace }}/backend
             # 3. 为测试配置一个简单的数据库（如SQLite）
-            DATABASE_URL: mysql://root:rootpassword@127.0.0.1:3306/test_db
+            DATABASE_URL: mysql://root:rootpassword@mysql:3306/test_db
             # 4. 设置调试模式关闭（Django的生产环境要求）
             DEBUG: False
 
