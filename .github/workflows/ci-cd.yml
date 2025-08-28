@@ -56,7 +56,7 @@ jobs:
       - name: Run frontend unit tests
         run: npm test
 
-  build-and-push-backend:
+    build-and-push-backend:
     runs-on: ubuntu-latest
     needs: [test-backend] # 只有后端测试通过了，才做这个工作
     steps:
