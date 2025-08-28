@@ -121,7 +121,7 @@ jobs:
         run: npm ci
 
       - name: Run frontend unit tests
-        run: npm test
+        run: npm run test:unit
 
   build-and-push-backend:
     runs-on: ubuntu-latest
