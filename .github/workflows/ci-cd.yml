@@ -9,6 +9,19 @@ on:
 jobs:
   test-backend:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
     defaults:
       run:
         working-directory: ./backend
@@ -53,9 +66,8 @@ jobs:
             # 2. 设置Python路径，确保能找到你的项目
             PYTHONPATH: ${{ github.workspace }}/backend
             # 3. 为测试配置一个简单的数据库（如SQLite）
-            DATABASE_URL: sqlite:///test.db
+            DATABASE_URL: mysql://root:rootpassword@127.0.0.1:3306/test_db
             # 4. 设置调试模式关闭（Django的生产环境要求）
-            TEST_DATABASE_URL: sqlite:///test.db
             DEBUG: False
 
   test-frontend:
