@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
           MYSQL_DATABASE: test_db
@@ -40,15 +40,30 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Create test database and user
+    #   - name: Create test database and user
+    #     run: |
+    #         sudo apt-get update && sudo apt-get install -y mysql-client
+    #         mysql -h"127.0.0.1" -u"root" -p"rootpassword" -e "
+    #         CREATE DATABASE IF NOT EXISTS test_db;
+    #         CREATE USER IF NOT EXISTS 'testuser'@'%' IDENTIFIED BY 'testpassword';
+    #         GRANT ALL PRIVILEGES ON test_db.* TO 'testuser'@'%';
+    #         FLUSH PRIVILEGES;
+    #         "
+
+        # 新增步骤：等待 MySQL 服务完全就绪
+      - name:  Waiting for MySQL to be ready
         run: |
             sudo apt-get update && sudo apt-get install -y mysql-client
-            mysql -h"127.0.0.1" -u"root" -p"rootpassword" -e "
-            CREATE DATABASE IF NOT EXISTS test_db;
-            CREATE USER IF NOT EXISTS 'testuser'@'%' IDENTIFIED BY 'testpassword';
-            GRANT ALL PRIVILEGES ON test_db.* TO 'testuser'@'%';
-            FLUSH PRIVILEGES;
-            "
+            for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+                echo "MySQL is ready!"
+                exit 0
+            fi
+            echo "Waiting for MySQL... (attempt $i/30)"
+            sleep 2
+            done
+            echo "MySQL failed to start in time."
+            exit 1
 
       - name: Run Django tests
         run: |
@@ -87,7 +102,7 @@ jobs:
             DB_NAME: test_db
             DB_USER: root
             DB_PASSWORD: rootpassword
-            DB_HOST: mysql  # 使用服务名称而不是IP地址
+            DB_HOST: 127.0.0.1 # 使用本地回环地址
             DB_PORT: 3306
             DEBUG: False
 
