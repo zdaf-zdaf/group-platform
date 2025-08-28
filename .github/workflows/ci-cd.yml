@@ -55,6 +55,7 @@ jobs:
             # 3. 为测试配置一个简单的数据库（如SQLite）
             DATABASE_URL: sqlite:///test.db
             # 4. 设置调试模式关闭（Django的生产环境要求）
+            TEST_DATABASE_URL: sqlite:///test.db
             DEBUG: False
 
   test-frontend:
