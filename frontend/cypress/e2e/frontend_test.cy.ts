@@ -277,4 +277,44 @@ print(a + b)
       cy.contains('总得分').should('be.visible')
 
   })
+  // ========================
+  // 教师查看学生提交记录与详情
+  // ========================
+  it('教师查看学生提交记录与详情', () => {
+    // 教师登录
+    cy.visit('http://localhost:5173/login')
+    cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
+    cy.get('input[placeholder="请输入密码"]').type(password)
+    cy.get('input[type="checkbox"]').check({ force: true })
+    cy.get('button').contains('立即登录').click()
+    cy.url().should('include', '/profile')
+
+    // 进入“实验管理”或“批改作业”页面（假设有入口按钮/菜单）
+    cy.contains('查看学生提交').click({ force: true })
+
+    // 等待提交卡片加载
+    cy.get('.submission-card', { timeout: 10000 }).should('exist')
+
+    // 检查至少有一条提交记录，且包含学生名、题组、提交时间等
+    cy.get('.submission-card').first().within(() => {
+      cy.contains('学生：').should('exist')
+      cy.contains('题组：').should('exist')
+      cy.contains('提交时间：').should('exist')
+    })
+
+    // 点击第一条提交，进入详情页
+    cy.get('.submission-card').first().click()
+
+    // 检查详情页内容
+    cy.url().should('include', 'submission-detail')
+    cy.get('.submission-detail').should('exist')
+    cy.get('.student-info').should('contain.text', '学生：')
+    cy.get('.student-info').should('contain.text', '提交时间：')
+    cy.get('.question-card').should('exist')
+    cy.get('.q-header').should('exist')
+    cy.get('.q-content').should('exist')
+
+    // 检查保存批改结果按钮
+    cy.contains('保存批改结果').should('exist')
+  })
 })
