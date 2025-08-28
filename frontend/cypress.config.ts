@@ -9,5 +9,4 @@ export default defineConfig({
   },
   video: true,                       // 开启录像
   videosFolder: "cypress/videos",    // 视频保存路径
-  videoUploadOnPasses: true,         // 保存所有测试的视频，不仅失败的
 });
