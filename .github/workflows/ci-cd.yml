@@ -104,7 +104,7 @@ jobs:
   # 【新增的Job】运行Postman API集成测试
   api-test-postman:
     # 取个好看的名字
-    name: 🚀 Run Postman API Tests
+    name:  Run Postman API Tests
     # 运行环境
     runs-on: ubuntu-latest
     # 【重要】设置依赖：必须等后端单元测试通过后才运行
@@ -112,21 +112,21 @@ jobs:
 
     steps:
       # 第一步：获取代码（必须）
-      - name: 📥 Checkout code
+      - name:  Checkout code
         uses: actions/checkout@v4
 
       # 第二步：安装Node.js（因为运行Postman的命令行工具需要）
-      - name: ⎔ Setup Node.js
+      - name:  Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       # 第三步：安装newman（这是Postman的命令行工具，用来运行测试）
-      - name: 📦 Install Newman
+      - name:  Install Newman
         run: npm install -g newman
 
       # 第四步：运行Postman测试！
-      - name: ✅ Run Postman Tests
+      - name:  Run Postman Tests
         run: |
           newman run postman/collection.json \
           --environment postman/environment.json \
@@ -139,13 +139,13 @@ jobs:
 
   # 【新增的Job】运行Cypress前端E2E测试
   gui-test-cypress:
-    name: 🖥️ Run Cypress GUI Tests
+    name:  Run Cypress GUI Tests
     runs-on: ubuntu-latest
     # 【重要】设置依赖：必须等前端单元测试和API测试都通过后才运行
     needs: [test-frontend, api-test-postman]
 
     steps:
-      - name: 📥 Checkout code
+      - name:  Checkout code
         uses: actions/checkout@v4
 
       - name: ⎔ Setup Node.js
@@ -156,12 +156,12 @@ jobs:
           cache-dependency-path: './frontend/package-lock.json'
 
       # 安装前端依赖（Cypress已经包含在里面了）
-      - name: 📦 Install Frontend Dependencies
+      - name:  Install Frontend Dependencies
         run: npm ci
         working-directory: ./frontend
 
       # 运行Cypress测试！
-      - name: ✅ Run Cypress Tests
+      - name:  Run Cypress Tests
         run: npx cypress run --headless # `--headless`表示无界面模式，必须在CI环境中使用
         working-directory: ./frontend
 
