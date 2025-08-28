@@ -1,0 +1,463 @@
+{
+  "info": {
+    "name": "灵狐平台API测试",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "认证模块",
+      "item": [
+        {
+          "name": "教师注册",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"test_teacher_{{timestamp}}\",\"password\":\"Teacher@123\",\"email\":\"teacher{{timestamp}}@example.com\",\"role\":\"teacher\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "学生注册",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"test_student_{{timestamp}}\",\"password\":\"Student@123\",\"email\":\"student{{timestamp}}@example.com\",\"role\":\"student\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "教师登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"test_teacher\",\"password\":\"Teacher@123\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "极速name": "学生登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"test_student\",\"password\":\"Student@123\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "用户管理",
+      "item": [
+        {
+          "name": "更新学生信息",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"student_id\":\"20230001\",\"faculty\":\"计算机学院\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/user/profile/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "user", "profile", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "教师获取学生列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/students/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "students", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "论坛功能",
+      "item": [
+        {
+          "name": "创建问题",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"测试问题标题\",\"content\":\"这是测试问题的内容\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/forum/questions/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "forum", "questions", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "获取问题列表",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/forum/questions/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "forum", "questions", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "添加评论",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"content\":\"这是一个测试评论\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/forum/questions/{{test_question_id}}/comments/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "forum", "questions", "{{test_question_id}}", "comments", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "切换点赞状态",
+          "request极速": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/questions/{{test_question_id}}/toggle-like/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "forum", "questions", "{{test_question_id}}", "toggle-like", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "删除评论",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/comments/{{test_comment_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "forum", "comments", "{{test_comment_id}}", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "删除问题",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forum/questions/{{test_question_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "forum", "questions", "{{test_question_id}}", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "学习资料",
+      "item": [
+        {
+          "name": "上传学习资料",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "测试资料",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "测试描述",
+                  "type": "text"
+                },
+                {
+                  "key": "type",
+                  "value": "pdf",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/test.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/materials/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "materials", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "获取学习资料列表",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/materials/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "materials", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "公告管理",
+      "item": [
+        {
+          "name": "创建公告",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacher_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"测试公告\",\"content\":\"这是测试公告内容\",\"type\":1}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/notices/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notices", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "获取公告列表",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/notices/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notices", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "标记公告已读",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{student_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notices/{{test_notice_id}}/mark_as_read/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notices", "{{test_notice_id}}", "mark_as_read", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// 设置时间戳变量",
+          "const timestamp = new Date().getTime();",
+          "pm.environment.set('timestamp', timestamp);"
+        ],
+        "type": "text/javascript"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "// 基本测试",
+          "pm.test('Status code is 200', function () {",
+          "    pm.response.to.have.status(200);",
+          "});",
+          "",
+          "pm.test('Response time is less than 500ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(500);",
+          "});",
+          "",
+          "pm.test('Response is valid JSON', function () {",
+          "    pm.response.to.be.json;",
+          "});",
+          "",
+          "// 保存token",
+          "if (pm.response.code === 200 && pm.request.url.path.includes('login')) {",
+          "    const responseData = pm.response.json();",
+          "    const token = responseData.access;",
+          "    ",
+          "    // 根据请求体判断是教师还是学生登录",
+          "    const requestBody = JSON.parse(pm.request.body.raw || '{}');",
+          "    ",
+          "    if (requestBody.role === 'teacher' || requestBody.username.includes('teacher')) {",
+          "        pm.environment.set('teacher_token', token);",
+          "        console.log('Teacher token set:', token);",
+          "    } else if (requestBody.role === 'student' || requestBody.username.includes('student')) {",
+          "        pm.environment.set('student_token', token);",
+          "        console.log('Student token set:', token);",
+          "    }",
+          "}",
+          "",
+          "// 保存创建的资源ID",
+          "if (pm.response.code === 201) {",
+          "    const responseData = pm.response.json();",
+          "    ",
+          "    if (pm.request.url.path.includes('questions')) {",
+          "        pm.environment.set('test_question_id', responseData.id);",
+          "        console.log('Question ID set:', responseData.id);",
+          "    } else if (pm.request.url.path.includes('comments')) {",
+          "        pm.environment.set('test_comment_id', responseData.id);",
+          "        console.log('Comment ID set:', responseData.id);",
+          "    } else if (pm.request.url.path.includes('notices')) {",
+          "        pm.environment.set('test_notice_id', responseData.id);",
+          "        console.log('Notice ID set:', responseData.id);",
+          "    }",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ]
+}
