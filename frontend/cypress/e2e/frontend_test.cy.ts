@@ -33,9 +33,10 @@ print(a + b)
   })
 
   // ========================
-  // 教师注册
+  // 教师注册+登录+修改个人信息和密码
   // ========================
-  it('教师注册流程', () => {
+  it('教师注册后登录并修改个人信息和密码', () => {
+    // 注册
     cy.visit('http://localhost:5173/register')
     cy.get('input[placeholder="请输入3-16位用户名"]').type(teacherUsername)
     cy.get('input[placeholder="请输入邮箱地址"]').type(`${teacherUsername}@example.com`)
@@ -46,6 +47,48 @@ print(a + b)
     cy.get('input[type="checkbox"]').check({ force: true })
     cy.get('button').contains('注册账号').click()
     cy.contains('注册成功！').should('be.visible')
+
+    // 登录
+    cy.visit('http://localhost:5173/login')
+    cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
+    cy.get('input[placeholder="请输入密码"]').type(password)
+    cy.get('input[type="checkbox"]').check({ force: true })
+    cy.get('button').contains('立即登录').click()
+    cy.url().should('include', '/profile')
+
+    // 进入个人信息页
+    cy.contains('个人信息').click({ force: true })
+    cy.url().should('include', '/profile')
+    cy.get('.personal-info').should('exist')
+
+    // 点击编辑信息
+    cy.contains('编辑信息').click({ force: true })
+
+    // 生成学工号 2337+用户名
+    const teacherId = `2337${teacherUsername}`
+    cy.get('input[placeholder="请输入学工号"]').clear().type(teacherId, { force: true })
+    cy.get('input[placeholder="请输入学院名称"]').clear().type('软件学院', { force: true })
+
+    // 保存信息
+    cy.contains('保存信息').click({ force: true })
+    cy.contains('个人信息已保存').should('be.visible')
+    cy.get('input[placeholder="请输入学工号"]').should('have.value', teacherId)
+    cy.get('input[placeholder="请输入学院名称"]').should('have.value', '软件学院')
+
+    // 修改密码
+    cy.contains('修改密码').click({ force: true })
+    cy.get('input[placeholder="请输入当前密码"]').type(password, { force: true })
+    cy.get('input[placeholder="8-20位字母数字组合"]').type('TTest1234', { force: true })
+    cy.get('input[placeholder="请再次输入新密码"]').type('TTest1234', { force: true })
+    cy.contains('确认修改').click({ force: true })
+    cy.contains('密码修改成功').should('be.visible')
+
+  // 退出登录并用新密码登录验证
+  cy.contains('退出登录').click({ force: true })
+  // 弹窗点击“确定”按钮
+  cy.get('.el-message-box').should('be.visible')
+  cy.get('.el-message-box__btns button').contains('确定').click({ force: true })
+  cy.contains('已安全退出').should('be.visible')
   })
 
   // ========================
@@ -276,5 +319,45 @@ print(a + b)
       })
       cy.contains('总得分').should('be.visible')
 
+  })
+  // ========================
+  // 教师查看学生提交记录与详情
+  // ========================
+  it('教师查看学生提交记录与详情', () => {
+    // 教师登录
+    cy.visit('http://localhost:5173/login')
+    cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
+    cy.get('input[placeholder="请输入密码"]').type(password)
+    cy.get('input[type="checkbox"]').check({ force: true })
+    cy.get('button').contains('立即登录').click()
+    cy.url().should('include', '/profile')
+
+    // 进入“实验管理”或“批改作业”页面（假设有入口按钮/菜单）
+    cy.contains('查看学生提交').click({ force: true })
+
+    // 等待提交卡片加载
+    cy.get('.submission-card', { timeout: 10000 }).should('exist')
+
+    // 检查至少有一条提交记录，且包含学生名、题组、提交时间等
+    cy.get('.submission-card').first().within(() => {
+      cy.contains('学生：').should('exist')
+      cy.contains('题组：').should('exist')
+      cy.contains('提交时间：').should('exist')
+    })
+
+    // 点击第一条提交，进入详情页
+    cy.get('.submission-card').first().click()
+
+    // 检查详情页内容
+    cy.url().should('include', 'submission-detail')
+    cy.get('.submission-detail').should('exist')
+    cy.get('.student-info').should('contain.text', '学生：')
+    cy.get('.student-info').should('contain.text', '提交时间：')
+    cy.get('.question-card').should('exist')
+    cy.get('.q-header').should('exist')
+    cy.get('.q-content').should('exist')
+
+    // 检查保存批改结果按钮
+    cy.contains('保存批改结果').should('exist')
   })
 })
