@@ -5,5 +5,9 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
+    specPattern: "cypress/e2e/**/*.cy.{js,ts}", // 可根据你的项目调整
   },
+  video: true,                       // 开启录像
+  videosFolder: "cypress/videos",    // 视频保存路径
+  videoUploadOnPasses: true,         // 保存所有测试的视频，不仅失败的
 });

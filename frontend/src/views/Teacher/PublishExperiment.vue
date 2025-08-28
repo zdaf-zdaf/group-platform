@@ -79,7 +79,7 @@
             </template>
 
             <el-form-item label="题目类型" required>
-              <el-select v-model="q.type" placeholder="选择类型">
+              <el-select v-model="q.type" placeholder="选择类型" :teleported="false">
                 <el-option label="选择题" value="choice" />
                 <el-option label="填空题" value="blank" />
                 <el-option label="编程题" value="code" />

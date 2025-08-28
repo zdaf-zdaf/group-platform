@@ -146,6 +146,7 @@ const problem = ref<CodingProblem>({
 })
 
 const goBack = () => {
+  saveAutosave() // 确保在返回前保存当前进度
   router.push(`/experiment/${experimentId.value}`)
 }
 

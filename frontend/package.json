@@ -44,6 +44,7 @@
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.7.0",
     "cypress": "^15.0.0",
+    "cypress-file-upload": "^5.0.8",
     "eslint": "^9.22.0",
     "eslint-plugin-oxlint": "^0.16.0",
     "eslint-plugin-playwright": "^2.2.0",
