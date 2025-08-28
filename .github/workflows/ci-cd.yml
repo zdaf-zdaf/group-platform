@@ -57,7 +57,14 @@ jobs:
             pwd
             echo "PYTHONPATH: $PYTHONPATH"
             
-            echo "2. 检查Django配置模块是否能被正确导入"
+            echo "2. 检查环境变量"
+            echo "DB_ENGINE: $DB_ENGINE"
+            echo "DB_NAME: $DB_NAME"
+            echo "DB_USER: $DB_USER"
+            echo "DB_HOST: $DB_HOST"
+            echo "DB_PORT: $DB_PORT"
+
+            echo "3. 检查Django配置模块是否能被正确导入"
             python -c "
             import os
             print('DJANGO_SETTINGS_MODULE环境变量:', os.environ.get('DJANGO_SETTINGS_MODULE'))
@@ -69,16 +76,19 @@ jobs:
                 print('导入失败，错误信息:', e)
             "
             
-            echo "3. 以详细模式运行测试"
+            echo "4. 以详细模式运行测试"
             python manage.py test --verbosity=2
         env:
             # 1. 设置Django配置模块（最关键）
             DJANGO_SETTINGS_MODULE: server.settings
             # 2. 设置Python路径，确保能找到你的项目
             PYTHONPATH: ${{ github.workspace }}/backend
-            # 3. 为测试配置一个简单的数据库（如SQLite）
-            DATABASE_URL: mysql://testuser:testpassword@127.0.0.1:3306/test_db
-            # 4. 设置调试模式关闭（Django的生产环境要求）
+            DB_ENGINE: django.db.backends.mysql
+            DB_NAME: test_db
+            DB_USER: root
+            DB_PASSWORD: rootpassword
+            DB_HOST: mysql  # 使用服务名称而不是IP地址
+            DB_PORT: 3306
             DEBUG: False
 
   test-frontend:
