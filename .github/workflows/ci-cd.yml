@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
           MYSQL_DATABASE: test_db
@@ -40,6 +40,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Create test database and user
+        run: |
+            sudo apt-get update && sudo apt-get install -y mysql-client
+            mysql -h"127.0.0.1" -u"root" -p"rootpassword" -e "
+            CREATE DATABASE IF NOT EXISTS test_db;
+            CREATE USER IF NOT EXISTS 'testuser'@'%' IDENTIFIED BY 'testpassword';
+            GRANT ALL PRIVILEGES ON test_db.* TO 'testuser'@'%';
+            FLUSH PRIVILEGES;
+            "
+
       - name: Run Django tests
         run: |
             # ===== 新增的调试命令 =====
@@ -67,7 +77,7 @@ jobs:
             # 2. 设置Python路径，确保能找到你的项目
             PYTHONPATH: ${{ github.workspace }}/backend
             # 3. 为测试配置一个简单的数据库（如SQLite）
-            DATABASE_URL: mysql://root:rootpassword@mysql:3306/test_db
+            DATABASE_URL: mysql://testuser:testpassword@127.0.0.1:3306/test_db
             # 4. 设置调试模式关闭（Django的生产环境要求）
             DEBUG: False
 
