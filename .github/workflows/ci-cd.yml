@@ -11,11 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
           MYSQL_DATABASE: test_db
-          MYSQL_ROOT_HOST: '%'
+          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
           - 3306:3306
         options: >-
@@ -40,30 +40,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-    #   - name: Create test database and user
-    #     run: |
-    #         sudo apt-get update && sudo apt-get install -y mysql-client
-    #         mysql -h"127.0.0.1" -u"root" -p"rootpassword" -e "
-    #         CREATE DATABASE IF NOT EXISTS test_db;
-    #         CREATE USER IF NOT EXISTS 'testuser'@'%' IDENTIFIED BY 'testpassword';
-    #         GRANT ALL PRIVILEGES ON test_db.* TO 'testuser'@'%';
-    #         FLUSH PRIVILEGES;
-    #         "
-
-        # 新增步骤：等待 MySQL 服务完全就绪
-      - name:  Waiting for MySQL to be ready
+    # 关键步骤：等待MySQL并就绪后，配置root用户权限
+      - name: ⚙️ Configure MySQL for Django
         run: |
             sudo apt-get update && sudo apt-get install -y mysql-client
+            # 等待MySQL启动
             for i in {1..30}; do
             if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
                 echo "MySQL is ready!"
-                exit 0
+                break
             fi
             echo "Waiting for MySQL... (attempt $i/30)"
             sleep 2
             done
-            echo "MySQL failed to start in time."
-            exit 1
+            # 关键命令：确保root用户可以使用mysql_native_password插件从任何主机连接
+            mysql -h"127.0.0.1" -uroot -prootpassword -e "
+            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
+            ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
+            FLUSH PRIVILEGES;
+            "
 
       - name: Run Django tests
         run: |
