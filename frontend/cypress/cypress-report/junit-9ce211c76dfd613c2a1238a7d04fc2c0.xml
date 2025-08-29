@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="5.197" tests="10" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-08-29T08:14:23" tests="0" file="cypress\e2e\2-advanced-examples\cypress_api.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Cypress APIs" timestamp="2025-08-29T08:14:23" tests="0" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Cypress.Commands" timestamp="2025-08-29T08:14:23" tests="1" time="2.976" failures="0">
+    <testcase name="Cypress APIs Cypress.Commands .add() - create a custom command" time="1.135" classname=".add() - create a custom command">
+    </testcase>
+  </testsuite>
+  <testsuite name="Cypress.Cookies" timestamp="2025-08-29T08:14:26" tests="1" time="0.504" failures="0">
+    <testcase name="Cypress APIs Cypress.Cookies .debug() - enable or disable debugging" time="0.487" classname=".debug() - enable or disable debugging">
+    </testcase>
+  </testsuite>
+  <testsuite name="Cypress.arch" timestamp="2025-08-29T08:14:26" tests="1" time="0.193" failures="0">
+    <testcase name="Cypress APIs Cypress.arch Get CPU architecture name of underlying OS" time="0.163" classname="Get CPU architecture name of underlying OS">
+    </testcase>
+  </testsuite>
+  <testsuite name="Cypress.config()" timestamp="2025-08-29T08:14:26" tests="1" time="0.223" failures="0">
+    <testcase name="Cypress APIs Cypress.config() Get and set configuration options" time="0.194" classname="Get and set configuration options">
+    </testcase>
+  </testsuite>
+  <testsuite name="Cypress.dom" timestamp="2025-08-29T08:14:26" tests="1" time="0.198" failures="0">
+    <testcase name="Cypress APIs Cypress.dom .isHidden() - determine if a DOM element is hidden" time="0.172" classname=".isHidden() - determine if a DOM element is hidden">
+    </testcase>
+  </testsuite>
+  <testsuite name="Cypress.env()" timestamp="2025-08-29T08:14:27" tests="1" time="0.203" failures="0">
+    <testcase name="Cypress APIs Cypress.env() Get environment variables" time="0.182" classname="Get environment variables">
+    </testcase>
+  </testsuite>
+  <testsuite name="Cypress.log" timestamp="2025-08-29T08:14:27" tests="1" time="0.184" failures="0">
+    <testcase name="Cypress APIs Cypress.log Control what is printed to the Command Log" time="0.164" classname="Control what is printed to the Command Log">
+    </testcase>
+  </testsuite>
+  <testsuite name="Cypress.platform" timestamp="2025-08-29T08:14:27" tests="1" time="0.201" failures="0">
+    <testcase name="Cypress APIs Cypress.platform Get underlying OS name" time="0.176" classname="Get underlying OS name">
+    </testcase>
+  </testsuite>
+  <testsuite name="Cypress.version" timestamp="2025-08-29T08:14:27" tests="1" time="0.324" failures="0">
+    <testcase name="Cypress APIs Cypress.version Get current version of Cypress being run" time="0.297" classname="Get current version of Cypress being run">
+    </testcase>
+  </testsuite>
+  <testsuite name="Cypress.spec" timestamp="2025-08-29T08:14:28" tests="1" time="0.188" failures="0">
+    <testcase name="Cypress APIs Cypress.spec Get current spec information" time="0.165" classname="Get current spec information">
+    </testcase>
+  </testsuite>
+</testsuites>

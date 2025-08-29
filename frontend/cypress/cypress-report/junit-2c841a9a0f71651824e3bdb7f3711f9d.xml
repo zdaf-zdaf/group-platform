@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="15.245" tests="3" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-08-29T08:12:54" tests="0" file="cypress\e2e\notice_test.cy.ts" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="公告模块功能测试" timestamp="2025-08-29T08:12:54" tests="3" time="15.237" failures="0">
+    <testcase name="公告模块功能测试 教师端发布、编辑、筛选、搜索公告" time="7.700" classname="教师端发布、编辑、筛选、搜索公告">
+    </testcase>
+    <testcase name="公告模块功能测试 学生端查看公告、标记已读、未读数刷新、筛选和搜索" time="2.939" classname="学生端查看公告、标记已读、未读数刷新、筛选和搜索">
+    </testcase>
+    <testcase name="公告模块功能测试 教师端删除发布的两个公告" time="2.801" classname="教师端删除发布的两个公告">
+    </testcase>
+  </testsuite>
+</testsuites>

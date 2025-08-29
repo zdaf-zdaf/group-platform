@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="29.557" tests="5" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-08-29T08:11:55" tests="0" file="cypress\e2e\frontend_test.cy.ts" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="灵狐智验前端完整流程集成测试" timestamp="2025-08-29T08:11:55" tests="5" time="29.556" failures="0">
+    <testcase name="灵狐智验前端完整流程集成测试 学生注册流程" time="2.860" classname="学生注册流程">
+    </testcase>
+    <testcase name="灵狐智验前端完整流程集成测试 教师注册后登录并修改个人信息和密码" time="5.911" classname="教师注册后登录并修改个人信息和密码">
+    </testcase>
+    <testcase name="灵狐智验前端完整流程集成测试 教师登录并创建实验" time="9.194" classname="教师登录并创建实验">
+    </testcase>
+    <testcase name="灵狐智验前端完整流程集成测试 学生登录完成实验" time="7.080" classname="学生登录完成实验">
+    </testcase>
+    <testcase name="灵狐智验前端完整流程集成测试 教师查看学生提交记录与详情" time="2.264" classname="教师查看学生提交记录与详情">
+    </testcase>
+  </testsuite>
+</testsuites>

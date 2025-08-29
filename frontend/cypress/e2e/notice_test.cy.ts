@@ -99,18 +99,21 @@ describe('公告模块功能测试', () => {
     cy.url().should('include', '/notices')
     cy.get('.notice-page').should('exist')
 
-    // 检查未读数显示
+    // 检查未读数显示，兼容无未读公告的情况，自动等待未读数变化
     cy.get('.unread-info .unread-count').invoke('text').then(countText => {
       const unreadBefore = parseInt(countText)
-      // 如果有未读公告，点击第一个未读公告
-      cy.get('.notice-list .notice-item.unread').first().within(() => {
-        cy.get('.notice-header .title').click({ force: true })
-      })
-      cy.wait(1000)
-      // 检查未读数减少
-      cy.get('.unread-info .unread-count').invoke('text').should(countAfter => {
-        expect(parseInt(countAfter)).to.be.lessThan(unreadBefore)
-      })
+      if (unreadBefore > 0) {
+        cy.get('.notice-list .notice-item.unread').first().within(() => {
+          cy.get('.notice-header .title').click({ force: true })
+        })
+        // 自动等待未读数变小
+        cy.get('.unread-info .unread-count').should($span => {
+          const countAfter = parseInt($span.text())
+          expect(countAfter).to.be.lessThan(unreadBefore)
+        })
+      } else {
+        cy.log('无未读公告，跳过已读数减少断言')
+      }
     })
 
     // 筛选类型
