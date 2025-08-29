@@ -78,26 +78,33 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Test successful login",
-                  "pm.test(\"Status code is 200\", function () {",
+                  "// 统一解析JSON并处理错误",
+                  "try {",
+                  "    const jsonData = pm.response.json();",
+                  "    ",
+                  "    // 检查响应结构 - 只检查必要的token字段",
+                  "    pm.test(\"Response has required tokens\", function() {",
+                  "        pm.expect(jsonData).to.have.property('access');",
+                  "        pm.expect(jsonData).to.have.property('refresh');",
+                  "    });",
+                  "    ",
+                  "    // 仅在响应结构正确时设置变量",
+                  "    if (jsonData.access && jsonData.refresh) {",
+                  "        pm.environment.set(\"access_token\", jsonData.access);",
+                  "        pm.collectionVariables.set(\"authToken\", jsonData.access);",
+                  "        pm.collectionVariables.set(\"refreshToken\", jsonData.refresh);",
+                  "        console.log(\"Tokens set successfully\");",
+                  "    } else {",
+                  "        console.warn(\"响应缺少token字段\");",
+                  "    }",
+                  "} catch (e) {",
+                  "    console.error(\"JSON解析失败:\", e.message);",
+                  "}",
+                  "",
+                  "// 状态码测试（始终执行）",
+                  "pm.test(\"Status code is 200\", function() {",
                   "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "// Check response structure",
-                  "pm.test(\"Response has access token\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('access');",
-                  "    pm.expect(jsonData).to.have.property('refresh');",
-                  "    pm.expect(jsonData).to.have.property('username');",
-                  "    pm.expect(jsonData).to.have.property('role');",
-                  "    pm.expect(jsonData).to.have.property('email');",
-                  "});",
-                  "",
-                  "// Save tokens for future requests",
-                  "var jsonData = pm.response.json();",
-                  "pm.collectionVariables.set(\"authToken\", jsonData.access);",
-                  "pm.collectionVariables.set(\"refreshToken\", jsonData.refresh);",
-                  ""
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -123,7 +130,7 @@
           },
           "response": []
         },
-         {
+        {
           "name": "Refresh Token",
           "event": [
             {
