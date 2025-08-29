@@ -23,69 +23,49 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-    defaults:
-      run:
-        working-directory: ./backend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies with pip
+      - name: Wait for MySQL ready and configure root
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-    # 关键步骤：等待MySQL并就绪后，配置root用户权限
-      - name: ⚙️ Configure MySQL for Django
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            # 等待MySQL启动
-            for i in {1..30}; do
+          sudo apt-get update && sudo apt-get install -y mysql-client
+          for i in {1..30}; do
             if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-                echo "MySQL is ready!"
-                break
+              echo "MySQL is ready!"; break
             fi
-            echo "Waiting for MySQL... (attempt $i/30)"
-            sleep 2
-            done
-            # 关键命令：确保root用户可以使用mysql_native_password插件从任何主机连接
-            mysql -h"127.0.0.1" -uroot -prootpassword -e "
+            echo "Waiting for MySQL... (attempt $i/30)"; sleep 2
+          done
+          mysql -h"127.0.0.1" -uroot -prootpassword -e "
             ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
             ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            FLUSH PRIVILEGES;
-            "
+            FLUSH PRIVILEGES;"
 
-        # 🔑 新增：执行数据库迁移
-      - name: Run migrations
+      - name: Build backend image
+        run: docker build -t course-backend:latest ./backend
+
+      - name: Run backend container with docker.sock
         run: |
-          python manage.py makemigrations --noinput
-          python manage.py migrate --noinput
-        env:
-          DJANGO_SETTINGS_MODULE: server.settings
-          DB_ENGINE: django.db.backends.mysql
-          DB_NAME: test_db
-          DB_USER: root
-          DB_PASSWORD: rootpassword
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DEBUG: False
+          docker run -d --name course-backend-container \
+            --network host \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -e DJANGO_SETTINGS_MODULE=server.settings \
+            -e DB_ENGINE=django.db.backends.mysql \
+            -e DB_NAME=test_db \
+            -e DB_USER=root \
+            -e DB_PASSWORD=rootpassword \
+            -e DB_HOST=127.0.0.1 \
+            -e DB_PORT=3306 \
+            -e DEBUG=False \
+            course-backend:latest
 
-      - name: Run Django tests
-        run: python manage.py test --verbosity=2
-        env:
-                DJANGO_SETTINGS_MODULE: server.settings
-                DB_ENGINE: django.db.backends.mysql
-                DB_NAME: test_db
-                DB_USER: root
-                DB_PASSWORD: rootpassword
-                DB_HOST: 127.0.0.1
-                DB_PORT: 3306
-                DEBUG: False
+      - name: Run migrations in backend container
+        run: |
+          docker exec course-backend-container python manage.py makemigrations --noinput
+          docker exec course-backend-container python manage.py migrate --noinput
+
+      - name: Run Django tests in backend container
+        run: docker exec course-backend-container python manage.py test --verbosity=2
 
   # 并行论坛测试
   api-test-luntan:
@@ -265,12 +245,12 @@ jobs:
             --env-var "baseUrl=http://127.0.0.1:8002/api" \  # 覆盖环境文件中的baseUrl
             --reporters cli
 
-    #   - name: 📄 Display Server Logs on Failure
-    #     if: failure()  
-    #     run: |
-    #         echo "===== Django Server Logs ====="
-    #         cat backend/debug.log  # 假设服务器日志输出到backend/debug.log
-    #         echo "===== End Logs ====="
+      - name: 📄 Display Server Logs on Failure
+        if: failure()  
+        run: |
+            echo "===== Django Server Logs ====="
+            cat backend/debug.log  # 假设服务器日志输出到backend/debug.log
+            echo "===== End Logs ====="
 
       - name: 🛑 Stop Django Server
         run: |
