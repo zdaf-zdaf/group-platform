@@ -213,7 +213,7 @@ jobs:
             # 等待MySQL启动（使用新端口3308）
             for i in {1..30}; do
             if mysqladmin ping -h"127.0.0.1" -P 3308 -uroot -prootpassword --silent; then
-                echo "MySQL for Luntan is ready!"
+                echo "MySQL for Lab is ready!"
                 break
             fi
             echo "Waiting for MySQL... (attempt $i/30)"
@@ -240,7 +240,7 @@ jobs:
       - name: 📦 Install Newman
         run: npm install -g newman
 
-      - name: ✅ Run Forum Tests
+      - name: ✅ Run Lab Tests
         run: |
             newman run postman/collection2-Lab.json \
             --environment postman/environment.json \
@@ -289,7 +289,7 @@ jobs:
             # 等待MySQL启动（使用新端口3309）
             for i in {1..30}; do
             if mysqladmin ping -h"127.0.0.1" -P 3309 -uroot -prootpassword --silent; then
-                echo "MySQL for Luntan is ready!"
+                echo "MySQL for GongGao is ready!"
                 break
             fi
             echo "Waiting for MySQL... (attempt $i/30)"
@@ -316,7 +316,7 @@ jobs:
       - name: 📦 Install Newman
         run: npm install -g newman
 
-      - name: ✅ Run Forum Tests
+      - name: ✅ Run Announcement Tests
         run: |
             newman run postman/collection3-GongGao.json \
             --environment postman/environment.json \
