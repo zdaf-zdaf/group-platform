@@ -1,356 +1,106 @@
-name: group-pipeline
+name: CI/CD
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 jobs:
+  # ================== 后端测试（容器化） ==================
   test-backend:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: test_db
-          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Wait for MySQL ready and configure root
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create network
+        run: docker network create my-app-network
+
+      - name: Run MySQL container
         run: |
-          sudo apt-get update && sudo apt-get install -y mysql-client
+          docker run -d --name mysql-db --network my-app-network \
+            -e MYSQL_ROOT_PASSWORD=956402436 \
+            -e MYSQL_DATABASE=lab_platform \
+            -p 3307:3306 \
+            mysql:8.0
+          echo "Waiting for MySQL..."
           for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-              echo "MySQL is ready!"; break
+            if docker exec mysql-db mysqladmin ping -uroot -p956402436 --silent; then
+              echo "MySQL is ready!"
+              break
             fi
-            echo "Waiting for MySQL... (attempt $i/30)"; sleep 2
+            sleep 2
           done
-          mysql -h"127.0.0.1" -uroot -prootpassword -e "
-            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            FLUSH PRIVILEGES;"
 
       - name: Build backend image
-        run: docker build -t course-backend:latest ./backend
+        working-directory: ./backend
+        run: docker build -t course-backend:latest .
 
-      - name: Run backend container with docker.sock
+      - name: Run backend container
         run: |
-          docker run -d --name course-backend-container \
-            --network host \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -e DJANGO_SETTINGS_MODULE=server.settings \
-            -e DB_ENGINE=django.db.backends.mysql \
-            -e DB_NAME=test_db \
-            -e DB_USER=root \
-            -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=127.0.0.1 \
+          docker run -d --name course-backend-container --network my-app-network \
+            -e DB_HOST=mysql-db \
             -e DB_PORT=3306 \
-            -e DEBUG=False \
+            -e DB_NAME=lab_platform \
+            -e DB_USER=root \
+            -e DB_PASSWORD=956402436 \
+            -p 8000:8000 \
             course-backend:latest
+          echo "Waiting for backend..."
+          sleep 10
 
-      - name: Run migrations in backend container
-        run: |
-          docker exec course-backend-container python manage.py makemigrations --noinput
-          docker exec course-backend-container python manage.py migrate --noinput
+      - name: Run migrations
+        run: docker exec course-backend-container python manage.py migrate --noinput
 
-      - name: Run Django tests in backend container
+      - name: Run backend tests
         run: docker exec course-backend-container python manage.py test --verbosity=2
 
-  # 并行论坛测试
+  # ================== API 测试（论坛模块） ==================
   api-test-luntan:
-    name: 💬 Parallel Forum Tests
     runs-on: ubuntu-latest
-    needs: [test-backend]
-    
-    services:
-      mysql-luntan:  # 服务名称唯一
-        image: mysql:8.0
-        env:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: test_db_luntan  # 独立的数据库名
-            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-            - 3307:3306  # 使用不同端口映射
-
+    needs: test-backend
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v5
-        with:
-            python-version: '3.10'
-        
-      - name: 📦 Install dependencies
-        run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-        working-directory: ./backend
-        
-      - name: ⚙️ Configure MySQL
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            # 等待MySQL启动（使用新端口3307）
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -P 3307 -uroot -prootpassword --silent; then
-                echo "MySQL for Luntan is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
-            sleep 2
-            done
 
-    # 🔑 新增：执行数据库迁移
-      - name: Run migrations
-        run: |
-          python manage.py makemigrations --noinput
-          python manage.py migrate --noinput
-        working-directory: ./backend
-        env:
-          DJANGO_SETTINGS_MODULE: server.settings
-          DB_ENGINE: django.db.backends.mysql
-          DB_NAME: test_db_luntan
-          DB_USER: root
-          DB_PASSWORD: rootpassword
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3307
-          DEBUG: False
-
-      - name: 🚀 Start Django Server (Port 8001)
-        run: |
-            python manage.py runserver 0.0.0.0:8001 &
-            echo $! > server.pid
-            # 等待服务器启动
-            sleep 5
-        working-directory: ./backend
-        env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_luntan  # 指定独立数据库
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3307  # 使用3307端口
-            DEBUG: False
-
-      - name: 📦 Install Newman
+      - name: Install Newman
         run: npm install -g newman
 
-      - name: ✅ Run Forum Tests
-        run: |
-            newman run postman/collection1-LunTan.json \
-            --environment postman/environment.json \
-            --env-var "baseUrl=http://127.0.0.1:8001/api" \  # 覆盖环境文件中的baseUrl
-            --reporters cli
+      - name: Run Postman tests (论坛)
+        run: newman run postman/luntan.postman_collection.json -e postman/environment.json
 
-      - name: 🛑 Stop Django Server
-        run: |
-            pkill -f "runserver 0.0.0.0:8001" || true
-
-  # 并行实验测试（配置类似，但使用不同端口和数据库名）
+  # ================== API 测试（实验模块） ==================
   api-test-lab:
-    name: 🔬 Parallel Lab Tests
     runs-on: ubuntu-latest
-    needs: [test-backend]
-    
-    services:
-      mysql-lab:
-        image: mysql:8.0
-        env:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: test_db_lab  # 独立数据库名
-            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-            - 3308:3306  # 不同端口
-
+    needs: test-backend
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v5
-        with:
-            python-version: '3.10'
-        
-      - name: 📦 Install dependencies
-        run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-        working-directory: ./backend
-        
-      - name: ⚙️ Configure MySQL
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            # 等待MySQL启动（使用新端口3308）
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -P 3308 -uroot -prootpassword --silent; then
-                echo "MySQL for Lab is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
-            sleep 2
-            done
 
-    # 🔑 新增：执行数据库迁移
-      - name: Run migrations
-        run: |
-          python manage.py makemigrations --noinput
-          python manage.py migrate --noinput
-        working-directory: ./backend
-        env:
-          DJANGO_SETTINGS_MODULE: server.settings
-          DB_ENGINE: django.db.backends.mysql
-          DB_NAME: test_db_lab
-          DB_USER: root
-          DB_PASSWORD: rootpassword
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3308
-          DEBUG: False
-
-      - name: 🚀 Start Django Server (Port 8002)
-        run: |
-            python manage.py runserver 0.0.0.0:8002 &
-            echo $! > server.pid
-            # 等待服务器启动
-            sleep 5
-        working-directory: ./backend
-        env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_lab  # 指定独立数据库
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3308  # 使用3308端口
-            DEBUG: False
-
-      - name: 📦 Install Newman
+      - name: Install Newman
         run: npm install -g newman
 
-      - name: ✅ Run Lab Tests
-        run: |
-            newman run postman/collection2-Lab.json \
-            --environment postman/environment.json \
-            --env-var "baseUrl=http://127.0.0.1:8002/api" \  # 覆盖环境文件中的baseUrl
-            --reporters cli
+      - name: Run Postman tests (实验)
+        run: newman run postman/lab.postman_collection.json -e postman/environment.json
 
-      - name: 📄 Display Server Logs on Failure
-        if: failure()  
-        run: |
-            echo "===== Django Server Logs ====="
-            cat backend/debug.log  # 假设服务器日志输出到backend/debug.log
-            echo "===== End Logs ====="
-
-      - name: 🛑 Stop Django Server
-        run: |
-            pkill -f "runserver 0.0.0.0:8002" || true
-
-
-  # 并行公告测试（配置类似，但使用不同端口和数据库名）
+  # ================== API 测试（公告模块） ==================
   api-test-gonggao:
-    name: 📢 Parallel Announcement Tests
     runs-on: ubuntu-latest
-    needs: [test-backend]
-    
-    services:
-      mysql-gonggao:
-        image: mysql:8.0
-        env:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: test_db_gonggao  # 独立数据库名
-            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-            - 3309:3306  # 不同端口
-
+    needs: test-backend
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v5
-        with:
-            python-version: '3.10'
-        
-      - name: 📦 Install dependencies
-        run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-        working-directory: ./backend
-        
-      - name: ⚙️ Configure MySQL
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            # 等待MySQL启动（使用新端口3309）
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -P 3309 -uroot -prootpassword --silent; then
-                echo "MySQL for GongGao is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
-            sleep 2
-            done
 
-    # 🔑 新增：执行数据库迁移
-      - name: Run migrations
-        run: |
-          python manage.py makemigrations --noinput
-          python manage.py migrate --noinput
-        working-directory: ./backend
-        env:
-          DJANGO_SETTINGS_MODULE: server.settings
-          DB_ENGINE: django.db.backends.mysql
-          DB_NAME: test_db_gonggao
-          DB_USER: root
-          DB_PASSWORD: rootpassword
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3309
-          DEBUG: False
-
-      - name: 🚀 Start Django Server (Port 8003)
-        run: |
-            python manage.py runserver 0.0.0.0:8003 &
-            echo $! > server.pid
-            # 等待服务器启动
-            sleep 5
-        working-directory: ./backend
-        env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_gonggao  # 指定独立数据库
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3309  # 使用3309端口
-            DEBUG: False
-
-      - name: 📦 Install Newman
+      - name: Install Newman
         run: npm install -g newman
 
-      - name: ✅ Run Announcement Tests
-        run: |
-            newman run postman/collection3-GongGao.json \
-            --environment postman/environment.json \
-            --env-var "baseUrl=http://127.0.0.1:8003/api" \  # 覆盖环境文件中的baseUrl
-            --reporters cli
-
-      - name: 🛑 Stop Django Server
-        run: |
-            pkill -f "runserver 0.0.0.0:8003" || true
-
-
-  # 【新增的Job】运行Cypress前端E2E测试
-  gui-test-cypress:
+      - name: Run Postman tests (公告)
+        run: newman run postman/gonggao.postman_collection.json -e postman/environment.json
+    gui-test-cypress:
     name:  Run Cypress GUI Tests
     runs-on: ubuntu-latest
     # 【重要】设置依赖：必须等前端单元测试和API测试都通过后才运行
