@@ -247,6 +247,13 @@ jobs:
             --env-var "baseUrl=http://127.0.0.1:8002/api" \  # 覆盖环境文件中的baseUrl
             --reporters cli
 
+      - name: 📄 Display Server Logs on Failure
+        if: failure()  
+        run: |
+            echo "===== Django Server Logs ====="
+            cat backend/server.log  # 假设服务器日志输出到backend/server.log
+            echo "===== End Logs ====="
+
       - name: 🛑 Stop Django Server
         run: |
             pkill -f "runserver 0.0.0.0:8002" || true
