@@ -60,44 +60,30 @@ jobs:
             FLUSH PRIVILEGES;
             "
 
-      - name: Run Django tests
-        run: |
-            # ===== 新增的调试命令 =====
-            echo "1. 检查当前目录和Python路径"
-            pwd
-            echo "PYTHONPATH: $PYTHONPATH"
-            
-            echo "2. 检查环境变量"
-            echo "DB_ENGINE: $DB_ENGINE"
-            echo "DB_NAME: $DB_NAME"
-            echo "DB_USER: $DB_USER"
-            echo "DB_HOST: $DB_HOST"
-            echo "DB_PORT: $DB_PORT"
+    # 🔑 新增：执行数据库迁移
+    - name: Run migrations
+    run: |
+      python manage.py makemigrations --noinput
+      python manage.py migrate --noinput
+    env:
+      DJANGO_SETTINGS_MODULE: server.settings
+      DB_ENGINE: django.db.backends.mysql
+      DB_NAME: test_db
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DEBUG: False
 
-            echo "3. 检查Django配置模块是否能被正确导入"
-            python -c "
-            import os
-            print('DJANGO_SETTINGS_MODULE环境变量:', os.environ.get('DJANGO_SETTINGS_MODULE'))
-            try:
-                from django.conf import settings
-                print('成功导入settings模块！')
-                print('使用的设置文件:', settings.SETTINGS_MODULE)
-            except Exception as e:
-                print('导入失败，错误信息:', e)
-            "
-            
-            echo "4. 以详细模式运行测试"
-            python manage.py test --verbosity=2
+      - name: Run Django tests
+        run: python manage.py test --verbosity=2
         env:
-            # 1. 设置Django配置模块（最关键）
             DJANGO_SETTINGS_MODULE: server.settings
-            # 2. 设置Python路径，确保能找到你的项目
-            PYTHONPATH: ${{ github.workspace }}/backend
             DB_ENGINE: django.db.backends.mysql
             DB_NAME: test_db
             DB_USER: root
             DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1 
+            DB_HOST: 127.0.0.1
             DB_PORT: 3306
             DEBUG: False
 
@@ -144,6 +130,22 @@ jobs:
             echo "Waiting for MySQL... (attempt $i/30)"
             sleep 2
             done
+
+    # 🔑 新增：执行数据库迁移
+    - name: Run migrations
+    run: |
+      python manage.py makemigrations --noinput
+      python manage.py migrate --noinput
+    working-directory: ./backend
+    env:
+      DJANGO_SETTINGS_MODULE: server.settings
+      DB_ENGINE: django.db.backends.mysql
+      DB_NAME: test_db_luntan
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3307
+      DEBUG: False
 
       - name: 🚀 Start Django Server (Port 8001)
         run: |
@@ -219,6 +221,22 @@ jobs:
             echo "Waiting for MySQL... (attempt $i/30)"
             sleep 2
             done
+
+    # 🔑 新增：执行数据库迁移
+    - name: Run migrations
+    run: |
+      python manage.py makemigrations --noinput
+      python manage.py migrate --noinput
+    working-directory: ./backend
+    env:
+      DJANGO_SETTINGS_MODULE: server.settings
+      DB_ENGINE: django.db.backends.mysql
+      DB_NAME: test_db_lab
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3308
+      DEBUG: False
 
       - name: 🚀 Start Django Server (Port 8002)
         run: |
@@ -302,6 +320,22 @@ jobs:
             echo "Waiting for MySQL... (attempt $i/30)"
             sleep 2
             done
+
+    # 🔑 新增：执行数据库迁移
+    - name: Run migrations
+    run: |
+      python manage.py makemigrations --noinput
+      python manage.py migrate --noinput
+    working-directory: ./backend
+    env:
+      DJANGO_SETTINGS_MODULE: server.settings
+      DB_ENGINE: django.db.backends.mysql
+      DB_NAME: test_db_gonggao
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3309
+      DEBUG: False
 
       - name: 🚀 Start Django Server (Port 8003)
         run: |
