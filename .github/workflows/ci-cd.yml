@@ -109,6 +109,20 @@ jobs:
     runs-on: ubuntu-latest
     # 【重要】设置依赖：必须等后端单元测试通过后才运行
     needs: [test-backend]
+    services:
+    mysql:
+      image: mysql:8.0
+      env:
+        MYSQL_ROOT_PASSWORD: rootpassword
+        MYSQL_DATABASE: test_db
+        MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+      ports:
+        - 3306:3306
+      options: >-
+        --health-cmd="mysqladmin ping"
+        --health-interval=10s
+        --health-timeout=5s
+        --health-retries=3
 
     steps:
       # 第一步：获取代码（必须）
@@ -121,21 +135,70 @@ jobs:
         with:
           node-version: '20'
 
-      # 第三步：安装newman（这是Postman的命令行工具，用来运行测试）
-      - name:  Install Newman
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.10'
+
+      - name: 📦 Install Python dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+        working-directory: ./backend
+
+      - name: ⚙️ Configure MySQL
+        run: |
+            sudo apt-get update && sudo apt-get install -y mysql-client
+            # 等待MySQL启动
+            for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+                echo "MySQL is ready!"
+                break
+            fi
+            echo "Waiting for MySQL... (attempt $i/30)"
+            sleep 2
+            done
+            # 配置MySQL权限
+            mysql -h"127.0.0.1" -uroot -prootpassword -e "
+            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
+            FLUSH PRIVILEGES;
+            "
+
+      - name: 🚀 Start Django Server
+        run: |
+            # 启动Django开发服务器在后台运行
+            python manage.py runserver 0.0.0.0:8000 &
+            SERVER_PID=$!
+            echo "Django server started with PID: $SERVER_PID"
+            
+            # 等待服务器启动
+            sleep 10
+            
+            # 检查服务器是否正常运行
+            curl -f http://localhost:8000/api/health/ || curl -f http://localhost:8000/ || true
+        working-directory: ./backend
+        env:
+            DJANGO_SETTINGS_MODULE: server.settings
+            DB_ENGINE: django.db.backends.mysql
+            DB_NAME: test_db
+            DB_USER: root
+            DB_PASSWORD: rootpassword
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3306
+            DEBUG: False
+
+      - name: 📦 Install Newman
         run: npm install -g newman
 
-      # 第四步：运行Postman测试！
-      - name:  Run Postman Tests
+      - name: ✅ Run Postman Tests
         run: |
-          newman run postman/collection.json \
-          --environment postman/environment.json \
-          --reporters cli
-        # 命令解释：
-        # newman run ...    -> 运行测试
-        # postman/collection.json     -> 测试用例文件路径
-        # --environment ... -> 环境变量文件路径
-        # --reporters cli   -> 在命令行里打印出漂亮的结果
+            # 修改环境变量文件，将localhost替换为127.0.0.1
+            sed -i 's/localhost/127.0.0.1/g' postman/environment.json
+            
+            # 运行测试
+            newman run postman/collection.json \
+            --environment postman/environment.json \
+            --reporters cli
 
   # 【新增的Job】运行Cypress前端E2E测试
   gui-test-cypress:
