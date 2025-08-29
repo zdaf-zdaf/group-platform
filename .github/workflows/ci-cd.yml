@@ -102,7 +102,7 @@ jobs:
             DEBUG: False
 
   # 论坛测试
-    test_LunTan:
+  test_LunTan:
     name: LunTan Tests
     runs-on: ubuntu-latest
     needs: [test-backend] # 只依赖后端测试，不依赖其他API测试
@@ -130,7 +130,7 @@ jobs:
             --reporters cli
 
     # 公告测试
-    test_GongGao:
+  test_GongGao:
     name: GongGao Tests
     runs-on: ubuntu-latest
     needs: [test-backend] # 只依赖后端测试
@@ -158,7 +158,7 @@ jobs:
             --reporters cli
 
     # 实验测试
-    test_lab:
+  test_lab:
     name: Lab Tests
     runs-on: ubuntu-latest
     needs: [test-backend] # 只依赖后端测试
