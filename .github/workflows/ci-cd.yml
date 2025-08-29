@@ -11,96 +11,68 @@ jobs:
   test-backend:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      test-backend:
+        runs-on: ubuntu-latest
+        services:
+          mysql:
+            image: mysql:8.0
+            env:
+              MYSQL_ROOT_PASSWORD: 956402436
+              MYSQL_DATABASE: lab_platform
+            ports:
+              - 3306:3306
+            options: >-
+              --health-cmd="mysqladmin ping -uroot -p956402436"
+              --health-interval=10s
+              --health-timeout=5s
+              --health-retries=5
+          backend:
+            build:
+              context: ./backend
+            image: course-backend:latest
+            env:
+              DB_HOST: mysql
+              DB_PORT: 3306
+              DB_NAME: lab_platform
+              DB_USER: root
+              DB_PASSWORD: 956402436
+            ports:
+              - 8000:8000
+            options: >-
+              --health-cmd="curl --fail http://localhost:8000/ || exit 1"
+              --health-interval=10s
+              --health-timeout=5s
+              --health-retries=10
+              -v /var/run/docker.sock:/var/run/docker.sock
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+          - name: Wait for backend service ready
+            run: |
+              for i in {1..30}; do
+                if curl -s http://localhost:8000/ > /dev/null; then
+                  echo "Backend is ready!"; break
+                fi
+                echo "Waiting for backend... ($i/30)"; sleep 2
+              done
 
-      - name: Create network
-        run: docker network create my-app-network
+          - name: Run migrations
+            run: |
+              docker exec $(docker ps -qf "name=backend") python manage.py migrate --noinput
 
-      - name: Run MySQL container
-        run: |
-          docker run -d --name mysql-db --network my-app-network \
-            -e MYSQL_ROOT_PASSWORD=956402436 \
-            -e MYSQL_DATABASE=lab_platform \
-            -p 3307:3306 \
-            mysql:8.0
-          echo "Waiting for MySQL..."
-          for i in {1..30}; do
-            if docker exec mysql-db mysqladmin ping -uroot -p956402436 --silent; then
-              echo "MySQL is ready!"
-              break
-            fi
-            sleep 2
-          done
+          - name: Run backend unit tests
+            run: |
+              docker exec $(docker ps -qf "name=backend") python manage.py test --verbosity=2
 
-      - name: Build backend image
-        working-directory: ./backend
-        run: docker build -t course-backend:latest .
+          - name: Install Newman
+            run: npm install -g newman
 
-      - name: Run backend container
-        run: |
-          docker run -d --name course-backend-container --network my-app-network \
-            -e DB_HOST=mysql-db \
-            -e DB_PORT=3306 \
-            -e DB_NAME=lab_platform \
-            -e DB_USER=root \
-            -e DB_PASSWORD=956402436 \
-            -p 8000:8000 \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            course-backend:latest
-          echo "Waiting for backend..."
-          sleep 10
-
-      - name: Run migrations
-        run: docker exec course-backend-container python manage.py migrate --noinput
-
-      - name: Run backend tests
-        run: docker exec course-backend-container python manage.py test --verbosity=2
-
-  # ================== API 测试（论坛模块） ==================
-  api-test-luntan:
-    runs-on: ubuntu-latest
-    needs: test-backend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Newman
-        run: npm install -g newman
-
-      - name: Run Postman tests (论坛)
-        run: newman run postman/collection1-LunTan.json -e postman/environment.json
-
-  # ================== API 测试（实验模块） ==================
-  api-test-lab:
-    runs-on: ubuntu-latest
-    needs: test-backend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Newman
-        run: npm install -g newman
-
-      - name: Run Postman tests (实验)
-        run: newman run postman/collection2-Lab.json -e postman/environment.json
-
-  # ================== API 测试（公告模块） ==================
-  api-test-gonggao:
-    runs-on: ubuntu-latest
-    needs: test-backend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Newman
-        run: npm install -g newman
-
-      - name: Run Postman tests (公告)
-        run: newman run postman/collection3-GongGao.json -e postman/environment.json
+          - name: Run Postman API tests
+            run: |
+              newman run postman/collection1-LunTan.json -e postman/environment.json
+              newman run postman/collection2-Lab.json -e postman/environment.json
+              newman run postman/collection3-GongGao.json -e postman/environment.json
 
 
   # 【新增的Job】运行Cypress前端E2E测试
