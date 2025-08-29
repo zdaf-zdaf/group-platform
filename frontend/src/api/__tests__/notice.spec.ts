@@ -120,4 +120,26 @@ describe('NoticeApi', () => {
       await expect(NoticeApi.getUnreadCount()).rejects.toThrow('获取未读公告数量失败')
     })
   })
+
+  describe('markAllAsRead', () => {
+    it('正例: 标记全部已读成功', async () => {
+      mockedAxios.post.mockResolvedValueOnce({ status: 200, data: {} })
+      await expect(NoticeApi.markAllAsRead()).resolves.toEqual({})
+    })
+    it('反例: 标记全部已读失败', async () => {
+      mockedAxios.post.mockRejectedValueOnce(new Error('fail'))
+      await expect(NoticeApi.markAllAsRead()).rejects.toThrow('标记所有公告为已读失败')
+    })
+  })
+
+  describe('markAsRead', () => {
+    it('正例: 标记单个已读成功', async () => {
+      mockedAxios.post.mockResolvedValueOnce({ status: 200, data: {} })
+      await expect(NoticeApi.markAsRead(1)).resolves.toEqual({})
+    })
+    it('反例: 标记单个已读失败', async () => {
+      mockedAxios.post.mockRejectedValueOnce({ message: 'fail', response: { status: 500, data: { detail: '服务器内部错误' } } })
+      await expect(NoticeApi.markAsRead(1)).rejects.toThrow('fail')
+    })
+  })
 })
