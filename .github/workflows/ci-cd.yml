@@ -169,7 +169,7 @@ jobs:
         run: |
             newman run postman/collection1-LunTan.json \
             --environment postman/environment.json \
-            --global-var "api_url=127.0.0.1:8001" \  # 使用8001端口
+            --env-var "baseUrl=http://127.0.0.1:8001/api" \  # 覆盖环境文件中的baseUrl
             --reporters cli
 
       - name: 🛑 Stop Django Server
@@ -244,7 +244,7 @@ jobs:
         run: |
             newman run postman/collection2-Lab.json \
             --environment postman/environment.json \
-            --global-var "api_url=127.0.0.1:8002" \  # 使用8002端口
+            --env-var "baseUrl=http://127.0.0.1:8002/api" \  # 覆盖环境文件中的baseUrl
             --reporters cli
 
       - name: 🛑 Stop Django Server
@@ -320,7 +320,7 @@ jobs:
         run: |
             newman run postman/collection3-GongGao.json \
             --environment postman/environment.json \
-            --global-var "api_url=127.0.0.1:8003" \  # 使用8003端口
+            --env-var "baseUrl=http://127.0.0.1:8003/api" \  # 覆盖环境文件中的baseUrl
             --reporters cli
 
       - name: 🛑 Stop Django Server
