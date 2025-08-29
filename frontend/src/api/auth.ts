@@ -6,7 +6,7 @@ import type { LoginForm } from '@/views/auth/Login.vue';
 const BASE_URL = 'http://localhost:8000/api/'; // Django 后端地址
 
 // 创建 axios 实例
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
   headers: {

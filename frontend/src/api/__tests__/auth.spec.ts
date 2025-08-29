@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { authService } from '@/api/auth'
+import { apiClient } from '@/api/auth'
 
 // mock axios (带 interceptors)
 vi.mock('axios', async () => {
@@ -67,4 +68,30 @@ describe('authService', () => {
     const res = await authService.getUserInfo('token')
     expect(res.username).toBe('user')
   })
+
+  it('register 正例: 注册成功', async () => {
+    const spy = vi.spyOn(apiClient, 'post').mockResolvedValueOnce({});
+    await expect(authService.register({ username: 'u', password: 'p', email: 'e', role: 'student' })).resolves.toBeUndefined();
+    spy.mockRestore();
+  });
+
+  it('register 反例: 注册失败', async () => {
+    const error = Object.assign(new Error('注册失败'), { response: { data: { message: '注册失败' } }, isAxiosError: true });
+    const spy = vi.spyOn(apiClient, 'post').mockRejectedValueOnce(error);
+    await expect(authService.register({ username: 'u', password: 'p', email: 'e', role: 'student' })).rejects.toThrow('注册失败');
+    spy.mockRestore();
+  });
+
+  it('updateUserProfile 正例: 更新成功', async () => {
+    const spy = vi.spyOn(apiClient, 'patch').mockResolvedValueOnce({});
+    await expect(authService.updateUserProfile({ student_id: '1' })).resolves.toBeUndefined();
+    spy.mockRestore();
+  });
+
+  it('updateUserProfile 反例: 更新失败', async () => {
+    const error = Object.assign(new Error('更新失败'), { response: { data: { message: '更新失败' } }, isAxiosError: true });
+    const spy = vi.spyOn(apiClient, 'patch').mockRejectedValueOnce(error);
+    await expect(authService.updateUserProfile({ student_id: '1' })).rejects.toThrow('更新失败');
+    spy.mockRestore();
+  });
 })

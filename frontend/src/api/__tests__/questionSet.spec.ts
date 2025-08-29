@@ -35,4 +35,29 @@ describe('questionSetService', () => {
     const res = await questionSetService.createSet({ title: 'set2', deadline: '', students: [], questions: [] });
     expect(res.title).toBe('set2');
   });
+
+  it('updateSet 正例', async () => {
+    const res = await questionSetService.updateSet(1, { title: 'set1' });
+    expect(res.title).toBe('set1');
+  });
+  it('updateSet 反例', async () => {
+    // mock put失败
+    const axios = await import('axios');
+    const oldPut = axios.default.put;
+    axios.default.put = () => Promise.reject(new Error('更新失败'));
+    await expect(questionSetService.updateSet(999, { title: 'fail' })).rejects.toThrow('更新实验失败');
+    axios.default.put = oldPut;
+  });
+
+  it('deleteSet 正例', async () => {
+    await expect(questionSetService.deleteSet(1)).resolves.toBeUndefined();
+  });
+  it('deleteSet 反例', async () => {
+    // mock delete失败
+    const axios = await import('axios');
+    const oldDelete = axios.default.delete;
+    axios.default.delete = () => Promise.reject(new Error('删除失败'));
+    await expect(questionSetService.deleteSet(999)).rejects.toThrow('删除实验失败');
+    axios.default.delete = oldDelete;
+  });
 });
