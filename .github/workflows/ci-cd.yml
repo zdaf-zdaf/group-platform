@@ -222,10 +222,9 @@ jobs:
 
       - name: 🚀 Start Django Server (Port 8002)
         run: |
-            python manage.py runserver 0.0.0.0:8002 &
+            python manage.py runserver 0.0.0.0:8002 > backend/server.log 2>&1 &
             echo $! > server.pid
-            # 等待服务器启动
-            sleep 5
+            # 等待服务器启动的健康检查代码...
         working-directory: ./backend
         env:
             DJANGO_SETTINGS_MODULE: server.settings
