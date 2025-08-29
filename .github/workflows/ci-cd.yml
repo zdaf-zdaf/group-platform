@@ -104,7 +104,7 @@ jobs:
   # 【新增的Job】运行Postman API集成测试
   api-test-postman:
     # 取个好看的名字
-    name:  Run Postman API Tests
+    name:  Run All Postman API Tests
     # 运行环境
     runs-on: ubuntu-latest
     # 【重要】设置依赖：必须等后端单元测试通过后才运行
@@ -190,15 +190,26 @@ jobs:
       - name: 📦 Install Newman
         run: npm install -g newman
 
-      - name: ✅ Run Postman Tests
+      - name: ✅ Run Tests1 LunTan
         run: |
-            # 修改环境变量文件，将localhost替换为127.0.0.1
-            sed -i 's/localhost/127.0.0.1/g' postman/environment.json
-            
-            # 运行测试
-            newman run postman/collection.json \
+            newman run postman/collection1-LunTan.json \
             --environment postman/environment.json \
             --reporters cli
+        # 注意：将 authentication-collection.json 替换为实际的认证测试集文件名
+
+      - name: ✅ Run Tests2 GongGao
+        run: |
+            newman run postman/collection2-GongGao.json \
+            --environment postman/environment.json \
+            --reporters cli
+        # 注意：将 forum-collection.json 替换为实际的论坛测试集文件名
+
+      - name: ✅ Run Tests3 Lab
+        run: |
+            newman run postman/collection3-Lab.json \
+            --environment postman/environment.json \
+            --reporters cli
+        # 注意：将 error-cases-collection.json 替换为实际的错误用例测试集文件名
 
   # 【新增的Job】运行Cypress前端E2E测试
   gui-test-cypress:

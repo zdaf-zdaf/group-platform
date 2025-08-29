@@ -1,0 +1,642 @@
+{
+  "info": {
+    "name": "Lab Platform API Tests",
+    "description": "集成测试集，用于测试实验室平台的认证、论坛和公告功能",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "testUsername",
+      "value": "testuser_{{$timestamp}}",
+      "type": "string"
+    },
+    {
+      "key": "testPassword",
+      "value": "Testpass123!",
+      "type": "string"
+    },
+    {
+      "key": "testEmail",
+      "value": "testuser{{$timestamp}}@example.com",
+      "type": "string"
+    },
+    {
+      "key": "teacherUsername",
+      "value": "teacher_{{$timestamp}}",
+      "type": "string"
+    },
+    {
+      "key": "teacherPassword",
+      "value": "Teacherpass123!",
+      "type": "string"
+    },
+    {
+      "key": "teacherEmail",
+      "value": "teacher{{$timestamp}}@example.com",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication Tests",
+      "item": [
+        {
+          "name": "Register User - Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test user registration with student role",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "// Save credentials for later use",
+                  "pm.collectionVariables.set(\"testUsername\", pm.variables.get(\"testUsername\"));",
+                  "pm.collectionVariables.set(\"testPassword\", pm.variables.get(\"testPassword\"));",
+                  "pm.collectionVariables.set(\"testEmail\", pm.variables.get(\"testEmail\"));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{testUsername}}\",\n    \"password\": \"{{testPassword}}\",\n    \"email\": \"{{testEmail}}\",\n    \"role\": \"student\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register User - Teacher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test user registration with teacher role",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "// Save teacher credentials",
+                  "pm.collectionVariables.set(\"teacherUsername\", \"teacher_{{$timestamp}}\");",
+                  "pm.collectionVariables.set(\"teacherPassword\", \"Teacherpass123!\");",
+                  "pm.collectionVariables.set(\"teacherEmail\", \"teacher{{$timestamp}}@example.com\");"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"teacher_{{$timestamp}}\",\n    \"password\": \"Teacherpass123!\",\n    \"email\": \"teacher{{$timestamp}}@example.com\",\n    \"role\": \"teacher\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test successful student login",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Check response structure",
+                  "pm.test(\"Response has access token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('access');",
+                  "    pm.expect(jsonData).to.have.property('refresh');",
+                  "    pm.expect(jsonData).to.have.property('username');",
+                  "    pm.expect(jsonData).to.have.property('role');",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "});",
+                  "",
+                  "// Save tokens for future requests",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"studentToken\", jsonData.access);",
+                  "pm.collectionVariables.set(\"studentRefreshToken\", jsonData.refresh);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{testUsername}}\",\n    \"password\": \"{{testPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login Teacher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test teacher login",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Save teacher token",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"teacherToken\", jsonData.access);",
+                  "pm.collectionVariables.set(\"teacherRefreshToken\", jsonData.refresh);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{teacherUsername}}\",\n    \"password\": \"{{teacherPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notice Tests",
+      "item": [
+        {
+          "name": "Create Notice (Teacher)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test creating a notice as teacher",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "// Save notice ID for later use",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"createdNoticeId\", jsonData.id);",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response contains notice data\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('title');",
+                  "    pm.expect(jsonData).to.have.property('content');",
+                  "    pm.expect(jsonData).to.have.property('type');",
+                  "    pm.expect(jsonData).to.have.property('author_name');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Test Notice {{$timestamp}}\",\n    \"content\": \"This is a test notice created by Postman integration tests.\",\n    \"type\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notices/",
+              "host": ["{{baseUrl}}"],
+              "path": ["notices", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notices List (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test getting notices list (student perspective)",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response contains notices with read status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData[0]).to.have.property('id');",
+                  "    pm.expect(jsonData[0]).to.have.property('title');",
+                  "    pm.expect(jsonData[0]).to.have.property('content');",
+                  "    pm.expect(jsonData[0]).to.have.property('is_read');",
+                  "    pm.expect(jsonData[0]).to.have.property('read_count');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notices/",
+              "host": ["{{baseUrl}}"],
+              "path": ["notices", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Unread Count (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test getting unread notice count",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response contains unread count\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('count');",
+                  "    pm.collectionVariables.set(\"initialUnreadCount\", jsonData.count);",
+                  "    pm.expect(jsonData.count).to.be.at.least(1);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notices/unread_count/",
+              "host": ["{{baseUrl}}"],
+              "path": ["notices", "unread_count", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notice as Read (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test marking a notice as read",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response shows successful marking\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('status', 'success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notices/{{createdNoticeId}}/mark_as_read/",
+              "host": ["{{baseUrl}}"],
+              "path": ["notices", "{{createdNoticeId}}", "mark_as_read", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Notice Read Status (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test verifying notice read status",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Verify the notice is now marked as read",
+                  "pm.test(\"Notice is marked as read\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    for (var i = 0; i < jsonData.length; i++) {",
+                  "        if (jsonData[i].id === pm.collectionVariables.get(\"createdNoticeId\")) {",
+                  "            pm.expect(jsonData[i].is_read).to.be.true;",
+                  "            return;",
+                  "        }",
+                  "    }",
+                  "    pm.expect.fail(\"Created notice not found in response\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notices/",
+              "host": ["{{baseUrl}}"],
+              "path": ["notices", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All Notices as Read (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test marking all notices as read",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response shows successful marking\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('status', 'success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notices/mark_all_read/",
+              "host": ["{{baseUrl}}"],
+              "path": ["notices", "mark_all_read", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify All Notices Read (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test verifying all notices are read",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Verify all notices are marked as read",
+                  "pm.test(\"All notices are read\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    for (var i = 0; i < jsonData.length; i++) {",
+                  "        pm.expect(jsonData[i].is_read).to.be.true;",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notices/",
+              "host": ["{{baseUrl}}"],
+              "path": ["notices", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Notice (Teacher)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test deleting a notice (teacher only)",
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notices/{{createdNoticeId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["notices", "{{createdNoticeId}}", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Error Case Tests",
+      "item": [
+        {
+          "name": "Create Notice (Student - Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test student trying to create notice (forbidden)",
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "// Verify error message",
+                  "pm.test(\"Response shows permission error\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('detail', '无权限操作');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Unauthorized Notice\",\n    \"content\": \"Student trying to create notice\",\n    \"type\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notices/",
+              "host": ["{{baseUrl}}"],
+              "path": ["notices", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Notice (Student - Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test student trying to delete notice (forbidden)",
+                  "pm.test(\"Status code is 403\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notices/{{createdNoticeId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["notices", "{{createdNoticeId}}", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

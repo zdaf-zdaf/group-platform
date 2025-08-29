@@ -1,0 +1,1001 @@
+{
+  "info": {
+    "name": "Lab Platform API Tests For Experiment Features",
+    "description": "集成测试集，用于测试实验室平台的实验相关功能",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testUsername",
+      "value": "testuser_{{$timestamp}}",
+      "type": "string"
+    },
+    {
+      "key": "testPassword",
+      "value": "Testpass123!",
+      "type": "string"
+    },
+    {
+      "key": "testEmail",
+      "value": "testuser{{$timestamp}}@example.com",
+      "type": "string"
+    },
+    {
+      "key": "createdQuestionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdCommentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teacherAuthToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentAuthToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teacherUsername",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentUsername",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teacherId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdExperimentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "submissionId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "实验功能完整流程测试",
+      "item": [
+            {
+                "name": "1. 准备工作 (注册教师和学生)",
+                "item": [
+                    {
+                        "name": "注册教师账号",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test(\"状态码应为 201 Created\", () => { pm.response.to.have.status(201); });",
+                                        "const jsonData = pm.response.json();",
+                                        "console.log('教师注册响应:', JSON.stringify(jsonData, null, 2));",
+                                        "",
+                                        "// 从请求体中提取用户名（因为响应可能不包含用户信息）",
+                                        "const requestBody = JSON.parse(pm.request.body.raw);",
+                                        "console.log('请求体:', JSON.stringify(requestBody, null, 2));",
+                                        "",
+                                        "// 优先使用响应中的数据，如果没有则使用请求中的数据",
+                                        "if(jsonData.id) { ",
+                                        "    pm.collectionVariables.set(\"teacherId\", jsonData.id); ",
+                                        "} else if(requestBody.username) {",
+                                        "    // 如果响应没有ID，生成一个临时ID",
+                                        "    pm.collectionVariables.set(\"teacherId\", \"temp_teacher_id\");",
+                                        "}",
+                                        "",
+                                        "if(jsonData.username) { ",
+                                        "    pm.collectionVariables.set(\"teacherUsername\", jsonData.username); ",
+                                        "} else if(requestBody.username) {",
+                                        "    pm.collectionVariables.set(\"teacherUsername\", requestBody.username);",
+                                        "}",
+                                        "",
+                                        "console.log('设置的教师用户名:', pm.collectionVariables.get(\"teacherUsername\"));"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "method": "POST",
+                            "header": [],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"username\": \"teacher_{{$randomInt}}\",\n    \"password\": \"teacherpass123\",\n    \"email\": \"teacher_{{$randomInt}}@example.com\",\n    \"role\": \"teacher\"\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "{{baseUrl}}/auth/register/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "auth",
+                                    "register",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "注册学生账号",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test(\"状态码应为 201 Created\", () => { pm.response.to.have.status(201); });",
+                                        "const jsonData = pm.response.json();",
+                                        "console.log('学生注册响应:', JSON.stringify(jsonData, null, 2));",
+                                        "",
+                                        "// 从请求体中提取用户名（因为响应可能不包含用户信息）",
+                                        "const requestBody = JSON.parse(pm.request.body.raw);",
+                                        "console.log('请求体:', JSON.stringify(requestBody, null, 2));",
+                                        "",
+                                        "// 优先使用响应中的数据，如果没有则使用请求中的数据",
+                                        "if(jsonData.id) { ",
+                                        "    pm.collectionVariables.set(\"studentId\", jsonData.id); ",
+                                        "} else {",
+                                        "    // 如果响应没有ID，设置一个临时ID，稍后从登录响应中获取",
+                                        "    pm.collectionVariables.set(\"studentId\", \"temp_student_id\");",
+                                        "}",
+                                        "",
+                                        "if(jsonData.username) { ",
+                                        "    pm.collectionVariables.set(\"studentUsername\", jsonData.username); ",
+                                        "} else if(requestBody.username) {",
+                                        "    pm.collectionVariables.set(\"studentUsername\", requestBody.username);",
+                                        "}",
+                                        "",
+                                        "console.log('设置的学生用户名:', pm.collectionVariables.get(\"studentUsername\"));"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "method": "POST",
+                            "header": [],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"username\": \"student_{{$randomInt}}\",\n    \"password\": \"studentpass123\",\n    \"email\": \"student_{{$randomInt}}@example.com\",\n    \"role\": \"student\"\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "{{baseUrl}}/auth/register/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "auth",
+                                    "register",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    }
+                ]
+            },
+            {
+                "name": "2. 教师操作 (创建和发布实验)",
+                "item": [
+                    {
+                        "name": "教师登录",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test(\"状态码应为 200 OK\", () => { pm.response.to.have.status(200); });",
+                                        "const jsonData = pm.response.json();",
+                                        "if (jsonData.access) { ",
+                                        "    pm.collectionVariables.set(\"teacherAuthToken\", jsonData.access); ",
+                                        "}",
+                                        "// 从登录响应中获取真实的用户ID",
+                                        "if (jsonData.access) {",
+                                        "    // 解码JWT token获取用户ID",
+                                        "    const payload = JSON.parse(atob(jsonData.access.split('.')[1]));",
+                                        "    console.log('教师JWT载荷:', JSON.stringify(payload, null, 2));",
+                                        "    if (payload.user_id) {",
+                                        "        pm.collectionVariables.set(\"teacherId\", payload.user_id);",
+                                        "        console.log('从JWT中获取教师ID:', payload.user_id);",
+                                        "    }",
+                                        "}"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "method": "POST",
+                            "header": [],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"username\": \"{{teacherUsername}}\",\n    \"password\": \"teacherpass123\"\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "{{baseUrl}}/auth/login/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "auth",
+                                    "login",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "创建新实验并分配给学生",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "// 检查必要的变量",
+                                        "console.log('当前studentId变量值:', pm.collectionVariables.get('studentId'));",
+                                        "console.log('当前teacherAuthToken:', pm.collectionVariables.get('teacherAuthToken'));",
+                                        "",
+                                        "// 检查studentId是否为有效数字",
+                                        "const studentId = pm.collectionVariables.get('studentId');",
+                                        "",
+                                        "console.log('studentId有效，值为:', studentId);",
+                                        "",
+                                        "pm.test('状态码应为 201 Created', () => { pm.response.to.have.status(201); });",
+                                        "const jsonData = pm.response.json();",
+                                        "console.log('创建实验响应:', JSON.stringify(jsonData, null, 2));",
+                                        "if (jsonData.id) { ",
+                                        "    pm.collectionVariables.set('createdExperimentId', jsonData.id);",
+                                        "    console.log('设置实验ID:', jsonData.id);",
+                                        "} else {",
+                                        "    console.log('警告: 响应中没有找到实验ID');",
+                                        "}"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{teacherAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "POST",
+                            "header": [],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"title\": \"Postman自动化综合实验 {{$timestamp}}\",\n    \"description\": \"这是一个包含所有题型的综合实验，用于自动化测试。\",\n    \"start_time\": \"2025-08-01T10:00:00+08:00\",\n    \"deadline\": \"2025-09-30T23:59:59+08:00\",\n    \"students\": [],\n    \"allow_late_submission\": true,\n    \"late_submission_penalty\": 10\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "{{baseUrl}}/experiments/experiments/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "experiments",
+                                    "experiments",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "创建选择题",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test('选择题创建成功', () => { pm.response.to.have.status(201); });",
+                                        "const jsonData = pm.response.json();",
+                                        "console.log('选择题创建响应:', JSON.stringify(jsonData, null, 2));",
+                                        "if (jsonData.id) {",
+                                        "    pm.collectionVariables.set('choiceQuestionId', jsonData.id);",
+                                        "    console.log('选择题ID:', jsonData.id);",
+                                        "}"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{teacherAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "POST",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"experiment\": {{createdExperimentId}},\n    \"description\": \"RESTful API中，哪个HTTP方法通常用于创建资源？\",\n    \"options\": [\n        { \"id\": \"0\", \"text\": \"GET\" },\n        { \"id\": \"1\", \"text\": \"POST\" },\n        { \"id\": \"2\", \"text\": \"DELETE\" }\n    ],\n    \"correct_answer\": \"1\",\n    \"score\": 5,\n    \"order\": 1\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "{{baseUrl}}/experiments/choice-problems/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "experiments",
+                                    "choice-problems",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "创建填空题",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test('填空题创建成功', () => { pm.response.to.have.status(201); });",
+                                        "const jsonData = pm.response.json();",
+                                        "console.log('填空题创建响应:', JSON.stringify(jsonData, null, 2));",
+                                        "if (jsonData.id) {",
+                                        "    pm.collectionVariables.set('fillQuestionId', jsonData.id);",
+                                        "    console.log('填空题ID:', jsonData.id);",
+                                        "}"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{teacherAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "POST",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"experiment\": {{createdExperimentId}},\n    \"description\": \"Docker是一种___技术。\",\n    \"correct_answer\": \"容器化\",\n    \"score\": 5,\n    \"order\": 2\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "{{baseUrl}}/experiments/fill-problems/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "experiments",
+                                    "fill-problems",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "创建编程题",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test('编程题创建成功', () => { pm.response.to.have.status(201); });",
+                                        "const jsonData = pm.response.json();",
+                                        "console.log('编程题创建响应:', JSON.stringify(jsonData, null, 2));",
+                                        "if (jsonData.id) {",
+                                        "    pm.collectionVariables.set('codingQuestionId', jsonData.id);",
+                                        "    console.log('编程题ID:', jsonData.id);",
+                                        "}"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{teacherAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "POST",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"experiment\": {{createdExperimentId}},\n    \"description\": \"编写一个Python函数，计算两个数的和\",\n    \"test_cases\": [\n        {\n            \"input\": \"3 5\",\n            \"output\": \"8\"\n        },\n        {\n            \"input\": \"10 20\",\n            \"output\": \"30\"\n        },\n        {\n            \"input\": \"-1 1\",\n            \"output\": \"0\"\n        }\n    ],\n    \"timeout\": 10,\n    \"mem_limit\": 256,\n    \"score\": 10,\n    \"order\": 3\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "{{baseUrl}}/experiments/coding-problems/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "experiments",
+                                    "coding-problems",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "教师更新实验信息",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test('更新成功', () => { pm.response.to.have.status(200); });",
+                                        "const jsonData = pm.response.json();",
+                                        "console.log('更新实验响应:', JSON.stringify(jsonData, null, 2));",
+                                        "// 验证更新后的信息",
+                                        "pm.test('标题已更新', () => {",
+                                        "    pm.expect(jsonData.title).to.include('已更新');",
+                                        "});",
+                                        "pm.test('描述已更新', () => {",
+                                        "    pm.expect(jsonData.description).to.include('更新后的描述');",
+                                        "});"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{teacherAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "PATCH",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"title\": \"Postman自动化综合实验 {{$timestamp}} - 已更新\",\n    \"description\": \"更新后的描述：这是一个经过修改的综合实验。\",\n    \"deadline\": \"2025-10-31T23:59:59+08:00\",\n    \"allow_late_submission\": false,\n    \"late_submission_penalty\": 20\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "{{baseUrl}}/experiments/experiments/{{createdExperimentId}}/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "experiments",
+                                    "experiments",
+                                    "{{createdExperimentId}}",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "教师获取更新后的实验详情",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test('获取成功', () => { pm.response.to.have.status(200); });",
+                                        "const jsonData = pm.response.json();",
+                                        "console.log('实验详情:', JSON.stringify(jsonData, null, 2));",
+                                        "// 验证包含所有题型",
+                                        "if (jsonData.questions) {",
+                                        "    const questionTypes = jsonData.questions.map(q => q.type);",
+                                        "    pm.test('包含选择题', () => {",
+                                        "        pm.expect(questionTypes).to.include('choice');",
+                                        "    });",
+                                        "    pm.test('包含填空题', () => {",
+                                        "        pm.expect(questionTypes).to.include('fill');",
+                                        "    });",
+                                        "    pm.test('包含编程题', () => {",
+                                        "        pm.expect(questionTypes).to.include('code');",
+                                        "    });",
+                                        "    console.log('实验包含的题目类型:', questionTypes);",
+                                        "}",
+                                        "// 验证更新的基本信息",
+                                        "pm.test('标题包含已更新', () => {",
+                                        "    pm.expect(jsonData.title).to.include('已更新');",
+                                        "});",
+                                        "pm.test('描述包含更新后', () => {",
+                                        "    pm.expect(jsonData.description).to.include('更新后的描述');",
+                                        "});"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{teacherAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "GET",
+                            "header": [],
+                            "url": {
+                                "raw": "{{baseUrl}}/experiments/experiments/{{createdExperimentId}}/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "experiments",
+                                    "experiments",
+                                    "{{createdExperimentId}}",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    }
+                ]
+            },
+            {
+                "name": "3. 学生操作 (获取和提交实验)",
+                "item": [
+                    {
+                        "name": "学生登录",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test(\"状态码应为 200 OK\", () => { pm.response.to.have.status(200); });",
+                                        "const jsonData = pm.response.json();",
+                                        "if (jsonData.access) { ",
+                                        "    pm.collectionVariables.set(\"studentAuthToken\", jsonData.access); ",
+                                        "}",
+                                        "// 从登录响应中获取真实的用户ID",
+                                        "if (jsonData.access) {",
+                                        "    // 解码JWT token获取用户ID",
+                                        "    const payload = JSON.parse(atob(jsonData.access.split('.')[1]));",
+                                        "    console.log('学生JWT载荷:', JSON.stringify(payload, null, 2));",
+                                        "    if (payload.user_id) {",
+                                        "        pm.collectionVariables.set(\"studentId\", payload.user_id);",
+                                        "        console.log('从JWT中获取学生ID:', payload.user_id);",
+                                        "    }",
+                                        "}"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "method": "POST",
+                            "header": [],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"username\": \"{{studentUsername}}\",\n    \"password\": \"studentpass123\"\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "{{baseUrl}}/auth/login/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "auth",
+                                    "login",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "学生获取实验列表",
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{studentAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "GET",
+                            "header": [],
+                            "url": {
+                                "raw": "{{baseUrl}}/experiments/experiments/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "experiments",
+                                    "experiments",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "学生提交实验答案",
+                        "event": [
+                            {
+                                "listen": "prerequest",
+                                "script": {
+                                    "exec": [
+                                        "// 验证必要的变量是否已设置",
+                                        "const requiredVars = ['createdExperimentId', 'choiceQuestionId', 'fillQuestionId', 'codingQuestionId'];",
+                                        "const missingVars = [];",
+                                        "",
+                                        "requiredVars.forEach(varName => {",
+                                        "    const value = pm.collectionVariables.get(varName);",
+                                        "    if (!value) {",
+                                        "        missingVars.push(varName);",
+                                        "    } else {",
+                                        "        console.log(`${varName}: ${value}`);",
+                                        "    }",
+                                        "});",
+                                        "",
+                                        "if (missingVars.length > 0) {",
+                                        "    console.log('缺少必要的变量:', missingVars.join(', '));",
+                                        "    throw new Error(`缺少必要的变量: ${missingVars.join(', ')}`);",
+                                        "} else {",
+                                        "    console.log('所有必要变量已设置完成');",
+                                        "}"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            },
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "console.log('响应状态:', pm.response.code);",
+                                        "console.log('响应头:', pm.response.headers.toJSON());",
+                                        "console.log('响应内容:', pm.response.text());",
+                                        "",
+                                        "if (pm.response.code === 500) {",
+                                        "    console.log('❌ 服务器错误，详细信息:');",
+                                        "    try {",
+                                        "        const errorData = pm.response.json();",
+                                        "        console.log('错误JSON:', JSON.stringify(errorData, null, 2));",
+                                        "        pm.test('捕获到500错误', () => {",
+                                        "            pm.expect(errorData.message).to.include('Error while fetching server API version');",
+                                        "        });",
+                                        "    } catch (e) {",
+                                        "        console.log('错误响应不是JSON格式:', pm.response.text());",
+                                        "    }",
+                                        "} else if (pm.response.code === 201 || pm.response.code === 200) {",
+                                        "    pm.test('提交成功', () => { ",
+                                        "        pm.expect(pm.response.code).to.be.oneOf([200, 201]); ",
+                                        "    });",
+                                        "    const jsonData = pm.response.json();",
+                                        "    console.log('学生提交响应:', JSON.stringify(jsonData, null, 2));",
+                                        "    ",
+                                        "    // 验证响应包含必要字段",
+                                        "    if(jsonData.submission_id) { ",
+                                        "        pm.collectionVariables.set('submissionId', jsonData.submission_id);",
+                                        "        pm.test('包含submission_id', () => {",
+                                        "            pm.expect(jsonData.submission_id).to.be.a('number');",
+                                        "        });",
+                                        "    }",
+                                        "    ",
+                                        "    if(jsonData.total_score !== undefined) { ",
+                                        "        console.log('总得分:', jsonData.total_score);",
+                                        "        pm.test('包含总得分', () => {",
+                                        "            pm.expect(jsonData.total_score).to.be.a('number');",
+                                        "        });",
+                                        "    }",
+                                        "    ",
+                                        "    // 验证提交结果包含各题型",
+                                        "    if (jsonData.results) {",
+                                        "        pm.test('包含选择题结果', () => {",
+                                        "            pm.expect(jsonData.results.choice).to.be.an('array');",
+                                        "        });",
+                                        "        pm.test('包含填空题结果', () => {",
+                                        "            pm.expect(jsonData.results.fill).to.be.an('array');",
+                                        "        });",
+                                        "        pm.test('包含编程题结果', () => {",
+                                        "            pm.expect(jsonData.results.coding).to.be.an('array');",
+                                        "        });",
+                                        "        console.log('提交结果验证完成');",
+                                        "    }",
+                                        "} else {",
+                                        "    console.log('其他状态码:', pm.response.code);",
+                                        "    pm.test('非预期状态码', () => {",
+                                        "        pm.expect.fail(`状态码 ${pm.response.code}: ${pm.response.text()}`);",
+                                        "    });",
+                                        "}"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{studentAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "POST",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"experiment_id\": {{createdExperimentId}},\n    \"answers\": {\n        \"choice\": [\n            {\n                \"question_id\": {{choiceQuestionId}},\n                \"selected\": \"1\"\n            }\n        ],\n        \"fill\": [\n            {\n                \"question_id\": {{fillQuestionId}},\n                \"answer\": \"容器化\"\n            }\n        ],\n        \"coding\": [\n            {\n                \"question_id\": {{codingQuestionId}},\n                \"code\": \"def add_numbers(a, b):\\n    return a + b\\n\\n# 读取输入\\ninput_line = input().strip()\\na, b = map(int, input_line.split())\\nresult = add_numbers(a, b)\\nprint(result)\"\n            }\n        ]\n    }\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "http://localhost:8000/submit/experiment/",
+                                "protocol": "http",
+                                "host": [
+                                    "localhost"
+                                ],
+                                "port": "8000",
+                                "path": [
+                                    "submit",
+                                    "experiment",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    }
+                ]
+            },
+            {
+                "name": "4. 教师批改 (查看提交并打分)",
+                "item": [
+                    {
+                        "name": "教师获取实验的提交列表",
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{teacherAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "GET",
+                            "header": [],
+                            "url": {
+                                "raw": "{{baseUrl}}/experiments/experiments/{{createdExperimentId}}/submissions/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "experiments",
+                                    "experiments",
+                                    "{{createdExperimentId}}",
+                                    "submissions",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "教师批改学生的提交",
+                        "event": [
+                            {
+                                "listen": "test",
+                                "script": {
+                                    "exec": [
+                                        "pm.test(\"状态码应为 200 OK\", () => { pm.response.to.have.status(200); });"
+                                    ],
+                                    "type": "text/javascript"
+                                }
+                            }
+                        ],
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{teacherAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "PATCH",
+                            "header": [],
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\n    \"score\": 95.5,\n    \"feedback\": \"做得很好，选择题第二题答案有误，请注意。\"\n}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": {
+                                "raw": "{{baseUrl}}/experiments/submissions/{{submissionId}}/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "experiments",
+                                    "submissions",
+                                    "{{submissionId}}",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    }
+                ]
+            },
+            {
+                "name": "5. 清理操作 (删除测试数据)",
+                "item": [
+                    {
+                        "name": "删除创建的实验",
+                        "request": {
+                            "auth": {
+                                "type": "bearer",
+                                "bearer": [
+                                    {
+                                        "key": "token",
+                                        "value": "{{teacherAuthToken}}",
+                                        "type": "string"
+                                    }
+                                ]
+                            },
+                            "method": "DELETE",
+                            "header": [],
+                            "url": {
+                                "raw": "{{baseUrl}}/experiments/experiments/{{createdExperimentId}}/",
+                                "host": [
+                                    "{{baseUrl}}"
+                                ],
+                                "path": [
+                                    "experiments",
+                                    "experiments",
+                                    "{{createdExperimentId}}",
+                                    ""
+                                ]
+                            }
+                        },
+                        "response": []
+                    }
+                ]
+            }
+      ]
+    }
+  ]
+}
