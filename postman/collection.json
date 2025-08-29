@@ -568,7 +568,7 @@
                   "pm.test(\"Response contains error details\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData).to.have.property('success', false);",
-                  "    pm.expect(jsonData).to.have.property('error');",
+                  "    pm.expect(jsonData).to.have.property('errors');",
                   "    pm.expect(jsonData.errors).to.have.property('detail');",
                   "    pm.expect(jsonData.errors.detail).to.be.an('array').that.includes('用户名或密码错误，请重新输入');",
                   "});"
@@ -605,12 +605,15 @@
               "script": {
                 "exec": [
                   "// Test accessing protected route without token",
-                  "pm.test(\"Status code is 200 for public access\", function () {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test(\"Status code is 401 without token\", function () {",
+                      "pm.response.to.have.status(401);",
                   "});",
-                  "pm.test(\"Response contains public user data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('data');",
+
+                  "pm.test(\"Response contains error details\", function () {",
+                      "var jsonData = pm.response.json();",
+                      "pm.expect(jsonData).to.have.property('error', true);",
+                      "pm.expect(jsonData).to.have.property('message', 'Authentication credentials were not provided.');",
+                      "pm.expect(jsonData).to.have.property('code', 401);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -623,7 +626,7 @@
             "url": {
               "raw": "{{baseUrl}}/auth/user/profile/",
               "host": ["{{baseUrl}}"],
-              "path": ["auth", "user", "profile", ""]
+              "path": ["auth", "user","profile",""]
             }
           },
           "response": []
