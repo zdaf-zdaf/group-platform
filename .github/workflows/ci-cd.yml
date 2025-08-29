@@ -102,7 +102,7 @@ jobs:
             DEBUG: False
 
   # 论坛测试
-test-LunTan:
+test_LunTan:
   name: LunTan Tests
   runs-on: ubuntu-latest
   needs: [test-backend] # 只依赖后端测试，不依赖其他API测试
@@ -130,7 +130,7 @@ test-LunTan:
           --reporters cli
 
 # 公告测试
-test-GongGao:
+test_GongGao:
   name: GongGao Tests
   runs-on: ubuntu-latest
   needs: [test-backend] # 只依赖后端测试
@@ -158,7 +158,7 @@ test-GongGao:
           --reporters cli
 
 # 实验测试
-test-lab:
+test_lab:
   name: Lab Tests
   runs-on: ubuntu-latest
   needs: [test-backend] # 只依赖后端测试
@@ -190,7 +190,7 @@ test-lab:
     name:  Run Cypress GUI Tests
     runs-on: ubuntu-latest
     # 【重要】设置依赖：必须等前端单元测试和API测试都通过后才运行
-    needs: [test-frontend, test-LunTan, test-GongGao, test-lab] # 依赖所有API测试
+    needs: [test-frontend, test_LunTan, test_GongGao, test_lab] # 依赖所有API测试
 
     steps:
       - name:  Checkout code
@@ -283,7 +283,7 @@ test-lab:
 
   notify-deployment-ready:
     runs-on: ubuntu-latest
-    needs: [test-backend, test-frontend, test-LunTan, test-GongGao, test-lab, gui-test-cypress, build-and-push-backend, build-and-push-frontend]
+    needs: [test-backend, test-frontend, test_LunTan, test_GongGao, test_lab, gui-test-cypress, build-and-push-backend, build-and-push-frontend]
     steps:
       - name: Notify Team
         run: |
