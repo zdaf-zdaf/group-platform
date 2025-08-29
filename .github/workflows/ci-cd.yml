@@ -72,7 +72,7 @@ jobs:
         run: npm install -g newman
 
       - name: Run Postman tests (论坛)
-        run: newman run postman/luntan.postman_collection.json -e postman/environment.json
+        run: newman run postman/collection1-LunTan.json -e postman/environment.json
 
   # ================== API 测试（实验模块） ==================
   api-test-lab:
@@ -86,7 +86,7 @@ jobs:
         run: npm install -g newman
 
       - name: Run Postman tests (实验)
-        run: newman run postman/lab.postman_collection.json -e postman/environment.json
+        run: newman run postman/collection2-Lab.json -e postman/environment.json
 
   # ================== API 测试（公告模块） ==================
   api-test-gonggao:
@@ -100,7 +100,7 @@ jobs:
         run: npm install -g newman
 
       - name: Run Postman tests (公告)
-        run: newman run postman/gonggao.postman_collection.json -e postman/environment.json
+        run: newman run postman/collection3-GongGao.json -e postman/environment.json
 
 
   # 【新增的Job】运行Cypress前端E2E测试
