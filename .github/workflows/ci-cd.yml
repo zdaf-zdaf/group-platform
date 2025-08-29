@@ -242,7 +242,7 @@ jobs:
 
       - name: ✅ Run Forum Tests
         run: |
-            newman run postman/collection1-LunTan.json \
+            newman run postman/collection2-Lab.json \
             --environment postman/environment.json \
             --global-var "api_url=127.0.0.1:8002" \  # 使用8002端口
             --reporters cli
@@ -318,7 +318,7 @@ jobs:
 
       - name: ✅ Run Forum Tests
         run: |
-            newman run postman/collection1-LunTan.json \
+            newman run postman/collection3-GongGao.json \
             --environment postman/environment.json \
             --global-var "api_url=127.0.0.1:8003" \  # 使用8003端口
             --reporters cli
