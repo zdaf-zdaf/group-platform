@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="4.654" tests="5" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-08-29T08:15:13" tests="0" file="cypress\e2e\2-advanced-examples\querying.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Querying" timestamp="2025-08-29T08:15:13" tests="5" time="4.652" failures="0">
+    <testcase name="Querying cy.get() - query DOM elements" time="1.220" classname="cy.get() - query DOM elements">
+    </testcase>
+    <testcase name="Querying cy.contains() - query DOM elements with matching content" time="0.255" classname="cy.contains() - query DOM elements with matching content">
+    </testcase>
+    <testcase name="Querying .within() - query DOM elements within a specific element" time="0.272" classname=".within() - query DOM elements within a specific element">
+    </testcase>
+    <testcase name="Querying cy.root() - query the root DOM element" time="0.212" classname="cy.root() - query the root DOM element">
+    </testcase>
+    <testcase name="Querying best practices - selecting elements" time="0.792" classname="best practices - selecting elements">
+    </testcase>
+  </testsuite>
+</testsuites>
