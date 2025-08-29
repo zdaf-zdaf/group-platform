@@ -101,122 +101,96 @@ jobs:
             DB_PORT: 3306
             DEBUG: False
 
-  # 【新增的Job】运行Postman API集成测试
-  api-test-postman:
-    # 取个好看的名字
-    name:  Run All Postman API Tests
-    # 运行环境
-    runs-on: ubuntu-latest
-    # 【重要】设置依赖：必须等后端单元测试通过后才运行
-    needs: [test-backend]
-    services:
-        mysql:
-            image: mysql:8.0
-            env:
-                MYSQL_ROOT_PASSWORD: rootpassword
-                MYSQL_DATABASE: test_db
-                MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-            ports:
-                - 3306:3306
-            options: >-
-                --health-cmd="mysqladmin ping"
-                --health-interval=10s
-                --health-timeout=5s
-                --health-retries=3
+  # 论坛测试
+test-LunTan:
+  name: LunTan Tests
+  runs-on: ubuntu-latest
+  needs: [test-backend] # 只依赖后端测试，不依赖其他API测试
+  services:
+    mysql:
+      image: mysql:8.0
+      env:
+        MYSQL_ROOT_PASSWORD: rootpassword
+        MYSQL_DATABASE: test_db
+        MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+      ports:
+        - 3306:3306
+  steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    - name: 🚀 Start Django Server
+      run: |
+        python manage.py runserver 0.0.0.0:8000 &
+        # ... 其他启动步骤
+      working-directory: ./backend
+    - name: ✅ Run Forum Tests
+      run: |
+        newman run postman/collection1-LunTan.json \
+          --environment postman/environment.json \
+          --reporters cli
 
-    steps:
-      # 第一步：获取代码（必须）
-      - name:  Checkout code
-        uses: actions/checkout@v4
+# 公告测试
+test-GongGao:
+  name: GongGao Tests
+  runs-on: ubuntu-latest
+  needs: [test-backend] # 只依赖后端测试
+  services:
+    mysql:
+      image: mysql:8.0
+      env:
+        MYSQL_ROOT_PASSWORD: rootpassword
+        MYSQL_DATABASE: test_db
+        MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+      ports:
+        - 3306:3306
+  steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    - name: 🚀 Start Django Server
+      run: |
+        python manage.py runserver 0.0.0.0:8001 & # 使用不同端口避免冲突
+        # ... 其他启动步骤
+      working-directory: ./backend
+    - name: ✅ Run Announcement Tests
+      run: |
+        newman run postman/collection2-GongGao.json \
+          --environment postman/environment.json \
+          --reporters cli
 
-      # 第二步：安装Node.js（因为运行Postman的命令行工具需要）
-      - name:  Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v5
-        with:
-            python-version: '3.10'
-
-      - name: 📦 Install Python dependencies
-        run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-        working-directory: ./backend
-
-      - name: ⚙️ Configure MySQL
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            # 等待MySQL启动
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-                echo "MySQL is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
-            sleep 2
-            done
-            # 配置MySQL权限
-            mysql -h"127.0.0.1" -uroot -prootpassword -e "
-            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            FLUSH PRIVILEGES;
-            "
-
-      - name: 🚀 Start Django Server
-        run: |
-            # 启动Django开发服务器在后台运行
-            python manage.py runserver 0.0.0.0:8000 &
-            SERVER_PID=$!
-            echo "Django server started with PID: $SERVER_PID"
-            
-            # 等待服务器启动
-            sleep 10
-            
-            # 检查服务器是否正常运行
-            curl -f http://localhost:8000/api/health/ || curl -f http://localhost:8000/ || true
-        working-directory: ./backend
-        env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
-            DEBUG: False
-
-      - name: 📦 Install Newman
-        run: npm install -g newman
-
-      - name: ✅ Run Tests1 LunTan
-        run: |
-            newman run postman/collection1-LunTan.json \
-            --environment postman/environment.json \
-            --reporters cli
-        # 注意：将 authentication-collection.json 替换为实际的认证测试集文件名
-
-      - name: ✅ Run Tests2 GongGao
-        run: |
-            newman run postman/collection2-GongGao.json \
-            --environment postman/environment.json \
-            --reporters cli
-        # 注意：将 forum-collection.json 替换为实际的论坛测试集文件名
-
-      - name: ✅ Run Tests3 Lab
-        run: |
-            newman run postman/collection3-Lab.json \
-            --environment postman/environment.json \
-            --reporters cli
-        # 注意：将 error-cases-collection.json 替换为实际的错误用例测试集文件名
+# 实验测试
+test-lab:
+  name: Lab Tests
+  runs-on: ubuntu-latest
+  needs: [test-backend] # 只依赖后端测试
+  services:
+    mysql:
+      image: mysql:8.0
+      env:
+        MYSQL_ROOT_PASSWORD: rootpassword
+        MYSQL_DATABASE: test_db
+        MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+      ports:
+        - 3306:3306
+  steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    - name: 🚀 Start Django Server
+      run: |
+        python manage.py runserver 0.0.0.0:8002 & # 使用不同端口
+        # ... 其他启动步骤
+      working-directory: ./backend
+    - name: ✅ Run Lab Tests
+      run: |
+        newman run postman/collection3-Lab.json \
+          --environment postman/environment.json \
+          --reporters cli
 
   # 【新增的Job】运行Cypress前端E2E测试
   gui-test-cypress:
     name:  Run Cypress GUI Tests
     runs-on: ubuntu-latest
     # 【重要】设置依赖：必须等前端单元测试和API测试都通过后才运行
-    needs: [test-frontend, api-test-postman]
+    needs: [test-frontend, test-LunTan, test-GongGao, test-lab] # 依赖所有API测试
 
     steps:
       - name:  Checkout code
@@ -309,7 +283,7 @@ jobs:
 
   notify-deployment-ready:
     runs-on: ubuntu-latest
-    needs: [test-backend, test-frontend, api-test-postman, gui-test-cypress, build-and-push-backend, build-and-push-frontend] #等待所有镜像推送成功
+    needs: [test-backend, test-frontend, test-LunTan, test-GongGao, test-lab, gui-test-cypress, build-and-push-backend, build-and-push-frontend]
     steps:
       - name: Notify Team
         run: |
