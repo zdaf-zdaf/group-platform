@@ -10,69 +10,66 @@ jobs:
   # ================== 后端测试（容器化） ==================
   test-backend:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: 956402436
+          MYSQL_DATABASE: lab_platform
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -uroot -p956402436"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      backend:
+        build:
+          context: ./backend
+        image: course-backend:latest
+        env:
+          DB_HOST: mysql
+          DB_PORT: 3306
+          DB_NAME: lab_platform
+          DB_USER: root
+          DB_PASSWORD: 956402436
+        ports:
+          - 8000:8000
+        options: >-
+          --health-cmd="curl --fail http://localhost:8000/ || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+          -v /var/run/docker.sock:/var/run/docker.sock
     steps:
-      test-backend:
-        runs-on: ubuntu-latest
-        services:
-          mysql:
-            image: mysql:8.0
-            env:
-              MYSQL_ROOT_PASSWORD: 956402436
-              MYSQL_DATABASE: lab_platform
-            ports:
-              - 3306:3306
-            options: >-
-              --health-cmd="mysqladmin ping -uroot -p956402436"
-              --health-interval=10s
-              --health-timeout=5s
-              --health-retries=5
-          backend:
-            build:
-              context: ./backend
-            image: course-backend:latest
-            env:
-              DB_HOST: mysql
-              DB_PORT: 3306
-              DB_NAME: lab_platform
-              DB_USER: root
-              DB_PASSWORD: 956402436
-            ports:
-              - 8000:8000
-            options: >-
-              --health-cmd="curl --fail http://localhost:8000/ || exit 1"
-              --health-interval=10s
-              --health-timeout=5s
-              --health-retries=10
-              -v /var/run/docker.sock:/var/run/docker.sock
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-          - name: Wait for backend service ready
-            run: |
-              for i in {1..30}; do
-                if curl -s http://localhost:8000/ > /dev/null; then
-                  echo "Backend is ready!"; break
-                fi
-                echo "Waiting for backend... ($i/30)"; sleep 2
-              done
+      - name: Wait for backend service ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:8000/ > /dev/null; then
+              echo "Backend is ready!"; break
+            fi
+            echo "Waiting for backend... ($i/30)"; sleep 2
+          done
 
-          - name: Run migrations
-            run: |
-              docker exec $(docker ps -qf "name=backend") python manage.py migrate --noinput
+      - name: Run migrations
+        run: |
+          docker exec $(docker ps -qf "name=backend") python manage.py migrate --noinput
 
-          - name: Run backend unit tests
-            run: |
-              docker exec $(docker ps -qf "name=backend") python manage.py test --verbosity=2
+      - name: Run backend unit tests
+        run: |
+          docker exec $(docker ps -qf "name=backend") python manage.py test --verbosity=2
 
-          - name: Install Newman
-            run: npm install -g newman
+      - name: Install Newman
+        run: npm install -g newman
 
-          - name: Run Postman API tests
-            run: |
-              newman run postman/collection1-LunTan.json -e postman/environment.json
-              newman run postman/collection2-Lab.json -e postman/environment.json
-              newman run postman/collection3-GongGao.json -e postman/environment.json
+      - name: Run Postman API tests
+        run: |
+          newman run postman/collection1-LunTan.json -e postman/environment.json
+          newman run postman/collection2-Lab.json -e postman/environment.json
+          newman run postman/collection3-GongGao.json -e postman/environment.json
 
 
   # 【新增的Job】运行Cypress前端E2E测试
