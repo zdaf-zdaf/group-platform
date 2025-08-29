@@ -60,32 +60,32 @@ jobs:
             FLUSH PRIVILEGES;
             "
 
-    # 🔑 新增：执行数据库迁移
-    - name: Run migrations
-    run: |
-      python manage.py makemigrations --noinput
-      python manage.py migrate --noinput
-    env:
-      DJANGO_SETTINGS_MODULE: server.settings
-      DB_ENGINE: django.db.backends.mysql
-      DB_NAME: test_db
-      DB_USER: root
-      DB_PASSWORD: rootpassword
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3306
-      DEBUG: False
+        # 🔑 新增：执行数据库迁移
+      - name: Run migrations
+        run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+        env:
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DEBUG: False
 
       - name: Run Django tests
         run: python manage.py test --verbosity=2
         env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
-            DEBUG: False
+                DJANGO_SETTINGS_MODULE: server.settings
+                DB_ENGINE: django.db.backends.mysql
+                DB_NAME: test_db
+                DB_USER: root
+                DB_PASSWORD: rootpassword
+                DB_HOST: 127.0.0.1
+                DB_PORT: 3306
+                DEBUG: False
 
   # 并行论坛测试
   api-test-luntan:
@@ -132,20 +132,20 @@ jobs:
             done
 
     # 🔑 新增：执行数据库迁移
-    - name: Run migrations
-    run: |
-      python manage.py makemigrations --noinput
-      python manage.py migrate --noinput
-    working-directory: ./backend
-    env:
-      DJANGO_SETTINGS_MODULE: server.settings
-      DB_ENGINE: django.db.backends.mysql
-      DB_NAME: test_db_luntan
-      DB_USER: root
-      DB_PASSWORD: rootpassword
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3307
-      DEBUG: False
+      - name: Run migrations
+        run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+        working-directory: ./backend
+        env:
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_luntan
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3307
+          DEBUG: False
 
       - name: 🚀 Start Django Server (Port 8001)
         run: |
@@ -223,20 +223,20 @@ jobs:
             done
 
     # 🔑 新增：执行数据库迁移
-    - name: Run migrations
-    run: |
-      python manage.py makemigrations --noinput
-      python manage.py migrate --noinput
-    working-directory: ./backend
-    env:
-      DJANGO_SETTINGS_MODULE: server.settings
-      DB_ENGINE: django.db.backends.mysql
-      DB_NAME: test_db_lab
-      DB_USER: root
-      DB_PASSWORD: rootpassword
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3308
-      DEBUG: False
+      - name: Run migrations
+        run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+        working-directory: ./backend
+        env:
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_lab
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3308
+          DEBUG: False
 
       - name: 🚀 Start Django Server (Port 8002)
         run: |
@@ -322,20 +322,20 @@ jobs:
             done
 
     # 🔑 新增：执行数据库迁移
-    - name: Run migrations
-    run: |
-      python manage.py makemigrations --noinput
-      python manage.py migrate --noinput
-    working-directory: ./backend
-    env:
-      DJANGO_SETTINGS_MODULE: server.settings
-      DB_ENGINE: django.db.backends.mysql
-      DB_NAME: test_db_gonggao
-      DB_USER: root
-      DB_PASSWORD: rootpassword
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3309
-      DEBUG: False
+      - name: Run migrations
+        run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+        working-directory: ./backend
+        env:
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_gonggao
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3309
+          DEBUG: False
 
       - name: 🚀 Start Django Server (Port 8003)
         run: |
