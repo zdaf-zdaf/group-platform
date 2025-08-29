@@ -37,12 +37,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
                   "// Test user registration with student role",
                   "pm.test(\"Status code is 201\", function () {",
                   "    pm.response.to.have.status(201);",
@@ -84,23 +78,33 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
-                  "if (pm.response.code === 500) {",
-                  "    console.error('注册失败，服务器错误:', pm.response.text());",
-                  "    pm.test('注册失败', function() {",
-                  "        pm.expect.fail('服务器返回500错误: ' + pm.response.text());",
+                  "// 统一解析JSON并处理错误",
+                  "try {",
+                  "    const jsonData = pm.response.json();",
+                  "    ",
+                  "    // 检查响应结构 - 只检查必要的token字段",
+                  "    pm.test(\"Response has required tokens\", function() {",
+                  "        pm.expect(jsonData).to.have.property('access');",
+                  "        pm.expect(jsonData).to.have.property('refresh');",
                   "    });",
-                  "} else {",
-                  "    pm.test(\"Status code is 200\", function () {",
-                  "        pm.response.to.have.status(200);",
-                  "    });",
-                  "    // 保存凭证...",
-                  "}"
+                  "    ",
+                  "    // 仅在响应结构正确时设置变量",
+                  "    if (jsonData.access && jsonData.refresh) {",
+                  "        pm.environment.set(\"access_token\", jsonData.access);",
+                  "        pm.collectionVariables.set(\"authToken\", jsonData.access);",
+                  "        pm.collectionVariables.set(\"refreshToken\", jsonData.refresh);",
+                  "        console.log(\"Tokens set successfully\");",
+                  "    } else {",
+                  "        console.warn(\"响应缺少token字段\");",
+                  "    }",
+                  "} catch (e) {",
+                  "    console.error(\"JSON解析失败:\", e.message);",
+                  "}",
+                  "",
+                  "// 状态码测试（始终执行）",
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -133,33 +137,17 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
-                  "if (pm.response.code === 200) {",
-                  "    const jsonData = pm.response.json();",
-                  "    if (jsonData.access && jsonData.refresh) {",
-                  "        pm.environment.set(\"access_token\", jsonData.access);",
-                  "        pm.collectionVariables.set(\"access_token\", jsonData.access);",
-                  "        pm.collectionVariables.set(\"refreshToken\", jsonData.refresh);",
-                  "        console.log(\"Tokens set successfully\");",
-                  "    } else {",
-                  "        console.warn(\"响应缺少token字段\");",
-                  "    }",
-                  "} else {",
-                  "    console.error(\"登录失败，状态码:\", pm.response.code);",
-                  "}",
-                  "if (pm.response.code === 200) {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.collectionVariables.set(\"access_token\", jsonData.access);",
-                  "    pm.collectionVariables.set(\"refreshToken\", jsonData.refresh);",
-                  "    console.log(\"Token refreshed successfully\");",
-                  "} else {",
-                  "    console.error(\"刷新令牌失败，状态码:\", pm.response.code);",
-                  "}"
+                  "// Test token refresh",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Save new tokens",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"authToken\", jsonData.access);",
+                  "pm.collectionVariables.set(\"refreshToken\", jsonData.refresh);",
+                  "",
+                  "console.log(\"Token refreshed successfully\");"
                 ],
                 "type": "text/javascript"
               }
@@ -178,7 +166,7 @@
               "raw": "{\n    \"refresh\": \"{{refreshToken}}\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/refresh/",
+              "raw": "{{baseUrl}}/api/auth/refresh/",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "refresh", ""]
             }
@@ -192,24 +180,20 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
-                  "if (pm.response.code === 200) {",
-                  "    pm.test(\"Response contains user info\", function () {",
-                  "        var jsonData = pm.response.json();",
-                  "        pm.expect(jsonData).to.have.property('success', true);",
-                  "        pm.expect(jsonData).to.have.property('data');",
-                  "        pm.expect(jsonData.data).to.have.property('username');",
-                  "        pm.expect(jsonData.data).to.have.property('email');",
-                  "        pm.expect(jsonData.data.username).to.eql(pm.collectionVariables.get(\"testUsername\"));",
-                  "    });",
-                  "} else {",
-                  "    console.error(\"获取用户信息失败，状态码:\", pm.response.code);",
-                  "}"
+                  "// Test getting user info with valid token",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response contains user info\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('username');",
+                  "    pm.expect(jsonData.data).to.have.property('email');",
+                  "    pm.expect(jsonData.data.username).to.eql(pm.collectionVariables.get(\"testUsername\"));",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -220,7 +204,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "value": "Bearer {{authToken}}"
               }
             ],
             "url": {
@@ -238,12 +222,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
                   "// Test updating user profile",
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
@@ -258,7 +236,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "value": "Bearer {{authToken}}"
               },
               {
                 "key": "Content-Type",
@@ -289,12 +267,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
                   "// Test getting questions list",
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
@@ -315,7 +287,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "value": "Bearer {{authToken}}"
               }
             ],
             "url": {
@@ -333,25 +305,23 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
-                  "if (pm.response.code === 201) {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.collectionVariables.set(\"createdQuestionId\", jsonData.id);",
-                  "    pm.test(\"Response contains question data\", function () {",
-                  "        pm.expect(jsonData).to.have.property('id');",
-                  "        pm.expect(jsonData).to.have.property('title');",
-                  "        pm.expect(jsonData).to.have.property('content');",
-                  "        pm.expect(jsonData).to.have.property('author');",
-                  "        pm.expect(jsonData.author.username).to.eql(pm.collectionVariables.get(\"testUsername\"));",
-                  "    });",
-                  "} else {",
-                  "    console.error(\"创建问题失败，状态码:\", pm.response.code);",
-                  "}"
+                  "// Test creating a new question",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "// Save question ID for later use",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"createdQuestionId\", jsonData.id);",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response contains question data\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('title');",
+                  "    pm.expect(jsonData).to.have.property('content');",
+                  "    pm.expect(jsonData).to.have.property('author');",
+                  "    pm.expect(jsonData.author.username).to.eql(pm.collectionVariables.get(\"testUsername\"));",
+                  "});"
                 ],
                 "type": "text/javascript"
               }
@@ -362,7 +332,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "value": "Bearer {{authToken}}"
               },
               {
                 "key": "Content-Type",
@@ -388,12 +358,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
                   "// Test toggling like on a question",
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
@@ -415,7 +379,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "value": "Bearer {{authToken}}"
               }
             ],
             "url": {
@@ -433,12 +397,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
                   "// Test adding a comment to a question",
                   "pm.test(\"Status code is 201\", function () {",
                   "    pm.response.to.have.status(201);",
@@ -465,7 +423,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "value": "Bearer {{authToken}}"
               },
               {
                 "key": "Content-Type",
@@ -491,12 +449,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
                   "// Test deleting a comment",
                   "pm.test(\"Status code is 204\", function () {",
                   "    pm.response.to.have.status(204);",
@@ -511,7 +463,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "value": "Bearer {{authToken}}"
               }
             ],
             "url": {
@@ -529,12 +481,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
                   "// Test deleting a question",
                   "pm.test(\"Status code is 204\", function () {",
                   "    pm.response.to.have.status(204);",
@@ -549,7 +495,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{access_token}}"
+                "value": "Bearer {{authToken}}"
               }
             ],
             "url": {
@@ -572,12 +518,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
                   "// Test registration with invalid data",
                   "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
@@ -626,20 +566,18 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
-                  "pm.test(\"Status code is 400\", function() {",
+                  "// Test login with invalid credentials",
+                  "pm.test(\"Status code is 400\", function () {",
                   "    pm.response.to.have.status(400);",
                   "});",
                   "",
-                  "pm.test(\"Response contains error details\", function() {",
+                  "// Verify error response structure",
+                  "pm.test(\"Response contains error details\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData).to.have.property('success', false);",
                   "    pm.expect(jsonData).to.have.property('errors');",
+                  "    pm.expect(jsonData.errors).to.have.property('detail');",
+                  "    pm.expect(jsonData.errors.detail).to.be.an('array').that.includes('用户名或密码错误，请重新输入');",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -673,12 +611,6 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "console.log(\"请求URL:\", pm.request.url.toString());",
-                  "console.log(\"请求头:\", JSON.stringify(pm.request.headers.toObject(), null, 2));",
-                  "console.log(\"请求体:\", pm.request.body ? pm.request.body.toString() : \"No request body\");",
-                  "console.log(\"响应状态:\", pm.response.code);",
-                  "console.log(\"响应头:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"响应体:\", pm.response.text());",
                   "// Test accessing protected route without token",
                   "pm.test(\"Status code is 401 without token\", function () {",
                       "pm.response.to.have.status(401);",
