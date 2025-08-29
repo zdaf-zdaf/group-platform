@@ -49,6 +49,7 @@ jobs:
             -e DB_USER=root \
             -e DB_PASSWORD=956402436 \
             -p 8000:8000 \
+            -v /var/run/docker.sock:/var/run/docker.sock \
             course-backend:latest
           echo "Waiting for backend..."
           sleep 10
