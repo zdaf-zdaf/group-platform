@@ -195,75 +195,6 @@ jobs:
       - name: 📦 Install Newman
         run: npm install -g newman
         
-    #     # 步骤7: 运行论坛测试集
-    #   - name: 💬 Run Forum Tests (LunTan)
-    #     run: |
-    #         # 修改环境变量文件，将localhost替换为127.0.0.1
-    #         sed -i 's/localhost/127.0.0.1/g' postman/environment.json
-            
-    #         # 运行论坛测试
-    #         newman run postman/collection1-LunTan.json \
-    #         --environment postman/environment.json \
-    #         --global-var "api_url=127.0.0.1:8000" \
-    #         --reporters cli
-            
-    #         echo "Forum tests completed!"
-        
-    #     # 步骤8: 清空数据库（在论坛测试后）
-    #   - name: 🗑️ Clean Database After Forum Tests
-    #     run: |
-    #         # 使用Django的flush命令清空数据库但保留表结构
-    #         python manage.py flush --no-input
-            
-    #         # 或者使用原始SQL命令清空所有表（更彻底）
-    #         # mysql -h"127.0.0.1" -uroot -prootpassword test_db -e "
-    #         #   SET FOREIGN_KEY_CHECKS = 0;
-    #         #   SELECT CONCAT('TRUNCATE TABLE ', table_name, ';')
-    #         #   FROM information_schema.tables
-    #         #   WHERE table_schema = 'test_db'
-    #         #   INTO OUTFILE '/tmp/truncate_tables.sql';
-    #         #   SOURCE /tmp/truncate_tables.sql;
-    #         #   SET FOREIGN_KEY_CHECKS = 1;
-    #         # "
-    #         echo "Database cleaned after forum tests!"
-    #     working-directory: ./backend
-    #     env:
-    #         DJANGO_SETTINGS_MODULE: server.settings
-    #         DB_ENGINE: django.db.backends.mysql
-    #         DB_NAME: test_db
-    #         DB_USER: root
-    #         DB_PASSWORD: rootpassword
-    #         DB_HOST: 127.0.0.1
-    #         DB_PORT: 3306
-    #         DEBUG: False
-        
-        # 步骤9: 运行实验测试集
-      - name: 🔬 Run Lab Tests
-        run: |
-            # 运行实验测试
-            newman run postman/collection2-Lab.json \
-            --environment postman/environment.json \
-            --global-var "api_url=127.0.0.1:8000" \
-            --reporters cli
-            
-            echo "Lab tests completed!"
-        
-        # 步骤10: 清空数据库（在实验测试后）
-      - name: 🗑️ Clean Database After Lab Tests
-        run: |
-            python manage.py flush --no-input
-            echo "Database cleaned after lab tests!"
-        working-directory: ./backend
-        env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
-            DEBUG: False
-
         # 步骤7: 运行论坛测试集
       - name: 💬 Run Forum Tests (LunTan)
         run: |
@@ -305,6 +236,75 @@ jobs:
             DB_HOST: 127.0.0.1
             DB_PORT: 3306
             DEBUG: False
+        
+        # 步骤9: 运行实验测试集
+      - name: 🔬 Run Lab Tests
+        run: |
+            # 运行实验测试
+            newman run postman/collection2-Lab.json \
+            --environment postman/environment.json \
+            --global-var "api_url=127.0.0.1:8000" \
+            --reporters cli
+            
+            echo "Lab tests completed!"
+        
+        # 步骤10: 清空数据库（在实验测试后）
+      - name: 🗑️ Clean Database After Lab Tests
+        run: |
+            python manage.py flush --no-input
+            echo "Database cleaned after lab tests!"
+        working-directory: ./backend
+        env:
+            DJANGO_SETTINGS_MODULE: server.settings
+            DB_ENGINE: django.db.backends.mysql
+            DB_NAME: test_db
+            DB_USER: root
+            DB_PASSWORD: rootpassword
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3306
+            DEBUG: False
+
+    #     # 步骤7: 运行论坛测试集
+    #   - name: 💬 Run Forum Tests (LunTan)
+    #     run: |
+    #         # 修改环境变量文件，将localhost替换为127.0.0.1
+    #         sed -i 's/localhost/127.0.0.1/g' postman/environment.json
+            
+    #         # 运行论坛测试
+    #         newman run postman/collection1-LunTan.json \
+    #         --environment postman/environment.json \
+    #         --global-var "api_url=127.0.0.1:8000" \
+    #         --reporters cli
+            
+    #         echo "Forum tests completed!"
+        
+    #     # 步骤8: 清空数据库（在论坛测试后）
+    #   - name: 🗑️ Clean Database After Forum Tests
+    #     run: |
+    #         # 使用Django的flush命令清空数据库但保留表结构
+    #         python manage.py flush --no-input
+            
+    #         # 或者使用原始SQL命令清空所有表（更彻底）
+    #         # mysql -h"127.0.0.1" -uroot -prootpassword test_db -e "
+    #         #   SET FOREIGN_KEY_CHECKS = 0;
+    #         #   SELECT CONCAT('TRUNCATE TABLE ', table_name, ';')
+    #         #   FROM information_schema.tables
+    #         #   WHERE table_schema = 'test_db'
+    #         #   INTO OUTFILE '/tmp/truncate_tables.sql';
+    #         #   SOURCE /tmp/truncate_tables.sql;
+    #         #   SET FOREIGN_KEY_CHECKS = 1;
+    #         # "
+    #         echo "Database cleaned after forum tests!"
+    #     working-directory: ./backend
+    #     env:
+    #         DJANGO_SETTINGS_MODULE: server.settings
+    #         DB_ENGINE: django.db.backends.mysql
+    #         DB_NAME: test_db
+    #         DB_USER: root
+    #         DB_PASSWORD: rootpassword
+    #         DB_HOST: 127.0.0.1
+    #         DB_PORT: 3306
+    #         DEBUG: False
         
         # 步骤11: 运行公告测试集
       - name: 📢 Run Announcement Tests (GongGao)
