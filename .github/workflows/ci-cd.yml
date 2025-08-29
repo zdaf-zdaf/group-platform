@@ -107,7 +107,7 @@ jobs:
     needs: [test-backend] # 依赖后端单元测试
     
     services:
-        mysql:
+      mysql:
         image: mysql:8.0
         env:
             MYSQL_ROOT_PASSWORD: rootpassword
