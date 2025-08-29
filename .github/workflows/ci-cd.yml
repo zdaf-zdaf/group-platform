@@ -10,6 +10,13 @@ jobs:
   # ================== 后端测试（容器化） ==================
   test-backend:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t course-backend:latest ./backend
+
     services:
       mysql:
         image: mysql:8.0
@@ -24,8 +31,6 @@ jobs:
           --health-timeout=5s
           --health-retries=5
       backend:
-        build:
-          context: ./backend
         image: course-backend:latest
         env:
           DB_HOST: mysql
