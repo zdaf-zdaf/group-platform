@@ -54,7 +54,8 @@ spec:
               mountPath: /var/lib/mysql
       volumes:
         - name: mysqldata
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: mysql-pvc
 ---
 apiVersion: v1
 kind: Service
