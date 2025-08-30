@@ -481,33 +481,23 @@ jobs:
             DB_PORT: 3306  # 使用标准端口3306
             DEBUG: False
         
+        # =============== 后端服务设置 ===============
       - name: Start Django server
         run: |
-            # 禁用 Django 的认证中间件用于测试环境
-            python manage.py runserver 0.0.0.0:8000 --insecure > ../logs/django.log 2>&1 &
+            # 禁用认证中间件并允许匿名访问
+            python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
             echo $! > ../logs/django.pid
         working-directory: ./backend
         env:
-            DJANGO_SETTINGS_MODULE: server.settings
             DB_ENGINE: django.db.backends.mysql
             DB_NAME: test_db_gui
             DB_USER: root
             DB_PASSWORD: rootpassword
             DB_HOST: 127.0.0.1
             DB_PORT: 3306
-            DEBUG: True  # 启用调试模式
-            # 禁用认证中间件
-            MIDDLEWARE: |
-              django.middleware.security.SecurityMiddleware,
-              django.contrib.sessions.middleware.SessionMiddleware,
-              django.middleware.common.CommonMiddleware,
-              django.middleware.csrf.CsrfViewMiddleware,
-              django.contrib.auth.middleware.AuthenticationMiddleware,
-              django.contrib.messages.middleware.MessageMiddleware,
-              django.middleware.clickjacking.XFrameOptionsMiddleware
 
         # =============== 前端服务设置 ===============
-      - name: Setup Node.js
+      - name: ⎔ Setup Node.js
         uses: actions/setup-node@v4
         with:
             node-version: '22'
@@ -515,12 +505,22 @@ jobs:
             cache-dependency-path: './frontend/package-lock.json'
         
       - name: Install frontend dependencies
-        run: npm ci
+        run: |
+            # 确保安装所有依赖
+            npm install --force
+            # 显式安装 react-scripts
+            npm install react-scripts@5.1.0 --save-exact
+        working-directory: ./frontend
+        
+      - name: Verify react-scripts installation
+        run: |
+            ls -la node_modules/.bin/react-scripts
+            npx react-scripts --version
         working-directory: ./frontend
         
       - name: Start React server
         run: |
-            npm start -- --port 3000 > ../logs/react.log 2>&1 &
+            npx react-scripts start --port 3000 > ../logs/react.log 2>&1 &
             echo $! > ../logs/react.pid
         working-directory: ./frontend
         
