@@ -497,7 +497,7 @@ jobs:
             DB_PORT: 3306
 
         # =============== 前端服务设置 ===============
-      - name: ⎔ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
             node-version: '22'
@@ -506,10 +506,14 @@ jobs:
         
       - name: Install frontend dependencies
         run: |
-            # 确保安装所有依赖
+            # 查看可用的 react-scripts 版本
+            npm view react-scripts versions --json
+            
+            # 安装一个已知存在的版本（例如 5.0.1）
+            npm install react-scripts@5.0.1 --save-exact
+            
+            # 然后安装其他依赖
             npm install --force
-            # 显式安装 react-scripts
-            npm install react-scripts@5.1.0 --save-exact
         working-directory: ./frontend
         
       - name: Verify react-scripts installation
