@@ -232,7 +232,7 @@ jobs:
         run: |
             newman run postman/collection2-Lab.json \
             --environment postman/environment.json \
-            --env-var "baseUrl=http://127.0.0.1:8002/api" \  # 覆盖环境文件中的baseUrl
+            --env-var "baseUrl=http://127.0.0.1:8002/api" \
             --reporters cli
       - name: 📄 Display Server Logs on Failure
         if: failure()  
@@ -329,6 +329,9 @@ jobs:
       - name: 🛑 Stop Django Server
         run: |
             pkill -f "runserver 0.0.0.0:8003" || true
+
+
+
   # 【新增的Job】运行Cypress前端E2E测试
   gui-test-cypress:
     name:  Run Cypress GUI Tests
