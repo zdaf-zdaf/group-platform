@@ -706,7 +706,7 @@ jobs:
           echo "所有Docker镜像已推送至 GitHub Container Registry。"
           echo "请成员C在本地执行以下命令进行部署："
           echo "kubectl apply -f k8s-manifests/"
-          
+
   deploy-to-k8s:
     name: Deploy to Kubernetes
     runs-on: self-hosted
@@ -715,6 +715,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
+      - name: Check Kubernetes status
+        run: |
+          # 检查 Kubernetes 是否运行
+          kubectl cluster-info
+          kubectl get nodes
+          
       - name: Configure kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -724,7 +730,7 @@ jobs:
         uses: azure/k8s-set-context@v3
         with:
           method: kubeconfig
-          kubeconfig: ${{ secrets.KUBE_CONFIG }}  # 取消注释这一行
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
       - name: Deploy MySQL Secret
         run: kubectl apply -f k8s/mysql-secret.yaml
@@ -739,6 +745,7 @@ jobs:
         run: |
           kubectl get pods
           kubectl get svc
+          kubectl get deployments
 
   test-secrets:
     runs-on: ubuntu-latest
