@@ -212,10 +212,8 @@ jobs:
 
       - name: 🚀 Start Django Server (Port 8002)
         run: |
-            python manage.py runserver 0.0.0.0:8002 &
-            echo $! > server.pid
-            # 等待服务器启动
-            sleep 5
+            python manage.py runserver 127.0.0.1:8002 &
+            sleep 5  # 等待服务器启动
         working-directory: ./backend
         env:
             DJANGO_SETTINGS_MODULE: server.settings
@@ -306,10 +304,8 @@ jobs:
 
       - name: 🚀 Start Django Server (Port 8003)
         run: |
-            python manage.py runserver 0.0.0.0:8003 &
-            echo $! > server.pid
-            # 等待服务器启动
-            sleep 5
+            python manage.py runserver 127.0.0.1:8003 &
+            sleep 5  # 等待服务器启动
         working-directory: ./backend
         env:
             DJANGO_SETTINGS_MODULE: server.settings
