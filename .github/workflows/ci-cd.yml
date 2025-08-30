@@ -522,16 +522,17 @@ jobs:
 
       - name: Repair and install dependencies
         run: |
-          # Use Node.js 22 to match package.json requirements
-          echo "NODE_VERSION=22" >> $GITHUB_ENV
-          
-          # Update npm to 11.5.2
-          npm install -g npm@11.5.2
-          
-          # Generate consistent lockfile
-          rm -f package-lock.json
-          npm install --package-lock-only
-          npm install
+            npm install -g npm@11.5.2
+            rm -f package-lock.json
+            npm install --package-lock-only
+            npm install
+
+      - name: Save fixed dependencies
+        uses: actions/upload-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend/package*.json
+            retention-days: 1
 
       - name: Run frontend unit tests
         run: npm run test:unit
@@ -542,6 +543,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+    # 从 test-frontend 作业获取修复后的 lockfile
+      - name: Download fixed lockfile
+        uses: actions/download-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend
+
+      - name: Update Dockerfile
+        run: |
+            sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
