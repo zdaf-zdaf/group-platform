@@ -396,7 +396,7 @@ jobs:
         run: |
             newman run postman/collection4-ziliao.json \
             --environment postman/materials_environment.json \
-            --env-var "baseUrl=http://127.0.0.1:8001" \
+            --env-var "baseUrl=http://127.0.0.1:8004" \
             --reporters cli
 
       - name: Stop Django Server
@@ -567,7 +567,7 @@ jobs:
 
       - name: Update Dockerfile
         run: |
-          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/Dockerfile
+          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
