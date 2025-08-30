@@ -514,27 +514,26 @@ jobs:
 
       - name: Install frontend dependencies
         run: |
-            # 清理缓存和旧依赖
-            npm cache clean --force
-            rm -rf node_modules
-            rm -f package-lock.json
-            
-            # 安装核心依赖（React 和 React DOM）
-            npm install react@^18.0.0 react-dom@^18.0.0 --legacy-peer-deps
-            
-            # 安装 react-scripts（使用已知兼容版本）
-            npm install react-scripts@5.0.0 --legacy-peer-deps
-            
-            # 安装其他依赖
-            npm install --legacy-peer-deps
-            
-            # 验证安装
-            echo "React version:"
-            npm list react
-            echo "React DOM version:"
-            npm list react-dom
-            echo "React Scripts version:"
-            npx react-scripts --version
+          # 确保 public 目录存在
+          if [ ! -d "public" ]; then
+            echo "Creating public directory..."
+            mkdir -p public
+            # 使用 echo 命令逐行创建 index.html 文件，避免 heredoc 缩进问题
+            echo '<!DOCTYPE html>' > public/index.html
+            echo '<html lang="en">' >> public/index.html
+            echo '  <head>' >> public/index.html
+            echo '    <meta charset="utf-8" />' >> public/index.html
+            echo '    <meta name="viewport" content="width=device-width, initial-scale=1" />' >> public/index.html
+            echo '    <title>React App</title>' >> public/index.html
+            echo '  </head>' >> public/index.html
+            echo '  <body>' >> public/index.html
+            echo '    <div id="root"></div>' >> public/index.html
+            echo '  </body>' >> public/index.html
+            echo '</html>' >> public/index.html
+          fi
+
+          # 安装依赖
+          npm install --legacy-peer-deps
         working-directory: ./frontend
 
       - name: Verify installation
