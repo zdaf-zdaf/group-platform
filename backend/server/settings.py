@@ -1,6 +1,7 @@
+import os
 from pathlib import Path
 from datetime import timedelta
-import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,8 +18,8 @@ SECRET_KEY = 'django-insecure-9ekm#x74ns6(j*h)3+jb-v*sz7bho2edo%g)uktin)ugf-5!s%
 DEBUG = True
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # 开发时允许所有主机
+#ALLOWED_HOSTS = []
 
 USE_TZ = True
 TIME_ZONE = 'Asia/Beijing'  # 或你服务器所在时区
@@ -36,9 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'experiments',
-    'materials',  # 新增的学习资料应用
+    'materials',
     'notice.apps.NoticeConfig',
 ]
 
@@ -68,25 +71,51 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',  # 添加对文件上传的支持
         'rest_framework.parsers.FileUploadParser',
     ),
+    # 新增：自定义异常处理
+    'EXCEPTION_HANDLER': 'server.settings.custom_exception_handler'
 }
 
 # CORS 设置
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vue 开发服务器地址
-    "http://127.0.0.1:5173",
+CORS_ALLOW_ALL_ORIGINS = True  # 开发环境下可以这样设置
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+# 新增：允许的请求头
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # 缩短token有效期便于测试
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    # 新增：更详细的错误信息
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
+
 
 ROOT_URLCONF = 'server.urls'
 
@@ -116,7 +145,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'lab_platform',
         'USER': 'root',
-        'PASSWORD': '956402436',
+        'PASSWORD': 'root',
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'OPTIONS': {
@@ -216,6 +245,13 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'debug.log'),
+            'formatter': 'verbose'
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
         },
     },
     'loggers': {
@@ -224,6 +260,16 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+        'user': {  # 添加用户相关日志
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'forum': {  # 添加论坛相关日志
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
         'materials': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
@@ -231,3 +277,34 @@ LOGGING = {
         },
     },
 }
+
+
+# 新增：自定义异常处理函数
+def custom_exception_handler(exc, context):
+    """
+    自定义DRF异常处理，提供更友好的错误信息
+    """
+    from rest_framework.views import exception_handler
+
+    # 调用默认异常处理
+    response = exception_handler(exc, context)
+
+    if response is not None:
+        # 自定义错误响应格式
+        custom_data = {
+            'error': True,
+            'message': str(exc),
+            'code': response.status_code,
+            'details': {}
+        }
+
+        # 添加额外错误详情
+        if hasattr(exc, 'detail'):
+            if isinstance(exc.detail, dict):
+                custom_data['details'] = exc.detail
+            elif isinstance(exc.detail, list):
+                custom_data['message'] = '; '.join(exc.detail)
+
+        response.data = custom_data
+
+    return response
