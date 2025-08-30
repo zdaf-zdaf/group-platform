@@ -324,7 +324,7 @@ jobs:
         run: |
             newman run postman/collection3-GongGao.json \
             --environment postman/environment.json \
-            --env-var "baseUrl=http://127.0.0.1:8003/api" \  # 覆盖环境文件中的baseUrl
+            --env-var "baseUrl=http://127.0.0.1:8003/api" \
             --reporters cli
       - name: 🛑 Stop Django Server
         run: |
