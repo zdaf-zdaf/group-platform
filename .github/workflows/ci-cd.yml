@@ -512,20 +512,29 @@ jobs:
             cache: 'npm'
             cache-dependency-path: './frontend/package-lock.json'
 
-      - name: Install compatible frontend dependencies
+      - name: Install frontend dependencies
         run: |
-            # 使用 legacy-peer-deps 解决版本冲突
+            # 清理缓存和旧依赖
+            npm cache clean --force
+            rm -rf node_modules
+            rm -f package-lock.json
+            
+            # 安装核心依赖（React 和 React DOM）
+            npm install react@^18.0.0 react-dom@^18.0.0 --legacy-peer-deps
+            
+            # 安装 react-scripts（使用已知兼容版本）
             npm install react-scripts@5.0.0 --legacy-peer-deps
             
             # 安装其他依赖
             npm install --legacy-peer-deps
             
             # 验证安装
-            echo "React scripts version:"
+            echo "React version:"
+            npm list react
+            echo "React DOM version:"
+            npm list react-dom
+            echo "React Scripts version:"
             npx react-scripts --version
-            
-            echo "TypeScript version:"
-            npx tsc --version
         working-directory: ./frontend
 
       - name: Verify installation
