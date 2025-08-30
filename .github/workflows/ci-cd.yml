@@ -706,10 +706,10 @@ jobs:
           echo "所有Docker镜像已推送至 GitHub Container Registry。"
           echo "请成员C在本地执行以下命令进行部署："
           echo "kubectl apply -f k8s-manifests/"
+          
   deploy-to-k8s:
     name: Deploy to Kubernetes
-    # 最重要的修改：使用自托管Runner的标签
-    runs-on: self-hosted # 或者是你自定义的标签，如 `self-hosted-linux`
+    runs-on: self-hosted
     needs: [notify-deployment-ready]
     steps:
       - name: Checkout code
@@ -720,13 +720,11 @@ jobs:
         with:
           version: 'latest'
           
-      # 注意：因为Runner就在本地，已经天然有访问集群的权限
-      # 所以不再需要 `azure/k8s-set-context` 步骤和 `KUBE_CONFIG` secret了！
-      # - name: Setup Kubernetes context
-      #   uses: azure/k8s-set-context@v3
-      #   with:
-      #     method: kubeconfig
-      #     kubeconfig: ${{ secrets.KUBE_CONFIG }} # 这个Secret可以删除了
+      - name: Setup Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}  # 取消注释这一行
 
       - name: Deploy MySQL Secret
         run: kubectl apply -f k8s/mysql-secret.yaml
