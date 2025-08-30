@@ -543,12 +543,24 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './frontend/package-lock.json'
 
+        # 修复依赖步骤
       - name: Repair and install dependencies
         run: |
+            # 确保使用正确的 npm 版本
             npm install -g npm@11.5.2
+            
+            # 完全重新生成 lockfile
+            rm -rf node_modules
             rm -f package-lock.json
+            
+            # 安装依赖并生成新的 lockfile
             npm install --package-lock-only
+            
+            # 完整安装依赖
             npm install
+            
+            # 验证依赖是否同步
+            npm ls --package-lock-only
 
       - name: Save fixed dependencies
         uses: actions/upload-artifact@v4
