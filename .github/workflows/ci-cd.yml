@@ -330,7 +330,78 @@ jobs:
         run: |
             pkill -f "runserver 0.0.0.0:8003" || true
 
+    # 并行学习资料测试
+  api-test-ziliao:
+    name: 📚 Parallel Learning Materials Tests
+    runs-on: ubuntu-latest
+    needs: [test-backend] # 依赖后端单元测试
+    
+    services:
+        mysql-ziliao:  # 服务名称唯一
+        image: mysql:8.0
+        env:
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_DATABASE: test_db_ziliao  # 独立的数据库名
+            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+            - 3310:3306  # 使用新端口（3310）
 
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.10'
+        
+      - name: 📦 Install dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+        working-directory: ./backend
+        
+      - name: ⚙️ Configure MySQL
+        run: |
+            sudo apt-get update && sudo apt-get install -y mysql-client
+            # 等待MySQL启动（使用新端口3310）
+            for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -P 3310 -uroot -prootpassword --silent; then
+                echo "MySQL for Learning Materials is ready!"
+                break
+            fi
+            echo "Waiting for MySQL... (attempt $i/30)"
+            sleep 2
+            done
+
+      - name: 🚀 Start Django Server (Port 8004)
+        run: |
+            python manage.py runserver 0.0.0.0:8004 &
+            sleep 5
+        working-directory: ./backend
+        env:
+            DJANGO_SETTINGS_MODULE: server.settings
+            DB_ENGINE: django.db.backends.mysql
+            DB_NAME: test_db_ziliao  # 指定独立数据库
+            DB_USER: root
+            DB_PASSWORD: rootpassword
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3310  # 使用3310端口
+            DEBUG: False
+
+      - name: 📦 Install Newman
+        run: npm install -g newman
+
+      - name: ✅ Run Learning Materials Tests
+        run: |
+            newman run postman/collection5-ziliao.json \
+            --environment postman/environment.json \
+            --global-var "api_url=127.0.0.1:8004" \
+            --reporters cli
+
+      - name: 🛑 Stop Django Server
+        run: |
+            pkill -f "runserver 0.0.0.0:8004" || true
 
   # 【新增的Job】运行Cypress前端E2E测试
   gui-test-cypress:
