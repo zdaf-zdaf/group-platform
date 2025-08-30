@@ -7,37 +7,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8000/api",
-      "type": "string"
-    },
-    {
-      "key": "testUsername",
-      "value": "testuser_{{$timestamp}}",
-      "type": "string"
-    },
-    {
-      "key": "testPassword",
-      "value": "Testpass123!",
-      "type": "string"
-    },
-    {
-      "key": "testEmail",
-      "value": "testuser{{$timestamp}}@example.com",
-      "type": "string"
-    },
-    {
-      "key": "teacherUsername",
-      "value": "teacher_{{$timestamp}}",
-      "type": "string"
-    },
-    {
-      "key": "teacherPassword",
-      "value": "Teacherpass123!",
-      "type": "string"
-    },
-    {
-      "key": "teacherEmail",
-      "value": "teacher{{$timestamp}}@example.com",
+      "value": "{{baseUrl}}", 
       "type": "string"
     }
   ],
@@ -46,23 +16,32 @@
       "name": "Authentication Tests",
       "item": [
         {
-          "name": "Register User - Student",
+          "name": "学生注册",
           "event": [
+            {
+              "listen": "prerequest",  
+              "script": {
+                "exec": [
+                  "// 动态生成唯一用户名",
+                  "const timestamp = new Date().getTime();",
+                  "pm.variables.set('dynamicStudentUsername', pm.variables.get('testUsername') + '_' + timestamp);",
+                  "pm.variables.set('dynamicStudentEmail', pm.variables.get('testEmail').replace('@', '_' + timestamp + '@'));"
+                ],
+                "type": "text/javascript"
+              }
+            },
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Test user registration with student role",
                   "pm.test(\"Status code is 201\", function () {",
                   "    pm.response.to.have.status(201);",
                   "});",
                   "",
-                  "// Save credentials for later use",
-                  "pm.collectionVariables.set(\"testUsername\", pm.variables.get(\"testUsername\"));",
-                  "pm.collectionVariables.set(\"testPassword\", pm.variables.get(\"testPassword\"));",
-                  "pm.collectionVariables.set(\"testEmail\", pm.variables.get(\"testEmail\"));"
-                ],
-                "type": "text/javascript"
+                  "// 保存动态生成的凭证",
+                  "const jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('actualStudentUsername', pm.variables.get('dynamicStudentUsername'));"
+                ]
               }
             }
           ],
@@ -76,7 +55,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"username\": \"{{testUsername}}\",\n    \"password\": \"{{testPassword}}\",\n    \"email\": \"{{testEmail}}\",\n    \"role\": \"student\"\n}"
+              "raw": "{\n    \"username\": \"{{dynamicStudentUsername}}\",\n    \"password\": \"{{testPassword}}\",\n    \"email\": \"{{dynamicStudentEmail}}\",\n    \"role\": \"student\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register/",
@@ -87,23 +66,29 @@
           "response": []
         },
         {
-          "name": "Register User - Teacher",
+          "name": "教师注册",
           "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const timestamp = new Date().getTime();",
+                  "pm.variables.set('dynamicTeacherUsername', 'teacher_' + timestamp);",
+                  "pm.variables.set('dynamicTeacherEmail', 'teacher' + timestamp + '@example.com');"
+                ]
+              }
+            },
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Test user registration with teacher role",
                   "pm.test(\"Status code is 201\", function () {",
                   "    pm.response.to.have.status(201);",
                   "});",
                   "",
-                  "// Save teacher credentials",
-                  "pm.collectionVariables.set(\"teacherUsername\", \"teacher_{{$timestamp}}\");",
-                  "pm.collectionVariables.set(\"teacherPassword\", \"Teacherpass123!\");",
-                  "pm.collectionVariables.set(\"teacherEmail\", \"teacher{{$timestamp}}@example.com\");"
-                ],
-                "type": "text/javascript"
+                  "// 保存教师凭证",
+                  "pm.collectionVariables.set('actualTeacherUsername', pm.variables.get('dynamicTeacherUsername'));"
+                ]
               }
             }
           ],
@@ -117,7 +102,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"username\": \"teacher_{{$timestamp}}\",\n    \"password\": \"Teacherpass123!\",\n    \"email\": \"teacher{{$timestamp}}@example.com\",\n    \"role\": \"teacher\"\n}"
+              "raw": "{\n    \"username\": \"{{dynamicTeacherUsername}}\",\n    \"password\": \"{{teacherPassword}}\",\n    \"email\": \"{{dynamicTeacherEmail}}\",\n    \"role\": \"teacher\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register/",
@@ -128,18 +113,17 @@
           "response": []
         },
         {
-          "name": "Login Student",
+          "name": "学生登录",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Test successful student login",
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "// Check response structure",
+                  "// 检查响应结构",
                   "pm.test(\"Response has access token\", function () {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData).to.have.property('access');",
@@ -149,13 +133,11 @@
                   "    pm.expect(jsonData).to.have.property('email');",
                   "});",
                   "",
-                  "// Save tokens for future requests",
+                  "// 保存token",
                   "var jsonData = pm.response.json();",
                   "pm.collectionVariables.set(\"studentToken\", jsonData.access);",
-                  "pm.collectionVariables.set(\"studentRefreshToken\", jsonData.refresh);",
-                  ""
-                ],
-                "type": "text/javascript"
+                  "pm.collectionVariables.set(\"studentRefreshToken\", jsonData.refresh);"
+                ]
               }
             }
           ],
@@ -169,7 +151,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"username\": \"{{testUsername}}\",\n    \"password\": \"{{testPassword}}\"\n}"
+              "raw": "{\n    \"username\": \"{{actualStudentUsername}}\",\n    \"password\": \"{{testPassword}}\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login/",
@@ -180,23 +162,21 @@
           "response": []
         },
         {
-          "name": "Login Teacher",
+          "name": "教师登录",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Test teacher login",
                   "pm.test(\"Status code is 200\", function () {",
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "// Save teacher token",
+                  "// 保存教师token",
                   "var jsonData = pm.response.json();",
                   "pm.collectionVariables.set(\"teacherToken\", jsonData.access);",
                   "pm.collectionVariables.set(\"teacherRefreshToken\", jsonData.refresh);"
-                ],
-                "type": "text/javascript"
+                ]
               }
             }
           ],
@@ -210,7 +190,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"username\": \"{{teacherUsername}}\",\n    \"password\": \"{{teacherPassword}}\"\n}"
+              "raw": "{\n    \"username\": \"{{actualTeacherUsername}}\",\n    \"password\": \"{{teacherPassword}}\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login/",
@@ -222,7 +202,7 @@
         }
       ]
     },
-    {
+   {
       "name": "Notice Tests",
       "item": [
         {
