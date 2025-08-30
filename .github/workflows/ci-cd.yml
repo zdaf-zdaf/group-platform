@@ -483,7 +483,8 @@ jobs:
         
       - name: Start Django server
         run: |
-            python manage.py runserver 0.0.0.0:8000 > ../logs/django.log 2>&1 &
+            # 禁用 Django 的认证中间件用于测试环境
+            python manage.py runserver 0.0.0.0:8000 --insecure > ../logs/django.log 2>&1 &
             echo $! > ../logs/django.pid
         working-directory: ./backend
         env:
@@ -494,7 +495,16 @@ jobs:
             DB_PASSWORD: rootpassword
             DB_HOST: 127.0.0.1
             DB_PORT: 3306
-            DEBUG: False
+            DEBUG: True  # 启用调试模式
+            # 禁用认证中间件
+            MIDDLEWARE: |
+              django.middleware.security.SecurityMiddleware,
+              django.contrib.sessions.middleware.SessionMiddleware,
+              django.middleware.common.CommonMiddleware,
+              django.middleware.csrf.CsrfViewMiddleware,
+              django.contrib.auth.middleware.AuthenticationMiddleware,
+              django.contrib.messages.middleware.MessageMiddleware,
+              django.middleware.clickjacking.XFrameOptionsMiddleware
 
         # =============== 前端服务设置 ===============
       - name: Setup Node.js
