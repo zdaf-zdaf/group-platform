@@ -1,0 +1,39 @@
+{
+	"id": "d0764b1d-c52d-455e-8d5c-6b6bc67297c9",
+	"name": "Lab Platform API - Local Development",
+	"values": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8000",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "testUsername",
+			"value": "testuser",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "testPassword",
+			"value": "Testpass123!",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "testEmail",
+			"value": "testuser@example.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "frontendUrl",
+			"value": "http://localhost:5173",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-08-28T10:25:37.084Z",
+	"_postman_exported_using": "Postman/11.60.2"
+}

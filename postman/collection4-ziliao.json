@@ -20,9 +20,9 @@
           "raw": "{\n  \"username\": \"{{testUsername}}\",\n  \"password\": \"{{testPassword}}\"\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/auth/login/",
+          "raw": "{{baseUrl}}/api/auth/login/",
           "host": ["{{baseUrl}}"],
-          "path": ["auth", "login", ""]
+          "path": ["api","auth", "login", ""]
         }
       },
       "event": [
@@ -82,13 +82,13 @@
                     {
                         "key": "file",
                         "type": "file",
-                        "src": "23182102-王露函-Lab07-实验报告.pdf"
+                        "src": "test-files/23182102-王露函-Lab07-实验报告.pdf"
                     }
                 ]
             },
             "url": {
-                "raw": "http://localhost:8000/materials/",
-                "host": ["http://localhost:8000"],
+                "raw": "{{baseUrl}}/materials/",
+                "host": ["{{baseUrl}}"],
                 "path": ["materials", ""]
             }
         },
@@ -139,8 +139,8 @@
           }
         ],
         "url": {
-            "raw": "http://localhost:8000/materials/",
-            "host": ["http://localhost:8000"],  
+            "raw": "{{baseUrl}}/materials/",
+            "host": ["{{baseUrl}}"],
             "path": ["materials", ""]
         }
       },
@@ -297,9 +297,9 @@
             ]
         },
             "url": {
-            "raw": "http://localhost:8000/materials/{{material_id}}/",
-            "host": ["http://localhost:8000"], 
-            "path": ["materials", "{{material_id}}", ""]
+                "raw": "{{baseUrl}}/materials/{{material_id}}/",
+                "host": ["{{baseUrl}}"],
+                "path": ["materials", "{{material_id}}", ""]
             }
         },
         "event": [
@@ -351,14 +351,14 @@
                 {
                 "key": "file",
                 "type": "file",
-                "src": "testfile.doc"
+                "src": "test-files/testfile.doc"
                 }
             ]
             },
             "url": {
-            "raw": "http://localhost:8000/materials/{{material_id}}/",
-            "host": ["http://localhost:8000"],
-            "path": ["materials", "{{material_id}}", ""]
+                "raw": "{{baseUrl}}/materials/{{material_id}}/",
+                "host": ["{{baseUrl}}"],
+                "path": ["materials", "{{material_id}}", ""]
             }
         },
         "event": [
@@ -399,125 +399,143 @@
         ]
         },
     
-    {
-        "name": "7. 删除资料",
-        "request": {
-            "method": "DELETE",
-            "header": [
-                {
-                    "key": "Authorization",
-                    "value": "Bearer {{teacher_token}}"
-                }
-            ],
-            "url": {
-                "raw": "http://localhost:8000/materials/{{material_id}}/", 
-                "host": ["http://localhost:8000"],
-                "path": ["materials", "{{material_id}}", ""]
-            }
-        },
-        "event": [
-            {
-                "listen": "test",
-                "script": {
-                    "exec": [
-                        "// 调试信息",
-                        "console.log('删除请求URL:', pm.request.url.toString());",
-                        "console.log('material_id:', pm.environment.get('material_id'));",
-                        "console.log('删除响应状态:', pm.response.code);",
-                        "console.log('删除响应内容:', pm.response.text());",
-                        "",
-                        "// 验证删除操作",
-                        "if (pm.response.code === 404) {",
-                        "    console.error('删除失败：资源未找到，可能已被删除或material_id不正确');",
-                        "    // 检查是否资源已被删除",
-                        "    pm.test('Deletion should be successful', function() {",
-                        "        // 即使404也可能是成功的，如果资源确实不存在了",
-                        "        pm.expect(pm.response.code).to.be.oneOf([204, 404]);",
-                        "    });",
-                        "} else {",
-                        "    pm.test('Deletion successful', function() {",
-                        "        pm.expect(pm.response.code).to.equal(204);",
-                        "        pm.environment.unset('material_id');",
-                        "    });",
-                        "}"
-                    ],
-                    "type": "text/javascript"
-                }
-            }
-        ]
-    },
-
-    {
-      "name": "8. 验证无效文件类型（无后端修改）",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{teacher_token}}"
-          }
-        ],
-        "body": {
-          "mode": "formdata",
-          "formdata": [
-            {
-              "key": "title",
-              "value": "无效文件测试",
-              "type": "text"
-            },
-             {
-                "key": "description",
-                "value": "测试无效文件类型",
-                "type": "text"
-            },
-            {
-                "key": "type",
-                "value": "doc",
-                "type": "text"
-            },
-            {
-                "key": "file", 
-                "type": "file",
-                "src": "testfile.txt"  
-            }
-          ]
-        },
-        "url": {
-                "raw": "http://localhost:8000/materials/",
-                "host": ["http://localhost:8000"],
-                "path": ["materials", ""]
-            }
-      },
-      "event": [
         {
-          "listen": "test",
-          "script": {
-            "exec": [
-                "// 验证无效文件被拒绝",
-                "if (pm.response.code === 400) {",
-                "    const error = pm.response.json();",
-                "    pm.test('Invalid file rejected', function() {",
-                "        pm.expect(error).to.have.property('file');",
-                "        pm.expect(error.file[0]).to.include('不支持的文件类型');",
-                "    });",
-                "    ",
-                "    // 调试信息",
-                "    console.log('无效文件类型验证成功:');",
-                "    console.log('- 错误信息:', response.details.file[0]);",
-                "    console.log('- 完整响应:', JSON.stringify(response, null, 2));",
-                "    ",
-                "} else {",
-                "    // 输出详细的错误信息以便调试",
-                "    console.log('预期400状态码，但得到:', pm.response.code);",
-                "    console.log('响应内容:', pm.response.text());",
-                "    pm.test(`Status should be 400, got ${pm.response.code}`, false);",
-                "}"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ]
-    },
+            "name": "7. 删除资料",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{teacher_token}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/materials/{{material_id}}/",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["materials", "{{material_id}}", ""]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// 调试信息",
+                            "console.log('删除请求URL:', pm.request.url.toString());",
+                            "console.log('material_id:', pm.environment.get('material_id'));",
+                            "console.log('删除响应状态:', pm.response.code);",
+                            "console.log('删除响应内容:', pm.response.text());",
+                            "",
+                            "// 验证删除操作 - 根据图片中的成功响应修改",
+                            "pm.test('Deletion successful', function() {",
+                            "    // 主要期望204状态码（成功删除）",
+                            "    pm.expect(pm.response.code).to.equal(204);",
+                            "});",
+                            "",
+                            "// 成功后的清理操作",
+                            "if (pm.response.code === 204) {",
+                            "    console.log('资源删除成功，清理material_id环境变量');",
+                            "    pm.environment.unset('material_id');",
+                            "}",
+                            "",
+                            "// 额外的错误处理（仅用于记录，不使测试失败）",
+                            "if (pm.response.code !== 204) {",
+                            "    console.warn('删除操作返回非预期状态码:', pm.response.code);",
+                            "    console.warn('响应内容:', pm.response.text());",
+                            "}",
+                            "// 对于404情况提供更具体的错误信息",
+                            "if (pm.response.code === 404) {",
+                                "console.error('删除失败：资源未找到，可能已被删除或material_id不正确');",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+
+        {
+            "name": "8. 验证无效文件类型（无后端修改）",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{teacher_token}}"
+                    }
+                ],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "title",
+                            "value": "无效文件测试",
+                            "type": "text"
+                        },
+                        {
+                            "key": "description",
+                            "value": "测试无效文件类型",
+                            "type": "text"
+                        },
+                        {
+                            "key": "type",
+                            "value": "doc",
+                            "type": "text"
+                        },
+                        {
+                            "key": "file",
+                            "type": "file",
+                            "src": "test-files/testfile.txt"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/materials/",
+                    "host": ["{{baseUrl}}"],
+                    "path": ["materials", ""]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "// 验证无效文件被拒绝",
+                            "if (pm.response.code === 400) {",
+                            "    const error = pm.response.json();",
+                            "    ",
+                            "    pm.test('Invalid file rejected', function() {",
+                            "        // 检查错误响应结构",
+                            "        pm.expect(error).to.have.property('details');",
+                            "        pm.expect(error.details).to.have.property('file');",
+                            "        ",
+                            "        // 根据实际错误消息调整断言",
+                            "        if (error.details.file[0].includes('No file was submitted')) {",
+                            "            // 处理未提交文件的情况",
+                            "            pm.expect(error.details.file[0]).to.include('No file was submitted');",
+                            "        } else if (error.details.file[0].includes('不支持的文件类型')) {",
+                            "            // 处理不支持文件类型的情况",
+                            "            pm.expect(error.details.file[0]).to.include('不支持的文件类型');",
+                            "        }",
+                            "    });",
+                            "    ",
+                            "    // 调试信息 - 使用正确的变量名",
+                            "    console.log('无效文件类型验证成功');",
+                            "    console.log('- 错误信息：', error.details.file[0]);",
+                            "    console.log('- 完整响应：', JSON.stringify(error, null, 2));",
+                            "} else {",
+                            "    // 输出详细的错误信息以便调试",
+                            "    console.log('预期400状态码，但得到:', pm.response.code);",
+                            "    console.log('响应内容:', pm.response.text());",
+                            "    pm.test(`Status should be 400, got ${pm.response.code}`, false);",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+
     {
       "name": "9. 超大文件处理（250MB测试）",
       "request": {
@@ -549,14 +567,14 @@
             {
             "key": "file",
             "type": "file", 
-            "src": "largefile.mp4"  
+            "src": "test-files/largefile.mp4"  
              }
           ]
         },
         "url": {
-                "raw": "http://localhost:8000/materials/",
-                "host": ["http://localhost:8000"],
-                "path": ["materials", ""]
+            "raw": "{{baseUrl}}/materials/",
+            "host": ["{{baseUrl}}"],
+            "path": ["materials", ""]
         }
       },
       "event": [

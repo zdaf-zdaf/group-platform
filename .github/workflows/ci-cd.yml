@@ -395,7 +395,7 @@ jobs:
       - name: ✅ Run Learning Materials Tests
         run: |
             newman run postman/collection4-ziliao.json \
-            --environment postman/environment.json \
+            --environment postman/materials_environment.json \
             --global-var "api_url=127.0.0.1:8004" \
             --reporters cli
 
