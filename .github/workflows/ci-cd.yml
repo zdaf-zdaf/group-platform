@@ -725,6 +725,15 @@ jobs:
         run: |
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > test-config.yaml
           kubectl --kubeconfig=test-config.yaml get nodes
+
+      # 在 deploy-to-k8s 作业开头添加
+      - name: Configure registry secret
+        run: |
+          kubectl create secret docker-registry ghcr-token \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.GHCR_PAT }} \
+            -o yaml | kubectl apply -f -
           
       - name: Configure kubectl
         uses: azure/setup-kubectl@v3
@@ -737,14 +746,14 @@ jobs:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
-      - name: Deploy MySQL Secret
-        run: kubectl apply -f k8s/mysql-secret.yaml
-        
+      - name: Deploy MySQL 
+        run: kubectl apply -f k8s-manifests/mysql-deployment.yaml  # 修正路径
+
       - name: Deploy Backend
-        run: kubectl apply -f k8s/backend-deployment.yaml
-        
+        run: kubectl apply -f k8s-manifests/backend-deployment.yaml
+
       - name: Deploy Frontend
-        run: kubectl apply -f k8s/frontend-deployment.yaml
+        run: kubectl apply -f k8s-manifests/frontend-deploy.yaml
         
       - name: Verify Deployment
         run: |
