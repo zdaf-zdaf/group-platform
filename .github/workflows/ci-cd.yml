@@ -752,3 +752,15 @@ jobs:
         run: |
             kubectl get pods
             kubectl get svc
+
+  test-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test KUBE_CONFIG
+        run: |
+            echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > test-config
+            kubectl --kubeconfig=test-config get nodes
+            
+      - name: Test GHCR_PAT
+        run: |
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
