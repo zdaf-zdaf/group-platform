@@ -30,3 +30,35 @@ WARNING 2025-08-30 16:35:18,228 log Not Found: /api/
 WARNING 2025-08-30 16:35:18,230 basehttp "GET /api/ HTTP/1.1" 404 2671
 INFO 2025-08-30 16:37:38,201 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\user_service\user\urls.py changed, reloading.
 INFO 2025-08-30 16:37:38,911 autoreload Watching for file changes with StatReloader
+WARNING 2025-08-30 16:37:47,410 log Not Found: /api/auth
+WARNING 2025-08-30 16:37:47,413 basehttp "GET /api/auth HTTP/1.1" 404 2691
+WARNING 2025-08-30 16:37:54,486 log Not Found: /api/api/auth
+WARNING 2025-08-30 16:37:54,487 basehttp "GET /api/api/auth HTTP/1.1" 404 2703
+INFO 2025-08-30 16:38:08,973 basehttp "GET /api/api/auth/register HTTP/1.1" 301 0
+WARNING 2025-08-30 16:38:09,107 log Method Not Allowed: /api/api/auth/register/
+WARNING 2025-08-30 16:38:09,113 basehttp "GET /api/api/auth/register/ HTTP/1.1" 405 8311
+INFO 2025-08-30 16:38:10,942 basehttp "GET /static/rest_framework/css/default.css HTTP/1.1" 200 1152
+INFO 2025-08-30 16:38:10,947 basehttp "GET /static/rest_framework/js/jquery-3.7.1.min.js HTTP/1.1" 200 87533
+INFO 2025-08-30 16:38:10,947 basehttp "GET /static/rest_framework/js/csrf.js HTTP/1.1" 200 1793
+INFO 2025-08-30 16:38:10,956 basehttp "GET /static/rest_framework/js/prettify-min.js HTTP/1.1" 200 13632
+INFO 2025-08-30 16:38:10,957 basehttp "GET /static/rest_framework/js/bootstrap.min.js HTTP/1.1" 200 39680
+INFO 2025-08-30 16:38:10,963 basehttp "GET /static/rest_framework/js/default.js HTTP/1.1" 200 1268
+INFO 2025-08-30 16:38:10,966 basehttp "GET /static/rest_framework/js/load-ajax-form.js HTTP/1.1" 200 59
+INFO 2025-08-30 16:38:10,981 basehttp "GET /static/rest_framework/css/prettify.css HTTP/1.1" 200 817
+INFO 2025-08-30 16:38:11,005 basehttp "GET /static/rest_framework/css/bootstrap.min.css HTTP/1.1" 200 121457
+INFO 2025-08-30 16:38:11,032 basehttp "GET /static/rest_framework/css/bootstrap-tweaks.css HTTP/1.1" 200 3426
+INFO 2025-08-30 16:38:11,051 basehttp "GET /static/rest_framework/img/grid.png HTTP/1.1" 200 1458
+INFO 2025-08-30 16:38:11,055 basehttp "GET /static/rest_framework/js/ajax-form.js HTTP/1.1" 200 3796
+WARNING 2025-08-30 16:43:04,326 log Method Not Allowed: /api/api/auth/login/
+WARNING 2025-08-30 16:43:04,327 basehttp "GET /api/api/auth/login/ HTTP/1.1" 405 7678
+WARNING 2025-08-30 16:43:10,135 log Method Not Allowed: /api/api/auth/refresh/
+WARNING 2025-08-30 16:43:10,138 basehttp "GET /api/api/auth/refresh/ HTTP/1.1" 405 7449
+WARNING 2025-08-30 16:43:17,682 log Not Found: /api/api/auth/user/file
+WARNING 2025-08-30 16:43:17,684 basehttp "GET /api/api/auth/user/file HTTP/1.1" 404 3948
+INFO 2025-08-30 16:43:27,314 basehttp "GET /api/api/auth/user/profile HTTP/1.1" 301 0
+WARNING 2025-08-30 16:43:27,326 log Unauthorized: /api/api/auth/user/profile/
+WARNING 2025-08-30 16:43:27,327 basehttp "GET /api/api/auth/user/profile/ HTTP/1.1" 401 5278
+WARNING 2025-08-30 16:43:52,018 log Unauthorized: /api/api/test/teacher/
+WARNING 2025-08-30 16:43:52,021 basehttp "GET /api/api/test/teacher/ HTTP/1.1" 401 5204
+WARNING 2025-08-30 16:43:58,639 log Unauthorized: /api/api/test/student/
+WARNING 2025-08-30 16:43:58,641 basehttp "GET /api/api/test/student/ HTTP/1.1" 401 5204
