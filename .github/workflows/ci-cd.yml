@@ -530,9 +530,9 @@ jobs:
     #     if: ${{ failure() }}
     #     run: cat logs/django.log
         
-    #   - name: Show frontend logs if failed
-    #     if: ${{ failure() }}
-    #     run: cat logs/react.log
+      - name: Show frontend logs if failed
+        if: ${{ failure() }}
+        run: cat logs/react.log
 
   test-frontend:
     runs-on: ubuntu-latest
