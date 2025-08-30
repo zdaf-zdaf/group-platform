@@ -1,0 +1,32 @@
+INFO 2025-08-30 16:28:21,920 autoreload Watching for file changes with StatReloader
+INFO 2025-08-30 16:29:58,514 autoreload Watching for file changes with StatReloader
+WARNING 2025-08-30 16:31:26,085 log Not Found: /
+WARNING 2025-08-30 16:31:26,086 basehttp "GET / HTTP/1.1" 404 2304
+WARNING 2025-08-30 16:31:26,177 log Not Found: /favicon.ico
+WARNING 2025-08-30 16:31:26,178 basehttp "GET /favicon.ico HTTP/1.1" 404 2355
+INFO 2025-08-30 16:33:12,084 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\user_service\server\urls.py changed, reloading.
+INFO 2025-08-30 16:33:12,643 autoreload Watching for file changes with StatReloader
+INFO 2025-08-30 16:33:23,186 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\user_service\server\urls.py changed, reloading.
+INFO 2025-08-30 16:33:23,953 autoreload Watching for file changes with StatReloader
+INFO 2025-08-30 16:33:35,725 basehttp "GET / HTTP/1.1" 200 38
+INFO 2025-08-30 16:33:49,132 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\user_service\server\urls.py changed, reloading.
+INFO 2025-08-30 16:33:49,674 autoreload Watching for file changes with StatReloader
+INFO 2025-08-30 16:33:53,476 basehttp "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-30 16:33:53,595 basehttp "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4176
+INFO 2025-08-30 16:33:54,203 basehttp "GET /static/admin/css/base.css HTTP/1.1" 200 22120
+INFO 2025-08-30 16:33:54,266 basehttp "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2808
+INFO 2025-08-30 16:33:54,576 basehttp "GET /static/admin/css/responsive.css HTTP/1.1" 200 16565
+INFO 2025-08-30 16:33:54,700 basehttp "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2025-08-30 16:33:54,737 basehttp "GET /static/admin/css/login.css HTTP/1.1" 200 951
+INFO 2025-08-30 16:33:54,742 basehttp "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-08-30 16:33:54,749 basehttp "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+WARNING 2025-08-30 16:34:00,338 log Not Found: /api/
+WARNING 2025-08-30 16:34:00,339 basehttp "GET /api/ HTTP/1.1" 404 2679
+INFO 2025-08-30 16:35:04,499 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\user_service\user\urls.py changed, reloading.
+INFO 2025-08-30 16:35:05,095 autoreload Watching for file changes with StatReloader
+INFO 2025-08-30 16:35:11,605 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\user_service\user\urls.py changed, reloading.
+INFO 2025-08-30 16:35:12,316 autoreload Watching for file changes with StatReloader
+WARNING 2025-08-30 16:35:18,228 log Not Found: /api/
+WARNING 2025-08-30 16:35:18,230 basehttp "GET /api/ HTTP/1.1" 404 2671
+INFO 2025-08-30 16:37:38,201 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\user_service\user\urls.py changed, reloading.
+INFO 2025-08-30 16:37:38,911 autoreload Watching for file changes with StatReloader
