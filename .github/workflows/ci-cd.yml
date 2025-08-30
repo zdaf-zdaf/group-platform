@@ -522,22 +522,16 @@ jobs:
 
       - name: Repair and install dependencies
         run: |
-            echo "=== 当前 Node.js 版本 ==="
-            node -v
-            echo "=== 当前 npm 版本 ==="
-            npm -v
-            
-            echo "=== 删除旧 lock 文件 ==="
-            rm -f package-lock.json
-            
-            echo "=== 重新生成 lock 文件 ==="
-            npm install --package-lock-only --legacy-peer-deps
-            
-            echo "=== 完整安装依赖 ==="
-            npm install --legacy-peer-deps
-            
-            echo "=== 验证依赖树 ==="
-            npm list --depth=0 || true
+          # Use Node.js 22 to match package.json requirements
+          echo "NODE_VERSION=22" >> $GITHUB_ENV
+          
+          # Update npm to 11.5.2
+          npm install -g npm@11.5.2
+          
+          # Generate consistent lockfile
+          rm -f package-lock.json
+          npm install --package-lock-only
+          npm install
 
       - name: Run frontend unit tests
         run: npm run test:unit
@@ -570,6 +564,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Update Dockerfile
+        run: |
+          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/Dockerfile
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
