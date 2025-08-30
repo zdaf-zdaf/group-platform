@@ -4,7 +4,7 @@
 	"values": [
 		{
 			"key": "baseUrl",
-			"value": "http://localhost:8004",
+			"value": "http://127.0.0.1:8004",
 			"type": "default",
 			"enabled": true
 		},

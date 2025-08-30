@@ -577,9 +577,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+        # 确保下载修复后的依赖文件
+      - name: Download fixed dependencies
+        uses: actions/download-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend
+
+        # 更新 Dockerfile 中的 Node 版本
       - name: Update Dockerfile
         run: |
-          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
+            sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
+            # 添加 --unsafe-perm 参数解决权限问题
+            sed -i '/npm ci/a RUN npm install -g npm@11.5.2 --unsafe-perm' frontend/dockerfile
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
