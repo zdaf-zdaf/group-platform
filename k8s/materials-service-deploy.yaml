@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: materials-service
+  labels:
+    app: materials-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: materials-service
+  template:
+    metadata:
+      labels:
+        app: materials-service
+    spec:
+      containers:
+        - name: materials-service
+          image: yourrepo/materials-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: server.settings
+            - name: DEBUG
+              value: "false"
+            - name: ALLOWED_HOSTS
+              value: "*"
+            - name: TIME_ZONE
+              value: Asia/Shanghai
+            - name: DB_ENGINE
+              value: django.db.backends.mysql
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_DATABASE
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+            - name: DB_HOST
+              value: mysql
+            - name: DB_PORT
+              value: "3306"
+            - name: CORS_ALLOW_ALL_ORIGINS
+              value: "true"
+            # 可选：若与用户服务共享 JWT 密钥
+            # - name: JWT_SIGNING_KEY
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: jwt-secret
+            #       key: SIGNING_KEY
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+          volumeMounts:
+            - name: media
+              mountPath: /app/media
+          # 若镜像 CMD 不做 migrate，可添加 postStart hook 或使用 initContainer 迁移
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: materials-media-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: materials-service
+  labels:
+    app: materials-service
+spec:
+  selector:
+    app: materials-service
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
