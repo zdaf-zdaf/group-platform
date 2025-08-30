@@ -515,11 +515,32 @@ jobs:
         working-directory: ./frontend
         
         # =============== 测试执行 ===============
-      - name: Wait for servers
+      - name: Wait for servers with timeout
         run: |
             npm install -g wait-on
-            wait-on http://localhost:3000 http://localhost:8000
-            sleep 5
+            
+            # 设置超时时间（最多等待2分钟）
+            timeout 120s wait-on http://localhost:3000 http://localhost:8000 || true
+            
+            # 检查服务状态
+            echo "=== 服务状态检查 ==="
+            echo "检查端口 3000:"
+            nc -z localhost 3000 && echo "前端服务运行中" || echo "前端服务未响应"
+            
+            echo "检查端口 8000:"
+            nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
+            
+            # 如果任一服务未启动，显示日志并退出
+            if ! nc -z localhost 3000 || ! nc -z localhost 8000; then
+            echo "❌ 服务启动失败，显示日志:"
+            echo "=== 后端日志 ==="
+            cat logs/django.log || echo "无后端日志"
+            echo "=== 前端日志 ==="
+            cat logs/react.log || echo "无前端日志"
+            exit 1
+            fi
+            
+            sleep 3
         
       - name: Run Cypress tests
         run: npx cypress run --headless --config baseUrl=http://localhost:3000
@@ -528,11 +549,11 @@ jobs:
         # =============== 日志收集 ===============
       - name: Show backend logs if failed
         if: ${{ failure() }}
-        run: cat backend/debug.log
+        run: cat logs/django.log
         
-    #   - name: Show frontend logs if failed
-    #     if: ${{ failure() }}
-    #     run: cat logs/react.log
+      - name: Show frontend logs if failed
+        if: ${{ failure() }}
+        run: cat logs/react.log
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -659,3 +680,37 @@ jobs:
           echo "所有Docker镜像已推送至 GitHub Container Registry。"
           echo "请成员C在本地执行以下命令进行部署："
           echo "kubectl apply -f k8s-manifests/"
+
+    # 在现有notify-deployment-ready作业后添加：
+  deploy-to-k8s:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    needs: [notify-deployment-ready]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Configure kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+            version: 'latest'
+            
+      - name: Setup Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+            method: kubeconfig
+            kubeconfig: ${{ secrets.KUBE_CONFIG }}
+            
+      - name: Deploy MySQL Secret
+        run: kubectl apply -f k8s/mysql-secret.yaml
+        
+      - name: Deploy Backend
+        run: kubectl apply -f k8s/backend-deployment.yaml
+        
+      - name: Deploy Frontend
+        run: kubectl apply -f k8s/frontend-deploy.yaml
+        
+      - name: Verify Deployment
+        run: |
+            kubectl get pods
+            kubectl get svc
