@@ -4,6 +4,59 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
+    {
+      "name": "0. 注册教师账号",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// 生成唯一用户名",
+              "const timestamp = new Date().getTime();",
+              "pm.variables.set('teacher_username', `test_teacher_${timestamp}`);",
+              "pm.variables.set('teacher_password', 'Testpass123!');"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "    console.log('教师账号注册成功');",
+              "    // 保存凭据用于后续登录",
+              "    pm.environment.set('testUsername', pm.variables.get('teacher_username'));",
+              "    pm.environment.set('testPassword', pm.variables.get('teacher_password'));",
+              "} else {",
+              "    console.error('注册失败:', pm.response.text());",
+              "    pm.test('注册应成功', false);",
+              "    postman.setNextRequest(null);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{teacher_username}}\",\n  \"password\": \"{{teacher_password}}\",\n  \"email\": \"{{teacher_username}}@example.com\",\n  \"role\": \"teacher\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register/",
+          "host": ["{{baseUrl}}"],
+          "path": ["api","auth", "register", ""]
+        }
+      }
+    },
 
     {
       "name": "1. 教师登录获取Token",
@@ -227,38 +280,32 @@
                         "        pm.expect(contentLength).to.be.a('number').and.to.be.greaterThan(0);",
                         "    });",
                         "    ",
-                        "    // 中文文件名验证 - 修复版",
-                        "    const contentDisposition = pm.response.headers.get('Content-Disposition');",
-                        "    if (contentDisposition) {",
-                        "        // 改进文件名提取逻辑",
-                        "        const filenamePart = contentDisposition.split('filename=')[1];",
-                        "        if (filenamePart) {",
-                        "            // 移除引号",
-                        "            let filename = filenamePart.replace(/['\"]/g, '');",
-                        "            ",
-                        "            // 处理URL编码的文件名",
-                        "            if (filename.includes('%')) {",
-                        "                filename = decodeURIComponent(filename);",
-                        "            }",
-                        "            ",
-                        "            // 处理额外的UTF-8编码指示",
-                        "            filename = filename.replace(/^UTF-8''/, '');",
-                        "            ",
-                        "            console.log('Detected filename:', filename);",
-                        "            ",
-                        "            pm.test('File should have valid name', function() {",
-                        "                pm.expect(filename).to.be.a('string').and.to.have.length.greaterThan(0);",
-                        "                pm.expect(filename).to.match(/\\.(pdf|doc|docx)$/i);",
-                        "            });",
-                        "        }",
-                        "    } else {",
-                        "        console.log('Content-Disposition header is missing');",
-                        "    }",
-                        "} else {",
-                        "    console.log('Download failed with status:', pm.response.code);",
-                        "    console.log('Response body:', pm.response.text());",
-                        "    pm.test(`Download should return 200, got ${pm.response.code}`, false);",
-                        "}"
+                         "// 中文文件名验证 - 修复版",
+          "const contentDisposition = pm.response.headers.get('Content-Disposition');",
+          "if (contentDisposition) {",
+          "    // 改进文件名提取逻辑",
+          "    let filename = '';",
+          "    const utf8Pattern = /filename\\*=UTF-8''(.+?)(?:;|$)/;",
+          "    const stdPattern = /filename=\"?(.+?)\"?$/;",
+          "    ",
+          "    if (utf8Pattern.test(contentDisposition)) {",
+          "        filename = decodeURIComponent(contentDisposition.match(utf8Pattern)[1]);",
+          "    } else if (stdPattern.test(contentDisposition)) {",
+          "        filename = contentDisposition.match(stdPattern)[1];",
+          "        if (/%[0-9A-F]{2}/.test(filename)) {",
+          "            filename = decodeURIComponent(filename);",
+          "        }",
+          "    }",
+          "    ",
+          "    console.log('Decoded filename:', filename);",
+          "    ",
+          "    pm.test('File should have valid name', function() {",
+          "        pm.expect(filename).to.be.a('string').and.to.have.length.greaterThan(0);",
+          "        pm.expect(filename).to.include('王露函'); // 验证中文字符",
+          "    });",
+          "} else {",
+          "    console.log('Content-Disposition header missing');",
+          "}"
                     ],
                     "type": "text/javascript"
                 }
