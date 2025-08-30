@@ -710,7 +710,7 @@ jobs:
   deploy-to-k8s:
     name: Deploy to Kubernetes
     runs-on: self-hosted
-    needs: [notify-deployment-ready]
+    needs: [build-and-push-frontend, build-and-push-backend]  # 应该依赖于构建作业，而不是通知作业
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -720,46 +720,54 @@ jobs:
           # 检查 Kubernetes 是否运行
           kubectl cluster-info
           kubectl get nodes
-
-      - name: Validate Kubernetes Connection
+          
+      - name: Validate and set up kubeconfig
         run: |
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > test-config.yaml
-          kubectl --kubeconfig=test-config.yaml get nodes
+          # 检查KUBE_CONFIG secret是否存在且有效
+          if [ -z "${{ secrets.KUBE_CONFIG }}" ]; then
+            echo "KUBE_CONFIG secret is empty or not set"
+            exit 1
+          fi
+          
+          # 解码并保存kubeconfig
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig.yaml
+          
+          # 验证kubeconfig格式
+          if ! kubectl --kubeconfig=kubeconfig.yaml config view; then
+            echo "Invalid kubeconfig format"
+            exit 1
+          fi
+          
+          # 设置KUBECONFIG环境变量供后续步骤使用
+          echo "KUBECONFIG=${PWD}/kubeconfig.yaml" >> $GITHUB_ENV
 
-      # 在 deploy-to-k8s 作业开头添加
       - name: Configure registry secret
         run: |
-          kubectl create secret docker-registry ghcr-token \
+          kubectl --kubeconfig=$KUBECONFIG create secret docker-registry ghcr-token \
             --docker-server=ghcr.io \
             --docker-username=${{ github.actor }} \
             --docker-password=${{ secrets.GHCR_PAT }} \
-            -o yaml | kubectl apply -f -
+            --dry-run=client -o yaml | kubectl --kubeconfig=$KUBECONFIG apply -f -
           
-      - name: Configure kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'latest'
-          
-      - name: Setup Kubernetes context
-        uses: azure/k8s-set-context@v3
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBE_CONFIG }}
-
       - name: Deploy MySQL 
-        run: kubectl apply -f k8s-manifests/mysql-deployment.yaml  # 修正路径
+        run: kubectl --kubeconfig=$KUBECONFIG apply -f k8s-manifests/mysql-deployment.yaml
 
       - name: Deploy Backend
-        run: kubectl apply -f k8s-manifests/backend-deployment.yaml
+        run: kubectl --kubeconfig=$KUBECONFIG apply -f k8s-manifests/backend-deployment.yaml
 
       - name: Deploy Frontend
-        run: kubectl apply -f k8s-manifests/frontend-deploy.yaml
+        run: kubectl --kubeconfig=$KUBECONFIG apply -f k8s-manifests/frontend-deploy.yaml
         
       - name: Verify Deployment
         run: |
-          kubectl get pods
-          kubectl get svc
-          kubectl get deployments
+          kubectl --kubeconfig=$KUBECONFIG get pods -o wide
+          kubectl --kubeconfig=$KUBECONFIG get svc
+          kubectl --kubeconfig=$KUBECONFIG get deployments
+          
+      - name: Wait for pods to be ready
+        run: |
+          # 等待所有pod变为就绪状态
+          kubectl --kubeconfig=$KUBECONFIG wait --for=condition=ready pod --all --timeout=300s
 
   test-secrets:
     runs-on: ubuntu-latest
