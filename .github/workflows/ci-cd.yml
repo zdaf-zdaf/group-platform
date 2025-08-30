@@ -525,14 +525,14 @@ jobs:
         run: npx cypress run --headless --config baseUrl=http://localhost:3000
         working-directory: ./frontend
         
-    #     # =============== 日志收集 ===============
-    #   - name: Show backend logs if failed
-    #     if: ${{ failure() }}
-    #     run: cat logs/django.log
-        
-      - name: Show frontend logs if failed
+        # =============== 日志收集 ===============
+      - name: Show backend logs if failed
         if: ${{ failure() }}
-        run: cat logs/react.log
+        run: cat backend/debug.log
+        
+    #   - name: Show frontend logs if failed
+    #     if: ${{ failure() }}
+    #     run: cat logs/react.log
 
   test-frontend:
     runs-on: ubuntu-latest
