@@ -720,6 +720,11 @@ jobs:
           # 检查 Kubernetes 是否运行
           kubectl cluster-info
           kubectl get nodes
+
+      - name: Validate Kubernetes Connection
+        run: |
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > test-config.yaml
+          kubectl --kubeconfig=test-config.yaml get nodes
           
       - name: Configure kubectl
         uses: azure/setup-kubectl@v3
