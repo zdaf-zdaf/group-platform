@@ -11,13 +11,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# System deps for mysqlclient
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
-    build-essential \
-    default-libmysqlclient-dev \
-    pkg-config \
- && rm -rf /var/lib/apt/lists/*
+     # 更换为阿里云 Debian 源，加速依赖安装（适配slim镜像）
+     RUN sed -i 's|http://deb.debian.org/debian|https://mirrors.aliyun.com/debian|g' /etc/apt/sources.list.d/debian.sources \
+      && apt-get update \
+      && apt-get install -y --no-install-recommends \
+          build-essential \
+          default-libmysqlclient-dev \
+          pkg-config \
+      && rm -rf /var/lib/apt/lists/*
 
 # Install Python deps first for better cache
 COPY requirements.txt ./requirements.txt

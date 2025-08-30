@@ -142,7 +142,7 @@ DATABASES = {
         'NAME': 'user_service_db',
         'USER': 'root',
         'PASSWORD': 'Zgq0412@',
-        'HOST': '127.0.0.1',
+        'HOST': 'host.docker.internal',
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
