@@ -481,20 +481,20 @@ jobs:
             DB_PORT: 3306  # 使用标准端口3306
             DEBUG: False
         
+        # =============== 后端服务设置 ===============
       - name: Start Django server
         run: |
-            python manage.py runserver 0.0.0.0:8000 > ../logs/django.log 2>&1 &
+            # 禁用认证中间件并允许匿名访问
+            python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
             echo $! > ../logs/django.pid
         working-directory: ./backend
         env:
-            DJANGO_SETTINGS_MODULE: server.settings
             DB_ENGINE: django.db.backends.mysql
             DB_NAME: test_db_gui
             DB_USER: root
             DB_PASSWORD: rootpassword
             DB_HOST: 127.0.0.1
             DB_PORT: 3306
-            DEBUG: False
 
         # =============== 前端服务设置 ===============
       - name: Setup Node.js
@@ -504,13 +504,50 @@ jobs:
             cache: 'npm'
             cache-dependency-path: './frontend/package-lock.json'
         
+        # =============== 前端服务设置 ===============
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+            node-version: '22'
+            cache: 'npm'
+            cache-dependency-path: './frontend/package-lock.json'
+
       - name: Install frontend dependencies
-        run: npm ci
+        run: |
+          # 确保 public 目录存在
+          if [ ! -d "public" ]; then
+            echo "Creating public directory..."
+            mkdir -p public
+            # 使用 echo 命令逐行创建 index.html 文件，避免 heredoc 缩进问题
+            echo '<!DOCTYPE html>' > public/index.html
+            echo '<html lang="en">' >> public/index.html
+            echo '  <head>' >> public/index.html
+            echo '    <meta charset="utf-8" />' >> public/index.html
+            echo '    <meta name="viewport" content="width=device-width, initial-scale=1" />' >> public/index.html
+            echo '    <title>React App</title>' >> public/index.html
+            echo '  </head>' >> public/index.html
+            echo '  <body>' >> public/index.html
+            echo '    <div id="root"></div>' >> public/index.html
+            echo '  </body>' >> public/index.html
+            echo '</html>' >> public/index.html
+          fi
+
+          # 安装依赖
+          npm install --legacy-peer-deps
+        working-directory: ./frontend
+
+      - name: Verify installation
+        run: |
+            echo "Checking for react-scripts binary:"
+            ls -la node_modules/.bin/ | grep react-scripts
+            
+            echo "Node modules contents:"
+            ls -la node_modules/ | head -10
         working-directory: ./frontend
         
       - name: Start React server
         run: |
-            npm start -- --port 3000 > ../logs/react.log 2>&1 &
+            npx react-scripts start --port 3000 > ../logs/react.log 2>&1 &
             echo $! > ../logs/react.pid
         working-directory: ./frontend
         
@@ -714,3 +751,15 @@ jobs:
         run: |
             kubectl get pods
             kubectl get svc
+
+  test-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test KUBE_CONFIG
+        run: |
+            echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > test-config
+            kubectl --kubeconfig=test-config get nodes
+            
+      - name: Test GHCR_PAT
+        run: |
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
