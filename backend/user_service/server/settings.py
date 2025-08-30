@@ -29,7 +29,6 @@ TIME_ZONE = 'Asia/Beijing'  # 或你服务器所在时区
 
 INSTALLED_APPS = [
     'user.apps.UserConfig',
-    'forum',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,9 +39,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
-    'experiments',
-    'materials',
-    'notice.apps.NoticeConfig',
 ]
 
 MIDDLEWARE = [
@@ -143,10 +139,10 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'lab_platform',
+        'NAME': 'user_service_db',
         'USER': 'root',
         'PASSWORD': 'Zgq0412@',
-        'HOST': '127.0.0.1',
+        'HOST': 'host.docker.internal',
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
@@ -261,16 +257,6 @@ LOGGING = {
             'propagate': True,
         },
         'user': {  # 添加用户相关日志
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'forum': {  # 添加论坛相关日志
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'materials': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
