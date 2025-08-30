@@ -374,6 +374,22 @@ jobs:
             sleep 2
             done
 
+    # 新增：执行数据库迁移
+      - name: Run migrations
+        run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+        working-directory: ./backend
+        env:
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_gonggao
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3310
+          DEBUG: False
+
       - name: Start Django Server (Port 8004)
         run: |
             python manage.py runserver 0.0.0.0:8004 &
