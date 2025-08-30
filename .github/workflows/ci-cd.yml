@@ -504,22 +504,37 @@ jobs:
             cache: 'npm'
             cache-dependency-path: './frontend/package-lock.json'
         
-      - name: Install frontend dependencies
+        # =============== 前端服务设置 ===============
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+            node-version: '22'
+            cache: 'npm'
+            cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Install compatible frontend dependencies
         run: |
-            # 查看可用的 react-scripts 版本
-            npm view react-scripts versions --json
+            # 使用 legacy-peer-deps 解决版本冲突
+            npm install react-scripts@5.0.0 --legacy-peer-deps
             
-            # 安装一个已知存在的版本（例如 5.0.1）
-            npm install react-scripts@5.0.1 --save-exact
+            # 安装其他依赖
+            npm install --legacy-peer-deps
             
-            # 然后安装其他依赖
-            npm install --force
-        working-directory: ./frontend
-        
-      - name: Verify react-scripts installation
-        run: |
-            ls -la node_modules/.bin/react-scripts
+            # 验证安装
+            echo "React scripts version:"
             npx react-scripts --version
+            
+            echo "TypeScript version:"
+            npx tsc --version
+        working-directory: ./frontend
+
+      - name: Verify installation
+        run: |
+            echo "Checking for react-scripts binary:"
+            ls -la node_modules/.bin/ | grep react-scripts
+            
+            echo "Node modules contents:"
+            ls -la node_modules/ | head -10
         working-directory: ./frontend
         
       - name: Start React server
