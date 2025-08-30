@@ -25,33 +25,45 @@ class DockerJudge:
         """
         passed = 0
         details = []
+        try:
+            for tc in problem["test_cases"]:
+                # 运行容器执行测试用例
+                try:
+                    result = self._run_container(
+                        code,
+                        problem["timeout"],
+                        problem["mem_limit"],
+                        tc["input"]
+                    )
+                except Exception as e:
+                    # 捕获容器运行异常，返回详细错误
+                    result = f"Error while running code in Docker: {str(e)}"
 
-        for tc in problem["test_cases"]:
-            # 运行容器执行测试用例
-            result = self._run_container(
-                code,
-                problem["timeout"],
-                problem["mem_limit"],
-                tc["input"]
-            )
+                # 比较输出结果
+                is_passed = self._compare_output(result, tc["output"])
+                details.append({
+                    "input": tc["input"],
+                    "expected": tc["output"],
+                    "actual": result,
+                    "is_passed": is_passed
+                })
 
-            # 比较输出结果
-            is_passed = self._compare_output(result, tc["output"])
-            details.append({
-                "input": tc["input"],
-                "expected": tc["output"],
-                "actual": result,
-                "is_passed": is_passed
-            })
+                if is_passed:
+                    passed += 1
 
-            if is_passed:
-                passed += 1
-
-        return {
-            "passed": passed,
-            "total": len(problem["test_cases"]),
-            "details": details
-        }
+            return {
+                "passed": passed,
+                "total": len(problem["test_cases"]),
+                "details": details
+            }
+        except Exception as e:
+            # 顶层捕获所有异常，返回统一错误信息
+            return {
+                "passed": 0,
+                "total": len(problem["test_cases"]),
+                "details": [],
+                "error": f"Error while fetching server API version: {str(e)}"
+            }
 
     def _run_container(self, code: str, timeout: int, mem_limit: int, input_str: str) -> str:
         container = None
@@ -68,12 +80,16 @@ class DockerJudge:
             )
 
             # attach_socket 返回 socket-like 对象，直接操作即可
-            sock = container.attach_socket(params={'stdin': 1, 'stream': 1})
-
-            if input_str:
-                sock.sendall(input_str.encode('utf-8') + b'\n')
-
-            sock.close()
+            try:
+                sock = container.attach_socket(params={'stdin': 1, 'stream': 1})
+                if input_str:
+                    sock.sendall(input_str.encode('utf-8') + b'\n')
+                sock.close()
+            except AttributeError as e:
+                # 捕获 socket 相关属性错误
+                return f"Error: SocketIO attribute error: {str(e)}"
+            except Exception as e:
+                return f"Error: SocketIO or attach_socket error: {str(e)}"
 
             exit_code = container.wait()['StatusCode']
 
@@ -85,9 +101,16 @@ class DockerJudge:
 
             return stdout.strip()
 
+        except docker.errors.DockerException as e:
+            return f"Error: Docker API error: {str(e)}"
+        except Exception as e:
+            return f"Error: Unexpected error: {str(e)}"
         finally:
             if container:
-                container.remove(force=True)
+                try:
+                    container.remove(force=True)
+                except Exception:
+                    pass
 
     def _compare_output(self, actual: str, expected: str) -> bool:
         """比较实际输出和预期输出"""
