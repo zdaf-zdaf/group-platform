@@ -403,33 +403,106 @@ jobs:
         run: |
             pkill -f "runserver 0.0.0.0:8004" || true
 
-  # 【新增的Job】运行Cypress前端E2E测试
   gui-test-cypress:
-    name:  Run Cypress GUI Tests
+    name: Run Cypress GUI Tests
     runs-on: ubuntu-latest
-    # 【重要】设置依赖：必须等前端单元测试和API测试都通过后才运行
-    needs: [test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao]
+    needs: [test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao] # 移除对test-backend的直接依赖
+    
+    services:
+      mysql-gui:  # 新增专用MySQL服务
+        image: mysql:8.0
+        env:
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_DATABASE: test_db_gui
+        ports:
+            - 3306:3306
+        options: >-
+            --health-cmd="mysqladmin ping"
+            --health-interval=10s
 
     steps:
-      - name:  Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
+        # =============== 后端服务设置 ===============
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.10'
+        
+      - name: Install backend dependencies
+        run: pip install -r requirements.txt
+        working-directory: ./backend
+        
+      - name: Wait for MySQL
+        run: |
+            sudo apt-get update && sudo apt-get install -y mysql-client
+            for i in {1..30}; do
+            if mysqladmin ping -h127.0.0.1 -uroot -prootpassword --silent; then
+                echo "MySQL ready"; break
+            fi
+            echo "Waiting for MySQL..."; sleep 2
+            done
+            
+      - name: Run migrations
+        run: |
+            python manage.py makemigrations --noinput
+            python manage.py migrate --noinput
+        working-directory: ./backend
+        env:
+            DJANGO_SETTINGS_MODULE: server.settings
+            DB_NAME: test_db_gui
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3306
+        
+      - name: Start Django server
+        run: |
+            python manage.py runserver 0.0.0.0:8000 > django.log 2>&1 &
+            echo $! > django.pid
+        working-directory: ./backend
+        env:
+            DJANGO_SETTINGS_MODULE: server.settings
+            DB_NAME: test_db_gui
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3306
+
+        # =============== 前端服务设置 ===============
       - name: ⎔ Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
+            node-version: '20'
+            cache: 'npm'
+            cache-dependency-path: './frontend/package-lock.json'
 
-      # 安装前端依赖（Cypress已经包含在里面了）
-      - name:  Install Frontend Dependencies
+      - name: Install frontend dependencies
         run: npm ci
         working-directory: ./frontend
 
-      # 运行Cypress测试！
-      - name:  Run Cypress Tests
-        run: npx cypress run --headless # `--headless`表示无界面模式，必须在CI环境中使用
+      - name: Start React server
+        run: |
+            npm start -- --port 3000 > react.log 2>&1 &
+            echo $! > react.pid
         working-directory: ./frontend
+
+        # =============== 测试执行 ===============
+      - name: Wait for servers
+        run: |
+            npm install -g wait-on
+            wait-on http://localhost:3000 http://localhost:8000
+            sleep 5  # 额外等待确保完全启动
+
+      - name: Run Cypress tests
+        run: npx cypress run --headless --config baseUrl=http://localhost:3000
+        working-directory: ./frontend
+
+        # =============== 日志收集 ===============
+      - name: Show backend logs if failed
+        if: ${{ failure() }}
+        run: cat backend/django.log
+        
+      - name: Show frontend logs if failed
+        if: ${{ failure() }}
+        run: cat frontend/react.log
 
   test-frontend:
     runs-on: ubuntu-latest
