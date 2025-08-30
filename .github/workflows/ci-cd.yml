@@ -396,7 +396,7 @@ jobs:
         run: |
             newman run postman/collection4-ziliao.json \
             --environment postman/materials_environment.json \
-            --env-var "baseUrl=http://127.0.0.1:8001/api" \
+            --env-var "baseUrl=http://127.0.0.1:8001" \
             --reporters cli
 
       - name: 🛑 Stop Django Server
@@ -516,12 +516,28 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: './frontend/package-lock.json'
 
-      - name: Install frontend dependencies
-        run: npm ci
+      - name: Repair and install dependencies
+        run: |
+            echo "=== 当前 Node.js 版本 ==="
+            node -v
+            echo "=== 当前 npm 版本 ==="
+            npm -v
+            
+            echo "=== 删除旧 lock 文件 ==="
+            rm -f package-lock.json
+            
+            echo "=== 重新生成 lock 文件 ==="
+            npm install --package-lock-only --legacy-peer-deps
+            
+            echo "=== 完整安装依赖 ==="
+            npm install --legacy-peer-deps
+            
+            echo "=== 验证依赖树 ==="
+            npm list --depth=0 || true
 
       - name: Run frontend unit tests
         run: npm run test:unit
