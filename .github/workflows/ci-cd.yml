@@ -337,7 +337,7 @@ jobs:
     needs: [test-backend] # 依赖后端单元测试
     
     services:
-        mysql-ziliao:  # 服务名称唯一
+      mysql-ziliao:  # 服务名称唯一
         image: mysql:8.0
         env:
             MYSQL_ROOT_PASSWORD: rootpassword
@@ -408,7 +408,7 @@ jobs:
     name:  Run Cypress GUI Tests
     runs-on: ubuntu-latest
     # 【重要】设置依赖：必须等前端单元测试和API测试都通过后才运行
-    needs: [test-frontend, api-test-luntan, api-test-lab, api-test-gonggao]  # 依赖所有并行测试
+    needs: [test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao]
 
     steps:
       - name:  Checkout code
@@ -499,7 +499,7 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}
   notify-deployment-ready:
     runs-on: ubuntu-latest
-    needs: [test-backend, test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, gui-test-cypress, build-and-push-backend, build-and-push-frontend]
+    needs: [test-backend, test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao, gui-test-cypress, build-and-push-backend, build-and-push-frontend] 
     steps:
       - name: Notify Team
         run: |
