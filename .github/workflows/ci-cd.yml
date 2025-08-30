@@ -426,6 +426,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+        # 下载修复后的依赖文件 - 关键修复
+      - name: Download fixed dependencies
+        uses: actions/download-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend
+
         # 创建日志目录
       - name: Create log directory
         run: mkdir -p logs
@@ -490,7 +497,7 @@ jobs:
             DEBUG: False
 
         # =============== 前端服务设置 ===============
-      - name: ⎔ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
             node-version: '22'
@@ -518,14 +525,14 @@ jobs:
         run: npx cypress run --headless --config baseUrl=http://localhost:3000
         working-directory: ./frontend
         
-        # =============== 日志收集 ===============
-      - name: Show backend logs if failed
-        if: ${{ failure() }}
-        run: cat logs/django.log
+    #     # =============== 日志收集 ===============
+    #   - name: Show backend logs if failed
+    #     if: ${{ failure() }}
+    #     run: cat logs/django.log
         
-      - name: Show frontend logs if failed
-        if: ${{ failure() }}
-        run: cat logs/react.log
+    #   - name: Show frontend logs if failed
+    #     if: ${{ failure() }}
+    #     run: cat logs/react.log
 
   test-frontend:
     runs-on: ubuntu-latest
