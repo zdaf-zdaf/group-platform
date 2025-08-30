@@ -126,10 +126,8 @@ jobs:
 
       - name: 🚀 Start Django Server (Port 8001)
         run: |
-            python manage.py runserver 0.0.0.0:8001 &
-            echo $! > server.pid
-            # 等待服务器启动
-            sleep 5
+            python manage.py runserver 127.0.0.1:8001 &
+            sleep 5  # 等待服务器启动
         working-directory: ./backend
         env:
             DJANGO_SETTINGS_MODULE: server.settings
@@ -148,7 +146,7 @@ jobs:
         run: |
             newman run postman/collection1-LunTan.json \
             --environment postman/environment.json \
-            --env-var "baseUrl=http://127.0.0.1:8001/api" \  # 覆盖环境文件中的baseUrl
+            --env-var "baseUrl=http://127.0.0.1:8001/api" \
             --reporters cli
       - name: 🛑 Stop Django Server
         run: |
