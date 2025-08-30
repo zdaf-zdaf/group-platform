@@ -67,7 +67,7 @@ jobs:
 
   # 并行论坛测试
   api-test-luntan:
-    name: 💬 Parallel Forum Tests
+    name: Parallel Forum Tests
     runs-on: ubuntu-latest
     needs: [test-backend]
     
@@ -414,6 +414,8 @@ jobs:
         env:
             MYSQL_ROOT_PASSWORD: rootpassword
             MYSQL_DATABASE: test_db_gui
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
             - 3306:3306
         options: >-
@@ -434,26 +436,38 @@ jobs:
         run: pip install -r requirements.txt
         working-directory: ./backend
         
-      - name: Wait for MySQL
+      - name: Configure MySQL
         run: |
             sudo apt-get update && sudo apt-get install -y mysql-client
+            # 等待MySQL启动（使用新端口3311）
             for i in {1..30}; do
-            if mysqladmin ping -h127.0.0.1 -uroot -prootpassword --silent; then
-                echo "MySQL ready"; break
+            if mysqladmin ping -h"127.0.0.1" -P 3311 -uroot -prootpassword --silent; then
+                echo "MySQL for Luntan is ready!"
+                break
             fi
-            echo "Waiting for MySQL..."; sleep 2
+            echo "Waiting for MySQL... (attempt $i/30)"
+            sleep 2
             done
+
+            mysql -h127.0.0.1 -uroot -prootpassword -e "
+              CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
+              GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+              FLUSH PRIVILEGES;"
             
       - name: Run migrations
         run: |
-            python manage.py makemigrations --noinput
-            python manage.py migrate --noinput
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
         working-directory: ./backend
         env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_NAME: test_db_gui
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_lab
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3311
+          DEBUG: False
         
       - name: Start Django server
         run: |
@@ -464,7 +478,7 @@ jobs:
             DJANGO_SETTINGS_MODULE: server.settings
             DB_NAME: test_db_gui
             DB_HOST: 127.0.0.1
-            DB_PORT: 3306
+            DB_PORT: 3311
 
         # =============== 前端服务设置 ===============
       - name: ⎔ Setup Node.js
