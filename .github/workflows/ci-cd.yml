@@ -666,59 +666,59 @@ jobs:
           echo "请成员C在本地执行以下命令进行部署："
           echo "kubectl apply -f k8s-manifests/"
 
-deploy-to-k8s:
-  name: Deploy to Kubernetes
-  runs-on: ubuntu-latest  # 不需要 self-hosted runner了！
-  needs: [build-and-push-frontend, build-and-push-backend]
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Install Telepresence
-      run: |
-        curl -s https://packagecloud.io/install/repositories/datawireio/telepresence/script.deb.sh | sudo bash
-        sudo apt install telepresence
+  deploy-to-k8s:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest  # 不需要 self-hosted runner了！
+    needs: [build-and-push-frontend, build-and-push-backend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
         
-    - name: Connect to local Kubernetes cluster
-      run: |
-        # 建立到您本地集群的隧道
-        telepresence connect --api-key ${{ secrets.TELEPRESENCE_API_KEY }} --cluster your-cluster-name
-      
-    - name: Configure kubectl context
-      run: |
-        # 现在可以使用本地集群了！
-        kubectl get nodes
-        
-    - name: Configure registry secret
-      run: |
-        kubectl create secret docker-registry ghcr-token \
-          --docker-server=ghcr.io \
-          --docker-username=${{ github.actor }} \
-          --docker-password=${{ secrets.GHCR_PAT }} \
-          --dry-run=client -o yaml | kubectl apply -f -
+      - name: Install Telepresence
+        run: |
+          curl -s https://packagecloud.io/install/repositories/datawireio/telepresence/script.deb.sh | sudo bash
+          sudo apt install telepresence
           
-    - name: Deploy MySQL 
-      run: kubectl apply -f k8s-manifests/mysql-deployment.yaml
-
-    - name: Deploy Backend
-      run: kubectl apply -f k8s-manifests/backend-deployment.yaml
-
-    - name: Deploy Frontend
-      run: kubectl apply -f k8s-manifests/frontend-deploy.yaml
-      
-    - name: Verify Deployment
-      run: |
-        kubectl get pods -o wide
-        kubectl get svc
-        kubectl get deployments
+      - name: Connect to local Kubernetes cluster
+        run: |
+          # 建立到您本地集群的隧道
+          telepresence connect --api-key ${{ secrets.TELEPRESENCE_API_KEY }} --cluster your-cluster-name
         
-    - name: Wait for pods to be ready
-      run: |
-        kubectl wait --for=condition=ready pod --all --timeout=300s
+      - name: Configure kubectl context
+        run: |
+          # 现在可以使用本地集群了！
+          kubectl get nodes
+          
+      - name: Configure registry secret
+        run: |
+          kubectl create secret docker-registry ghcr-token \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.GHCR_PAT }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+            
+      - name: Deploy MySQL 
+        run: kubectl apply -f k8s-manifests/mysql-deployment.yaml
+
+      - name: Deploy Backend
+        run: kubectl apply -f k8s-manifests/backend-deployment.yaml
+
+      - name: Deploy Frontend
+        run: kubectl apply -f k8s-manifests/frontend-deploy.yaml
         
-    - name: Disconnect Telepresence
-      run: |
-        telepresence quit
+      - name: Verify Deployment
+        run: |
+          kubectl get pods -o wide
+          kubectl get svc
+          kubectl get deployments
+          
+      - name: Wait for pods to be ready
+        run: |
+          kubectl wait --for=condition=ready pod --all --timeout=300s
+          
+      - name: Disconnect Telepresence
+        run: |
+          telepresence quit
 
   test-secrets:
     runs-on: ubuntu-latest
