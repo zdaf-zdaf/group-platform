@@ -506,7 +506,7 @@ jobs:
       - name: Start Vue server
         run: |
             # 启动Vue开发服务器
-            npm run serve -- --port 8080 > ../logs/vue.log 2>&1 &
+            npm run vue -- --port 8080 > ../logs/vue.log 2>&1 &
             echo $! > ../logs/vue.pid
             
             # 等待10秒让服务启动
