@@ -421,31 +421,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-        # 下载修复后的依赖文件 - 关键修复
       - name: Download fixed dependencies
         uses: actions/download-artifact@v4
         with:
             name: frontend-dependencies
             path: ./frontend
 
-        # 创建日志目录
       - name: Create log directory
         run: mkdir -p logs
 
-        # =============== 后端服务设置 ===============
+      # =============== 后端服务设置 ===============
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
             python-version: '3.10'
-        
+      
       - name: Install backend dependencies
         run: pip install -r requirements.txt
         working-directory: ./backend
-        
+      
       - name: Configure MySQL
         run: |
             sudo apt-get update && sudo apt-get install -y mysql-client
-            # 等待MySQL启动（使用标准端口3306）
             for i in {1..30}; do
             if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
                 echo "MySQL for GUI is ready!"
@@ -455,12 +452,11 @@ jobs:
             sleep 2
             done
             
-            # 确保root用户权限
             mysql -h127.0.0.1 -uroot -prootpassword -e "
             CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
             GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
             FLUSH PRIVILEGES;"
-        
+      
       - name: Run migrations
         run: |
             python manage.py makemigrations --noinput
@@ -469,17 +465,15 @@ jobs:
         env:
             DJANGO_SETTINGS_MODULE: server.settings
             DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_gui  # 使用正确的数据库名
+            DB_NAME: test_db_gui
             DB_USER: root
             DB_PASSWORD: rootpassword
             DB_HOST: 127.0.0.1
-            DB_PORT: 3306  # 使用标准端口3306
+            DB_PORT: 3306
             DEBUG: False
-        
-        # =============== 后端服务设置 ===============
+      
       - name: Start Django server
         run: |
-            # 禁用认证中间件并允许匿名访问
             python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
             echo $! > ../logs/django.pid
         working-directory: ./backend
@@ -490,90 +484,74 @@ jobs:
             DB_PASSWORD: rootpassword
             DB_HOST: 127.0.0.1
             DB_PORT: 3306
-        
-        # =============== 前端服务设置 ===============
-      - name: Setup Node.js
+      
+      # =============== Vue前端服务设置 ===============
+      - name: Setup Node.js for Vue
         uses: actions/setup-node@v4
         with:
             node-version: '22'
             cache: 'npm'
             cache-dependency-path: './frontend/package-lock.json'
 
-      - name: Install frontend dependencies
+      - name: Install Vue dependencies
         run: |
-          # 确保 public 目录存在
-          if [ ! -d "public" ]; then
-            echo "Creating public directory..."
-            mkdir -p public
-            # 使用 echo 命令逐行创建 index.html 文件，避免 heredoc 缩进问题
-            echo '<!DOCTYPE html>' > public/index.html
-            echo '<html lang="en">' >> public/index.html
-            echo '  <head>' >> public/index.html
-            echo '    <meta charset="utf-8" />' >> public/index.html
-            echo '    <meta name="viewport" content="width=device-width, initial-scale=1" />' >> public/index.html
-            echo '    <title>React App</title>' >> public/index.html
-            echo '  </head>' >> public/index.html
-            echo '  <body>' >> public/index.html
-            echo '    <div id="root"></div>' >> public/index.html
-            echo '  </body>' >> public/index.html
-            echo '</html>' >> public/index.html
-          fi
-          # 安装依赖
-          npm install --legacy-peer-deps
+            # 安装依赖
+            npm install
+            
+            # 创建.env文件配置Vue环境变量
+            echo "VUE_APP_API_BASE_URL=http://localhost:8000" > .env
+            echo "VUE_APP_DEBUG=true" >> .env
         working-directory: ./frontend
 
-      - name: Verify react-scripts installation
+      - name: Start Vue server
         run: |
-          ls -la node_modules/.bin/react-scripts || echo "react-scripts not found"
-          npm list react-scripts
+            # 启动Vue开发服务器
+            npm run serve -- --port 8080 > ../logs/vue.log 2>&1 &
+            echo $! > ../logs/vue.pid
+            
+            # 等待10秒让服务启动
+            sleep 10
         working-directory: ./frontend
-        
-      - name: Start React server
-        run: |
-            npx react-scripts start --port 3000 > ../logs/react.log 2>&1 &
-            echo $! > ../logs/react.pid
-        working-directory: ./frontend
-        
-        # =============== 测试执行 ===============
+      
+      # =============== 测试执行 ===============
       - name: Wait for servers with timeout
         run: |
             npm install -g wait-on
             
-            # 设置超时时间（最多等待2分钟）
-            timeout 120s wait-on http://localhost:3000 http://localhost:8000 || true
+            # 等待Vue前端(8080)和Django后端(8000)
+            timeout 120s wait-on http://localhost:8080 http://localhost:8000 || true
             
             # 检查服务状态
             echo "=== 服务状态检查 ==="
-            echo "检查端口 3000:"
-            nc -z localhost 3000 && echo "前端服务运行中" || echo "前端服务未响应"
+            echo "检查端口 8080:"
+            nc -z localhost 8080 && echo "前端服务运行中" || echo "前端服务未响应"
             
             echo "检查端口 8000:"
             nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
             
-            # 如果任一服务未启动，显示日志并退出
-            if ! nc -z localhost 3000 || ! nc -z localhost 8000; then
-            echo "❌ 服务启动失败，显示日志:"
+            if ! nc -z localhost 8080 || ! nc -z localhost 8000; then
+            echo "❌❌ 服务启动失败，显示日志:"
             echo "=== 后端日志 ==="
             cat logs/django.log || echo "无后端日志"
             echo "=== 前端日志 ==="
-            cat logs/react.log || echo "无前端日志"
+            cat logs/vue.log || echo "无前端日志"
             exit 1
             fi
             
             sleep 3
-        
+      
       - name: Run Cypress tests
-        run: npx cypress run --headless --config baseUrl=http://localhost:3000
+        run: npx cypress run --headless --config baseUrl=http://localhost:8080
         working-directory: ./frontend
-        
-        # =============== 日志收集 ===============
+      
+      # =============== 日志收集 ===============
       - name: Show backend logs if failed
         if: ${{ failure() }}
         run: cat logs/django.log
-        
+      
       - name: Show frontend logs if failed
         if: ${{ failure() }}
-        run: cat logs/react.log
+        run: cat logs/vue.log
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -609,6 +587,10 @@ jobs:
             
             # 验证依赖是否同步
             npm ls --package-lock-only
+
+      - name: Run frontend unit tests
+        run: npm run test:unit  # 确保package.json中有test:unit脚本
+
       - name: Save fixed dependencies
         uses: actions/upload-artifact@v4
         with:
