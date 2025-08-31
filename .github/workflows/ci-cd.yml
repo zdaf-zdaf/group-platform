@@ -503,14 +503,27 @@ jobs:
             echo "VUE_APP_DEBUG=true" >> .env
         working-directory: ./frontend
 
+      - name: Debug package.json scripts
+        run: |
+          echo "package.json scripts:"
+          npm run
+        working-directory: ./frontend
+
       - name: Start Vue server
         run: |
             # 启动Vue开发服务器
-            npm run vue -- --port 8080 > ../logs/vue.log 2>&1 &
+            npm run dev -- --port 8080 > ../logs/vue.log 2>&1 &
             echo $! > ../logs/vue.pid
             
-            # 等待10秒让服务启动
-            sleep 10
+            # 等待服务启动并检查端口
+            for i in {1..10}; do
+              if nc -z localhost 8080; then
+                echo "Vue server is running on port 8080"
+                break
+              fi
+              echo "Waiting for Vue server to start... (attempt $i/10)"
+              sleep 10
+            done
         working-directory: ./frontend
       
       # =============== 测试执行 ===============
