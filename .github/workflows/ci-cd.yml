@@ -655,19 +655,19 @@ jobs:
       - name: Update Dockerfile
         run: |
           # 仅更新Node版本
-          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/Dockerfile
+          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
           
           # 添加--legacy-peer-deps参数
-          sed -i 's/npm install/npm install --legacy-peer-deps/' frontend/Dockerfile
+          sed -i 's/npm install/npm install --legacy-peer-deps/' frontend/dockerfile
           
           # 添加vue-cli-service安装
-          sed -i '/npm install --legacy-peer-deps/a RUN npm install -g @vue/cli-service' frontend/Dockerfile
+          sed -i '/npm install --legacy-peer-deps/a RUN npm install -g @vue/cli-service' frontend/dockerfile
           
           # 添加调试命令
-          sed -i '/COPY \. \./a RUN npm ls --depth=0' frontend/Dockerfile
+          sed -i '/COPY \. \./a RUN npm ls --depth=0' frontend/dockerfile
           
           # 打印验证
-          cat frontend/Dockerfile
+          cat frontend/dockerfile
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
