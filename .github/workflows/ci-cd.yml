@@ -532,8 +532,16 @@ jobs:
             npm install -g wait-on
             
             # 等待Vue前端(8080)和Django后端(8000)
-            timeout 120s wait-on http://localhost:8080 http://localhost:8000 || true
+            timeout 180s wait-on http://localhost:8080 http://localhost:8000 || true
             
+            # 添加 API 健康检查
+            echo "=== API 健康检查 ==="
+            curl -I http://localhost:8000/api/healthcheck
+            
+            # 添加前端健康检查
+            echo "=== 前端健康检查 ==="
+            curl -I http://localhost:8080
+
             # 检查服务状态
             echo "=== 服务状态检查 ==="
             echo "检查端口 8080:"
@@ -554,7 +562,10 @@ jobs:
             sleep 3
       
       - name: Run Cypress tests
-        run: npx cypress run --headless --config baseUrl=http://localhost:8080
+        run: |
+          npx cypress run --headless --config baseUrl=http://localhost:8080 --browser chrome --record false --ci-build-id $GITHUB_RUN_ID
+        env:
+          DEBUG: "cypress:*"
         working-directory: ./frontend
       
       # =============== 日志收集 ===============

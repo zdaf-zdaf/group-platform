@@ -21,4 +21,5 @@ import 'cypress-file-upload'
 before(() => {
   cy.request('GET', 'http://localhost:8000/health').its('status').should('eq', 200)
   cy.request('GET', 'http://localhost:3000').its('status').should('eq', 200)
+  Cypress.env('API_BASE_URL', 'http://localhost:8000')
 });
