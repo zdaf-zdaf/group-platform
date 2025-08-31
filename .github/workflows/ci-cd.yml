@@ -601,7 +601,9 @@ jobs:
         run: |
           # Vue 项目的测试命令通常是 npm run test:unit 或 npm run test
           npm run test:unit || npm run test
-        working-directory: ./frontendtest-frontend:
+          working-directory: ./frontend
+    
+  test-frontend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -728,7 +730,7 @@ jobs:
     steps:
       - name: Notify Team
         run: |
-          echo "CI/CD 流水线成功完成！"
+          echo "CI/CD 流水线成功完成"
           echo "所有测试（单元、API、GUI）均已通过！"
           echo "所有Docker镜像已推送至 GitHub Container Registry。"
           echo "请成员C在本地执行以下命令进行部署："
