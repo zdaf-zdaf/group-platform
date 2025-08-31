@@ -330,6 +330,7 @@ jobs:
         run: |
             pkill -f "runserver 0.0.0.0:8003" || true
 
+
     # 并行学习资料测试
   api-test-ziliao:
     name: Parallel Learning Materials Tests
@@ -601,8 +602,41 @@ jobs:
         run: |
           # Vue 项目的测试命令通常是 npm run test:unit 或 npm run test
           npm run test:unit || npm run test
-          working-directory: ./frontend
-    
+        working-directory: ./frontend
+
+  build-and-push-backend:
+    runs-on: ubuntu-latest
+    needs: [test-backend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+    # 从 test-frontend 作业获取修复后的 lockfile
+      - name: Download fixed lockfile
+        uses: actions/download-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend
+
+      - name: Update Dockerfile
+        run: |
+            sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/backend:latest
+            ghcr.io/${{ github.repository_owner }}/backend:${{ github.sha }}
 
   build-and-push-frontend:
     runs-on: ubuntu-latest
@@ -631,11 +665,11 @@ jobs:
           CMD ["nginx", "-g", "daemon off;"]
           EOF
                   else
-            # 更新现有的 Dockerfile
-            sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/Dockerfile
-            # 确保使用 Vue 的构建命令
-            sed -i 's/npm run build:skip-check/npm run build/' frontend/Dockerfile
-          fi
+                    # 更新现有的 Dockerfile
+                    sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/Dockerfile
+                    # 确保使用 Vue 的构建命令
+                    sed -i 's/npm run build:skip-check/npm run build/' frontend/Dockerfile
+                  fi
         working-directory: ./
 
       - name: Login to GitHub Container Registry
@@ -660,7 +694,7 @@ jobs:
     steps:
       - name: Notify Team
         run: |
-          echo "CI/CD 流水线成功完成"
+          echo "CI/CD 流水线成功完成！"
           echo "所有测试（单元、API、GUI）均已通过！"
           echo "所有Docker镜像已推送至 GitHub Container Registry。"
           echo "请成员C在本地执行以下命令进行部署："
@@ -668,57 +702,65 @@ jobs:
 
   deploy-to-k8s:
     name: Deploy to Kubernetes
-    runs-on: ubuntu-latest  # 不需要 self-hosted runner了！
-    needs: [build-and-push-frontend, build-and-push-backend]
+    runs-on: self-hosted
+    needs: [build-and-push-frontend, build-and-push-backend]  # 应该依赖于构建作业，而不是通知作业
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Install Telepresence
+      - name: Check Kubernetes status
         run: |
-          curl -s https://packagecloud.io/install/repositories/datawireio/telepresence/script.deb.sh | sudo bash
-          sudo apt install telepresence
-          
-      - name: Connect to local Kubernetes cluster
-        run: |
-          # 建立到您本地集群的隧道
-          telepresence connect --api-key ${{ secrets.TELEPRESENCE_API_KEY }} --cluster your-cluster-name
-        
-      - name: Configure kubectl context
-        run: |
-          # 现在可以使用本地集群了！
+          # 检查 Kubernetes 是否运行
+          kubectl cluster-info
           kubectl get nodes
           
+      - name: Validate and set up kubeconfig
+        run: |
+          # 检查KUBE_CONFIG secret是否存在且有效
+          if [ -z "${{ secrets.KUBE_CONFIG }}" ]; then
+            echo "KUBE_CONFIG secret is empty or not set"
+            exit 1
+          fi
+          
+          # 解码并保存kubeconfig
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig.yaml
+          
+          # 验证kubeconfig格式
+          if ! kubectl --kubeconfig=kubeconfig.yaml config view; then
+            echo "Invalid kubeconfig format"
+            exit 1
+          fi
+          
+          # 设置KUBECONFIG环境变量供后续步骤使用
+          echo "KUBECONFIG=${PWD}/kubeconfig.yaml" >> $GITHUB_ENV
+
       - name: Configure registry secret
         run: |
-          kubectl create secret docker-registry ghcr-token \
+          kubectl --kubeconfig=$KUBECONFIG create secret docker-registry ghcr-token \
             --docker-server=ghcr.io \
             --docker-username=${{ github.actor }} \
             --docker-password=${{ secrets.GHCR_PAT }} \
-            --dry-run=client -o yaml | kubectl apply -f -
-            
+            --dry-run=client -o yaml | kubectl --kubeconfig=$KUBECONFIG apply -f -
+          
       - name: Deploy MySQL 
-        run: kubectl apply -f k8s-manifests/mysql-deployment.yaml
+        run: kubectl --kubeconfig=$KUBECONFIG apply -f k8s-manifests/mysql-deployment.yaml
 
       - name: Deploy Backend
-        run: kubectl apply -f k8s-manifests/backend-deployment.yaml
+        run: kubectl --kubeconfig=$KUBECONFIG apply -f k8s-manifests/backend-deployment.yaml
 
       - name: Deploy Frontend
-        run: kubectl apply -f k8s-manifests/frontend-deploy.yaml
+        run: kubectl --kubeconfig=$KUBECONFIG apply -f k8s-manifests/frontend-deploy.yaml
         
       - name: Verify Deployment
         run: |
-          kubectl get pods -o wide
-          kubectl get svc
-          kubectl get deployments
+          kubectl --kubeconfig=$KUBECONFIG get pods -o wide
+          kubectl --kubeconfig=$KUBECONFIG get svc
+          kubectl --kubeconfig=$KUBECONFIG get deployments
           
       - name: Wait for pods to be ready
         run: |
-          kubectl wait --for=condition=ready pod --all --timeout=300s
-          
-      - name: Disconnect Telepresence
-        run: |
-          telepresence quit
+          # 等待所有pod变为就绪状态
+          kubectl --kubeconfig=$KUBECONFIG wait --for=condition=ready pod --all --timeout=300s
 
   test-secrets:
     runs-on: ubuntu-latest
