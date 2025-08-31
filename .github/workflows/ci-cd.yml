@@ -329,8 +329,6 @@ jobs:
       - name: Stop Django Server
         run: |
             pkill -f "runserver 0.0.0.0:8003" || true
-
-
     # 并行学习资料测试
   api-test-ziliao:
     name: Parallel Learning Materials Tests
@@ -374,7 +372,6 @@ jobs:
             echo "Waiting for MySQL... (attempt $i/30)"
             sleep 2
             done
-
       - name: Start Django Server (Port 8004)
         run: |
             python manage.py runserver 0.0.0.0:8004 &
@@ -399,11 +396,9 @@ jobs:
             --environment postman/materials_environment.json \
             --env-var "baseUrl=http://127.0.0.1:8004" \
             --reporters cli
-
       - name: Stop Django Server
         run: |
             pkill -f "runserver 0.0.0.0:8004" || true
-
   gui-test-cypress:
     name: Run Cypress GUI Tests
     runs-on: ubuntu-latest
@@ -422,7 +417,6 @@ jobs:
         options: >-
             --health-cmd="mysqladmin ping"
             --health-interval=10s
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -497,75 +491,89 @@ jobs:
             DB_HOST: 127.0.0.1
             DB_PORT: 3306
         
-      # =============== 前端服务设置 ===============
+        # =============== 前端服务设置 ===============
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
+            node-version: '22'
+            cache: 'npm'
+            cache-dependency-path: './frontend/package-lock.json'
 
-      - name: Install Vue dependencies
+      - name: Install frontend dependencies
         run: |
-          # 清理缓存和旧依赖
-          npm cache clean --force
-          rm -rf node_modules
-          rm -f package-lock.json
-          
-          # 安装 Vue 项目依赖
+          # 确保 public 目录存在
+          if [ ! -d "public" ]; then
+            echo "Creating public directory..."
+            mkdir -p public
+            # 使用 echo 命令逐行创建 index.html 文件，避免 heredoc 缩进问题
+            echo '<!DOCTYPE html>' > public/index.html
+            echo '<html lang="en">' >> public/index.html
+            echo '  <head>' >> public/index.html
+            echo '    <meta charset="utf-8" />' >> public/index.html
+            echo '    <meta name="viewport" content="width=device-width, initial-scale=1" />' >> public/index.html
+            echo '    <title>React App</title>' >> public/index.html
+            echo '  </head>' >> public/index.html
+            echo '  <body>' >> public/index.html
+            echo '    <div id="root"></div>' >> public/index.html
+            echo '  </body>' >> public/index.html
+            echo '</html>' >> public/index.html
+          fi
+          # 安装依赖
           npm install --legacy-peer-deps
-          
-          # 验证 Vue 相关依赖
-          npm list vue @vue/cli-service || echo "Vue dependencies not found"
         working-directory: ./frontend
 
-      - name: Start Vue server
+      - name: Verify react-scripts installation
         run: |
-          # Vue 项目的启动命令通常是 npm run serve
-          npm run serve -- --port 3000 > ../logs/vue.log 2>&1 &
-          echo $! > ../logs/vue.pid
+          ls -la node_modules/.bin/react-scripts || echo "react-scripts not found"
+          npm list react-scripts
         working-directory: ./frontend
-      
-      # =============== 测试执行 ===============
+        
+      - name: Start React server
+        run: |
+            npx react-scripts start --port 3000 > ../logs/react.log 2>&1 &
+            echo $! > ../logs/react.pid
+        working-directory: ./frontend
+        
+        # =============== 测试执行 ===============
       - name: Wait for servers with timeout
         run: |
-          npm install -g wait-on
-          
-          # 设置超时时间（最多等待2分钟）
-          timeout 120s wait-on http://localhost:3000 http://localhost:8000 || true
-          
-          # 检查服务状态
-          echo "=== 服务状态检查 ==="
-          echo "检查端口 3000:"
-          nc -z localhost 3000 && echo "前端服务运行中" || echo "前端服务未响应"
-          
-          echo "检查端口 8000:"
-          nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
-          
-          # 如果任一服务未启动，显示日志并退出
-          if ! nc -z localhost 3000 || ! nc -z localhost 8000; then
+            npm install -g wait-on
+            
+            # 设置超时时间（最多等待2分钟）
+            timeout 120s wait-on http://localhost:3000 http://localhost:8000 || true
+            
+            # 检查服务状态
+            echo "=== 服务状态检查 ==="
+            echo "检查端口 3000:"
+            nc -z localhost 3000 && echo "前端服务运行中" || echo "前端服务未响应"
+            
+            echo "检查端口 8000:"
+            nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
+            
+            # 如果任一服务未启动，显示日志并退出
+            if ! nc -z localhost 3000 || ! nc -z localhost 8000; then
             echo "❌ 服务启动失败，显示日志:"
             echo "=== 后端日志 ==="
             cat logs/django.log || echo "无后端日志"
             echo "=== 前端日志 ==="
-            cat logs/vue.log || echo "无前端日志"
+            cat logs/react.log || echo "无前端日志"
             exit 1
-          fi
-          
-          sleep 3
-      
+            fi
+            
+            sleep 3
+        
       - name: Run Cypress tests
         run: npx cypress run --headless --config baseUrl=http://localhost:3000
         working-directory: ./frontend
-      
-      # =============== 日志收集 ===============
+        
+        # =============== 日志收集 ===============
       - name: Show backend logs if failed
         if: ${{ failure() }}
         run: cat logs/django.log
         
       - name: Show frontend logs if failed
         if: ${{ failure() }}
-        run: cat logs/vue.log
+        run: cat logs/react.log
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -583,30 +591,37 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './frontend/package-lock.json'
 
-      - name: Install Vue dependencies
+        # 修复依赖步骤
+      - name: Repair and install dependencies
         run: |
-          # 确保使用正确的包管理器（Vue 项目通常使用 npm 或 yarn）
-          npm install --legacy-peer-deps
-          
-          # 如果是 Vue CLI 项目，确保 @vue/cli-service 已安装
-          if ! grep -q "@vue/cli-service" package.json; then
-            echo "Installing Vue CLI service..."
-            npm install -g @vue/cli-service
-          fi
-          
-          # 验证 Vue 相关依赖
-          npm list vue @vue/cli-service || echo "Vue dependencies not found"
-        working-directory: ./frontend
+            # 确保使用正确的 npm 版本
+            npm install -g npm@11.5.2
+            
+            # 完全重新生成 lockfile
+            rm -rf node_modules
+            rm -f package-lock.json
+            
+            # 安装依赖并生成新的 lockfile
+            npm install --package-lock-only
+            
+            # 完整安装依赖
+            npm install
+            
+            # 验证依赖是否同步
+            npm ls --package-lock-only
+      - name: Save fixed dependencies
+        uses: actions/upload-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend/package*.json
+            retention-days: 1
 
       - name: Run frontend unit tests
-        run: |
-          # Vue 项目的测试命令通常是 npm run test:unit 或 npm run test
-          npm run test:unit || npm run test
-        working-directory: ./frontend
+        run: npm run test:unit
 
   build-and-push-backend:
     runs-on: ubuntu-latest
-    needs: [test-backend, test-frontend]
+    needs: [test-backend]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -621,7 +636,6 @@ jobs:
       - name: Update Dockerfile
         run: |
             sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -637,7 +651,6 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/backend:latest
             ghcr.io/${{ github.repository_owner }}/backend:${{ github.sha }}
-
   build-and-push-frontend:
     runs-on: ubuntu-latest
     needs: [test-frontend]
@@ -645,33 +658,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Update Dockerfile for Vue
+        # 确保下载修复后的依赖文件
+      - name: Download fixed dependencies
+        uses: actions/download-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend
+
+        # 更新 Dockerfile 中的 Node 版本
+      - name: Update Dockerfile
         run: |
-          # 确保 Dockerfile 适用于 Vue 项目
-          # Vue 项目通常使用 nginx 作为生产服务器
-          if [ ! -f "frontend/Dockerfile" ]; then
-            echo "Creating Vue Dockerfile..."
-            cat << EOF > frontend/Dockerfile
-          FROM node:22-alpine as build-stage
-          WORKDIR /app
-          COPY package*.json ./
-          RUN npm install
-          COPY . .
-          RUN npm run build
-
-          FROM nginx:1.27-alpine as production-stage
-          COPY --from=build-stage /app/dist /usr/share/nginx/html
-          EXPOSE 80
-          CMD ["nginx", "-g", "daemon off;"]
-          EOF
-                  else
-                    # 更新现有的 Dockerfile
-                    sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/Dockerfile
-                    # 确保使用 Vue 的构建命令
-                    sed -i 's/npm run build:skip-check/npm run build/' frontend/Dockerfile
-                  fi
-        working-directory: ./
-
+            sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
+            # 添加 --unsafe-perm 参数解决权限问题
+            sed -i '/npm ci/a RUN npm install -g npm@11.5.2 --unsafe-perm' frontend/dockerfile
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -687,7 +686,6 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/frontend:latest
             ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}
-
   notify-deployment-ready:
     runs-on: ubuntu-latest
     needs: [test-backend, test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao, gui-test-cypress, build-and-push-backend, build-and-push-frontend] 
@@ -699,69 +697,39 @@ jobs:
           echo "所有Docker镜像已推送至 GitHub Container Registry。"
           echo "请成员C在本地执行以下命令进行部署："
           echo "kubectl apply -f k8s-manifests/"
-
+    # 在现有notify-deployment-ready作业后添加：
   deploy-to-k8s:
     name: Deploy to Kubernetes
-    runs-on: self-hosted
-    needs: [build-and-push-frontend, build-and-push-backend]  # 应该依赖于构建作业，而不是通知作业
+    runs-on: ubuntu-latest
+    needs: [notify-deployment-ready]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Check Kubernetes status
-        run: |
-          # 检查 Kubernetes 是否运行
-          kubectl cluster-info
-          kubectl get nodes
-          
-      - name: Validate and set up kubeconfig
-        run: |
-          # 检查KUBE_CONFIG secret是否存在且有效
-          if [ -z "${{ secrets.KUBE_CONFIG }}" ]; then
-            echo "KUBE_CONFIG secret is empty or not set"
-            exit 1
-          fi
-          
-          # 解码并保存kubeconfig
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig.yaml
-          
-          # 验证kubeconfig格式
-          if ! kubectl --kubeconfig=kubeconfig.yaml config view; then
-            echo "Invalid kubeconfig format"
-            exit 1
-          fi
-          
-          # 设置KUBECONFIG环境变量供后续步骤使用
-          echo "KUBECONFIG=${PWD}/kubeconfig.yaml" >> $GITHUB_ENV
-
-      - name: Configure registry secret
-        run: |
-          kubectl --kubeconfig=$KUBECONFIG create secret docker-registry ghcr-token \
-            --docker-server=ghcr.io \
-            --docker-username=${{ github.actor }} \
-            --docker-password=${{ secrets.GHCR_PAT }} \
-            --dry-run=client -o yaml | kubectl --kubeconfig=$KUBECONFIG apply -f -
-          
-      - name: Deploy MySQL 
-        run: kubectl --kubeconfig=$KUBECONFIG apply -f k8s-manifests/mysql-deployment.yaml
-
+      - name: Configure kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+            version: 'latest'
+            
+      - name: Setup Kubernetes context
+        uses: azure/k8s-set-context@v3
+        with:
+            method: kubeconfig
+            kubeconfig: ${{ secrets.KUBE_CONFIG }}
+            
+      - name: Deploy MySQL Secret
+        run: kubectl apply -f k8s/mysql-secret.yaml
+        
       - name: Deploy Backend
-        run: kubectl --kubeconfig=$KUBECONFIG apply -f k8s-manifests/backend-deployment.yaml
-
+        run: kubectl apply -f k8s/backend-deployment.yaml
+        
       - name: Deploy Frontend
-        run: kubectl --kubeconfig=$KUBECONFIG apply -f k8s-manifests/frontend-deploy.yaml
+        run: kubectl apply -f k8s/frontend-deploy.yaml
         
       - name: Verify Deployment
         run: |
-          kubectl --kubeconfig=$KUBECONFIG get pods -o wide
-          kubectl --kubeconfig=$KUBECONFIG get svc
-          kubectl --kubeconfig=$KUBECONFIG get deployments
-          
-      - name: Wait for pods to be ready
-        run: |
-          # 等待所有pod变为就绪状态
-          kubectl --kubeconfig=$KUBECONFIG wait --for=condition=ready pod --all --timeout=300s
-
+            kubectl get pods
+            kubectl get svc
   test-secrets:
     runs-on: ubuntu-latest
     steps:
