@@ -640,19 +640,35 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+
         # 确保下载修复后的依赖文件
       - name: Download fixed dependencies
         uses: actions/download-artifact@v4
         with:
             name: frontend-dependencies
             path: ./frontend
-
-        # 更新 Dockerfile 中的 Node 版本
       - name: Update Dockerfile
         run: |
-            sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
-            # 添加 --unsafe-perm 参数解决权限问题
-            sed -i '/npm ci/a RUN npm install -g npm@11.5.2 --unsafe-perm' frontend/dockerfile
+          # 仅更新Node版本
+          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/Dockerfile
+          
+          # 添加--legacy-peer-deps参数
+          sed -i 's/npm install/npm install --legacy-peer-deps/' frontend/Dockerfile
+          
+          # 添加vue-cli-service安装
+          sed -i '/npm install --legacy-peer-deps/a RUN npm install -g @vue/cli-service' frontend/Dockerfile
+          
+          # 添加调试命令
+          sed -i '/COPY \. \./a RUN npm ls --depth=0' frontend/Dockerfile
+          
+          # 打印验证
+          cat frontend/Dockerfile
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
