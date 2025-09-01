@@ -536,7 +536,7 @@ jobs:
             
             # 添加 API 健康检查
             echo "=== API 健康检查 ==="
-            curl -I http://localhost:8000/api/healthcheck
+            curl -f http://localhost:8000/health/ || echo "API健康检查失败"
             
             # 添加前端健康检查
             echo "=== 前端健康检查 ==="

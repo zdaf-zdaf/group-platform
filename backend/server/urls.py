@@ -18,6 +18,8 @@ from user.views import (
     UserProfileUpdateView
 )
 from experiments.views import ExperimentViewSet, SubmissionViewSet, AnswerViewSet, StudentViewSet
+from . import views
+from django.urls import path, include
 
 router = DefaultRouter()
 router.register(r'materials', LearningMaterialViewSet, basename='material')
@@ -53,7 +55,8 @@ urlpatterns = [
         path('questions/<int:question_id>/comments/', forum_views.CommentCreateView.as_view(), name='comment-create'),
         path('comments/<int:pk>/', forum_views.CommentDeleteView.as_view(), name='comment-delete'),
     ])),
-
+    path('health/', views.health_check),
+    path('health/', include('health.urls')),
 ]
 
 # 修复：正确处理中文字符路径服务
