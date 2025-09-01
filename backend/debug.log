@@ -6,3 +6,29 @@ INFO 2025-09-01 09:35:49,404 autoreload Watching for file changes with StatReloa
 INFO 2025-09-01 09:37:49,341 autoreload Watching for file changes with StatReloader
 INFO 2025-09-01 09:38:12,816 basehttp "GET /health/ HTTP/1.1" 200 16
 INFO 2025-09-01 10:35:33,458 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 11:38:26,442 basehttp "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+WARNING 2025-09-01 11:38:27,765 log Bad Request: /api/auth/login/
+WARNING 2025-09-01 11:38:27,768 basehttp "POST /api/auth/login/ HTTP/1.1" 400 84
+WARNING 2025-09-01 11:40:07,300 log Bad Request: /api/auth/login/
+WARNING 2025-09-01 11:40:07,300 basehttp "POST /api/auth/login/ HTTP/1.1" 400 84
+WARNING 2025-09-01 11:40:12,137 log Bad Request: /api/auth/login/
+WARNING 2025-09-01 11:40:12,137 basehttp "POST /api/auth/login/ HTTP/1.1" 400 84
+WARNING 2025-09-01 11:40:17,581 log Bad Request: /api/auth/login/
+WARNING 2025-09-01 11:40:17,582 basehttp "POST /api/auth/login/ HTTP/1.1" 400 84
+WARNING 2025-09-01 11:40:22,890 log Bad Request: /api/auth/login/
+WARNING 2025-09-01 11:40:22,891 basehttp "POST /api/auth/login/ HTTP/1.1" 400 84
+WARNING 2025-09-01 11:41:06,774 log Bad Request: /api/auth/login/
+WARNING 2025-09-01 11:41:06,775 basehttp "POST /api/auth/login/ HTTP/1.1" 400 84
+WARNING 2025-09-01 11:41:12,054 log Bad Request: /api/auth/login/
+WARNING 2025-09-01 11:41:12,054 basehttp "POST /api/auth/login/ HTTP/1.1" 400 84
+INFO 2025-09-01 12:03:01,084 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 12:03:48,899 basehttp "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+WARNING 2025-09-01 12:03:49,373 log Bad Request: /api/auth/login/
+WARNING 2025-09-01 12:03:49,374 basehttp "POST /api/auth/login/ HTTP/1.1" 400 84
+WARNING 2025-09-01 12:03:54,308 log Bad Request: /api/auth/login/
+WARNING 2025-09-01 12:03:54,309 basehttp "POST /api/auth/login/ HTTP/1.1" 400 84
+INFO 2025-09-01 12:10:35,713 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\server\settings.py changed, reloading.
+INFO 2025-09-01 12:10:36,602 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 12:10:47,070 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\server\settings.py changed, reloading.
+INFO 2025-09-01 12:10:48,131 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 12:12:55,351 autoreload Watching for file changes with StatReloader

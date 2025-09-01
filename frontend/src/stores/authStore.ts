@@ -70,11 +70,10 @@ export const useAuthStore = defineStore('auth', () => {
       // 清除旧存储
       clearStorage();
 
-      // 根据记住我选项选择存储方式
-      if (formData.rememberMe) {
-        localStorage.setItem('token', token.value);
-        localStorage.setItem('userInfo', JSON.stringify(userInfo.value));
-      } else {
+      // 无论是否记住我，都同步写入 localStorage，保证所有 axios 代码都能取到 token
+      localStorage.setItem('token', token.value);
+      localStorage.setItem('userInfo', JSON.stringify(userInfo.value));
+      if (!formData.rememberMe) {
         sessionStorage.setItem('token', token.value);
         sessionStorage.setItem('userInfo', JSON.stringify(userInfo.value));
       }

@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus';
 
 // 创建带类型声明的 Axios 实例
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'http://127.0.0.1:8000',
   headers: {
     'X-Requested-With': 'XMLHttpRequest'
   }
