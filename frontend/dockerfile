@@ -29,4 +29,4 @@ RUN npm run build
 FROM nginx:stable-alpine as production-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;", "--", "--port", "80"]
+CMD ["nginx", "-g", "daemon off;", "npm", "run", "serve", "--", "--port", "80"]

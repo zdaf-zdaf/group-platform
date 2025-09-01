@@ -718,6 +718,9 @@ jobs:
 
   generate-deployment-script:
     name: Generate Deployment Script
+
+  generate-deployment-script:
+    name: Generate Deployment Script
     runs-on: ubuntu-latest
     # 依赖所有测试和构建作业
     needs: [test-backend, test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao, build-and-push-backend, build-and-push-frontend]
@@ -725,6 +728,41 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # 生成部署脚本
+      - name: Generate Local Deployment Package
+        run: |
+          # 创建一键部署脚本
+          cat > deploy-to-local.sh << 'EOF'
+          #!/bin/bash
+          echo "开始部署到本地K8s环境..."
+          
+          # 1. 更新镜像版本
+          sed -i "s|image:.*backend:.*|image: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}|g" k8s/backend-deployment.yaml
+          sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
+          
+          # 2. 部署到K8s
+          kubectl apply -f k8s/
+          
+          # 3. 等待服务就绪
+          echo "等待服务启动..."
+          sleep 30
+          
+          # 4. 显示访问信息
+          echo "部署完成！"
+          echo "前端访问: http://localhost:30080"
+          echo "后端API: http://localhost:30080/api"
+          echo ""
+          echo "运行集成测试:"
+          echo "cd postman && newman run collection1-LunTan.json -e environment.json"
+          EOF
+          
+          chmod +x deploy-to-local.sh
+          echo "生成了一键部署脚本: deploy-to-local.sh"
+
+      # 上传部署包
+      - name: Upload Deployment Package
+        uses: actions/upload-artifact@v4
 
       # 生成部署脚本
       - name: Generate Local Deployment Package
@@ -768,12 +806,30 @@ jobs:
           retention-days: 7
 
   notify-deployment-ready:
+          name: local-deployment-package
+          path: |
+            k8s/
+            deploy-to-local.sh
+          retention-days: 7
+
+  notify-deployment-ready:
     runs-on: ubuntu-latest
+    # 依赖部署脚本生成作业
+    needs: [generate-deployment-script] 
     # 依赖部署脚本生成作业
     needs: [generate-deployment-script] 
     steps:
       - name: Notify Team
+      - name: Notify Team
         run: |
+          echo "CI流程完成！"
+          echo ""
+          echo "请下载部署包并本地执行:"
+          echo "1. 从Artifacts下载 'local-deployment-package'"
+          echo "2. 解压后运行: chmod +x deploy-to-local.sh && ./deploy-to-local.sh"
+          echo "3. 访问 http://localhost:30080 验证部署"
+          echo ""
+          echo "注意: 确保本地Docker Desktop和Kubectl已正确配置"
           echo "CI流程完成！"
           echo ""
           echo "请下载部署包并本地执行:"

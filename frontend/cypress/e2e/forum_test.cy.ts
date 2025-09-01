@@ -10,7 +10,7 @@ describe('论坛模块功能测试', () => {
 
   // 学生端发帖、点赞、评论、删除
   it('学生端发帖、点赞、评论、删除', () => {
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(student.username)
     cy.get('input[placeholder="请输入密码"]').type(student.password)
     cy.get('input[type="checkbox"]').check({ force: true })
@@ -57,7 +57,7 @@ describe('论坛模块功能测试', () => {
 
   // 教师端置顶、点赞、评论、删除
   it('教师端置顶、点赞、评论、删除', () => {
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(teacher.username)
     cy.get('input[placeholder="请输入密码"]').type(teacher.password)
     cy.get('input[type="checkbox"]').check({ force: true })
