@@ -2,7 +2,7 @@ import { defineConfig } from "cypress";
 
 export default defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:8080',
+    baseUrl: 'http://localhost:5173',
     setupNodeEvents(on, config) {
     },
     specPattern: "cypress/e2e/**/*.cy.{js,ts}", // 可根据你的项目调整
