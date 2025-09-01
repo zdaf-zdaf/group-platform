@@ -1,11 +1,14 @@
-from rest_framework import permissions
+from rest_framework.permissions import BasePermission
 
-# permissions.py
-class IsTeacherOrReadOnly(permissions.BasePermission):
+class IsTeacher(BasePermission):
+    """
+    检查 Token 中的角色是否为 'teacher'
+    """
     def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        role = getattr(request.user, 'role', None)
-        is_staff = getattr(request.user, 'is_staff', False)
-        is_superuser = getattr(request.user, 'is_superuser', False)
-        return role == 'teacher' or is_staff or is_superuser
+        # 当 JWT 认证成功后，Token 的载荷(payload)会保存在 request.auth 中
+        # request.user 是一个 SimpleLazyObject，代表一个临时的、不在数据库中的用户
+        if not request.user or not request.auth:
+            return False
+        
+        # 从 Token 的载荷中获取 role 字段，并判断是否为 'teacher'
+        return request.auth.get('role') == 'teacher'

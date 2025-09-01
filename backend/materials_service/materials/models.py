@@ -1,8 +1,8 @@
-from django.db import models
-from django.contrib.auth import get_user_model  # 导入 get_user模型
+# backend/materials_service/materials/models.py
 
-# 获取用户模型
-User = get_user_model()
+from django.db import models
+
+# 不再导入 get_user_model，因为我们不再关联 User 模型
 
 class LearningMaterial(models.Model):
     MATERIAL_TYPES = (
@@ -25,13 +25,10 @@ class LearningMaterial(models.Model):
     size = models.BigIntegerField(verbose_name="文件大小(字节)", default=0)
     downloads = models.PositiveIntegerField(default=0, verbose_name="下载次数")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
-    created_by = models.ForeignKey(
-        User,  # 使用定义好的User变量
-        on_delete=models.CASCADE,
-        verbose_name="上传者",
-        related_name='uploaded_materials'
-    )
-    # 关联题组ID（来自 experiments 微服务），解耦为纯整数，跨服务通过 API 协作
+    
+    # 关键修改：将 ForeignKey 改为 CharField
+    uploader_username = models.CharField(max_length=150, verbose_name="上传者用户名")
+    
     question_set = models.IntegerField(null=True, blank=True, verbose_name="关联题组ID")
 
     class Meta:
@@ -43,6 +40,6 @@ class LearningMaterial(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        if self.file and not self.size:  # 自动计算文件大小
+        if self.file and not self.size:
             self.size = self.file.size
         super().save(*args, **kwargs)

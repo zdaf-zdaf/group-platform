@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # 用户微服务
+  user_service:
+    build:
+      context: ./backend/user_service
+      dockerfile: Dockerfile
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./backend/user_service:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=user_db 
+      - DB_NAME=user_db_name
+      - DB_USER=root
+      - DB_PASSWORD=my-secret-pw-123
+    depends_on:
+      - user_db
+    restart: always
+
+  # 学习资料微服务
+  materials_service:
+    build:
+      context: ./backend/materials_service
+      dockerfile: Dockerfile
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8001"
+    volumes:
+      - ./backend/materials_service:/app
+      - materials_media:/app/media
+    ports:
+      - "8001:8001"
+    environment:
+      - DB_HOST=materials_db
+      - DB_NAME=materials_db_name
+      - DB_USER=root
+      - DB_PASSWORD=my-secret-pw-123
+      - SECRET_KEY='django-insecure-9ekm#x74ns6(j*h)3+jb-v*sz7bho2edo%g)uktin)ugf-5!s%'
+    depends_on:
+      - materials_db 
+    restart: always
+
+  # 前端服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: dockerfile
+    ports:
+      - "5173:80"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    # 确保后端服务启动后再启动前端，以便代理能正常工作
+    depends_on:
+      - user_service
+      - materials_service
+    restart: always
+
+  # 用户服务的数据库
+  user_db:
+    image: mysql:8.0
+    container_name: user_db
+    volumes:
+      - user_mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw-123
+      MYSQL_DATABASE: user_db_name
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  # 资料服务的数据库
+  materials_db:
+    image: mysql:8.0
+    container_name: materials_db
+    volumes:
+      - materials_mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw-123
+      MYSQL_DATABASE: materials_db_name
+    ports:
+      - "3308:3306" # 映射到主机的3308端口，避免冲突
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+volumes:
+  user_mysql_data:
+  materials_mysql_data:
+  materials_media:

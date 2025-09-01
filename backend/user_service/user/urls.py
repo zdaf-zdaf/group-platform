@@ -10,7 +10,7 @@ from user.views import (
 )
 
 urlpatterns = [
-    path('api/auth/', include([
+    path('auth/', include([
         path('register/', RegisterView.as_view(), name='register'),
         path('login/', CustomTokenObtainPairView.as_view(), name='login'),
         path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
