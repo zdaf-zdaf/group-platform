@@ -8,22 +8,27 @@ describe('论坛模块功能测试', () => {
   const postComment = '自动化测试评论内容'
   const teacherComment = '教师自动化评论内容'
 
-  // 学生端发帖、点赞、评论、删除
-  it('学生端发帖、点赞、评论、删除', () => {
-    cy.visit('http://127.0.0.1:8080/login')
-    cy.get('input[placeholder="请输入用户名"]').type(student.username)
-    cy.get('input[placeholder="请输入密码"]').type(student.password)
+  // 登录函数封装
+  function login(user: { username: string; password: string }) {
+    cy.visit('/login')
+    cy.get('input[placeholder="请输入用户名"]').type(user.username)
+    cy.get('input[placeholder="请输入密码"]').type(user.password)
     cy.get('input[type="checkbox"]').check({ force: true })
+
+    // 拦截登录接口
+    cy.intercept('POST', '/api/auth/login/').as('loginRequest')
     cy.get('button').contains('立即登录').click()
 
-    cy.url().then(url => {
-      console.log('当前 URL:', url)
-    })
-    cy.get('body').then($body => {
-      console.log('页面内容:', $body.text())
-    })
+    // 等待接口返回成功
+    cy.wait('@loginRequest').its('response.statusCode').should('eq', 200)
 
-    cy.url({ timeout: 15000 }).should('include', '/profile')
+    // 等待页面跳转到 /profile
+    cy.url({ timeout: 20000 }).should('include', '/profile')
+  }
+
+  // 学生端发帖、点赞、评论、删除
+  it('学生端发帖、点赞、评论、删除', () => {
+    login(student)
 
     cy.contains('答疑论坛').click({ force: true })
     cy.url({ timeout: 15000 }).should('include', '/forum')
@@ -65,21 +70,7 @@ describe('论坛模块功能测试', () => {
 
   // 教师端置顶、点赞、评论、删除
   it('教师端置顶、点赞、评论、删除', () => {
-    cy.visit('http://127.0.0.1:8080/login')
-    cy.get('input[placeholder="请输入用户名"]').type(teacher.username)
-    cy.get('input[placeholder="请输入密码"]').type(teacher.password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-
-    cy.url().then(url => {
-      console.log('当前 URL:', url)
-    })
-    cy.get('body').then($body => {
-      console.log('页面内容:', $body.text())
-    })
-
-
-    cy.url({ timeout: 15000 }).should('include', '/profile')
+    login(teacher)
 
     cy.contains('答疑论坛').click({ force: true })
     cy.url({ timeout: 15000 }).should('include', '/forum')
