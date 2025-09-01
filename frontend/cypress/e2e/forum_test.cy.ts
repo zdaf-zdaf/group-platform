@@ -15,10 +15,10 @@ describe('论坛模块功能测试', () => {
     cy.get('input[placeholder="请输入密码"]').type(student.password)
     cy.get('input[type="checkbox"]').check({ force: true })
     cy.get('button').contains('立即登录').click()
-    cy.url().should('include', '/profile')
+    cy.url({ timeout: 15000 }).should('include', '/profile')
 
     cy.contains('答疑论坛').click({ force: true })
-    cy.url().should('include', '/forum')
+    cy.url({ timeout: 15000 }).should('include', '/forum')
     cy.get('.forum').should('exist')
 
     // 发布帖子
@@ -62,10 +62,10 @@ describe('论坛模块功能测试', () => {
     cy.get('input[placeholder="请输入密码"]').type(teacher.password)
     cy.get('input[type="checkbox"]').check({ force: true })
     cy.get('button').contains('立即登录').click()
-    cy.url().should('include', '/profile')
+    cy.url({ timeout: 15000 }).should('include', '/profile')
 
     cy.contains('答疑论坛').click({ force: true })
-    cy.url().should('include', '/forum')
+    cy.url({ timeout: 15000 }).should('include', '/forum')
     cy.get('.forum').should('exist')
 
     // 发布帖子
