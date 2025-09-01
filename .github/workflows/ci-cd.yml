@@ -611,6 +611,15 @@ jobs:
         if: ${{ failure() }}
         run: cat logs/vue.log
 
+      # =============== 日志强制收集 ===============
+      # 无论成功或失败都输出日志，方便排查
+      - name: Always show backend logs
+        if: always()
+        run: cat logs/django.log || true
+      - name: Always show frontend logs
+        if: always()
+        run: cat logs/vue.log || true
+
   test-frontend:
     runs-on: ubuntu-latest
     defaults:
