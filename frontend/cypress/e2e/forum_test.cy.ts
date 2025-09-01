@@ -10,23 +10,32 @@ describe('论坛模块功能测试', () => {
 
   // 登录函数封装
   function login(user: { username: string; password: string }) {
+    cy.log('step1: visit /login')
     cy.visit('/login')
+    cy.log('step2: type username')
     cy.get('input[placeholder="请输入用户名"]').type(user.username)
+    cy.log('step3: type password')
     cy.get('input[placeholder="请输入密码"]').type(user.password)
+    cy.log('step4: check rememberMe')
     cy.get('input[type="checkbox"]').check({ force: true })
 
+    cy.log('step5: intercept login api')
     // 拦截登录接口
     cy.intercept('POST', '/api/auth/login/').as('loginRequest')
+    cy.log('step6: click login button')
     cy.get('button').contains('立即登录').click()
 
+    cy.log('step7: wait loginRequest')
     // 等待接口返回成功
     cy.wait('@loginRequest').its('response.statusCode').should('eq', 200)
 
+    cy.log('step8: print localStorage token')
     // 打印localStorage内容
     cy.window().then(win => {
       cy.log('localStorage token:', win.localStorage.getItem('token'))
     })
 
+    cy.log('step9: hook console.error')
     // 打印页面console错误
     cy.on('window:before:load', (win) => {
       win.console.error = (...args) => {
@@ -35,10 +44,13 @@ describe('论坛模块功能测试', () => {
       }
     })
 
+    cy.log('step10: wait for /profile')
     // 等待页面跳转到 /profile
     cy.url({ timeout: 20000 }).should('include', '/profile')
+    cy.log('step11: print cookies')
     // 新增调试
     cy.getCookies().then(cookies => { cy.log('Cookies:', JSON.stringify(cookies)) })
+    cy.log('step12: print localStorage all')
     cy.window().then(win => { cy.log('localStorage:', JSON.stringify(win.localStorage)) })
   }
 
