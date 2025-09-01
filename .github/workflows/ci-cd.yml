@@ -2,9 +2,9 @@ name: group-pipeline
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "mhl" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "mhl" ]
 
 jobs:
   # ================== 后端测试（容器化） ==================
