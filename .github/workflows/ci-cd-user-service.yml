@@ -3,11 +3,11 @@ name: User Service CI/CD
 on:
   push:
     paths:
-      - 'backend/user_service/**'  # 只监控user_service目录的变更
+      - 'backend/user-service/**'  # 只监控user-service目录的变更
     branches: [ "master" ]
   pull_request:
     paths:
-      - 'backend/user_service/**'
+      - 'backend/user-service/**'
     branches: [ "master" ]
 
 jobs:

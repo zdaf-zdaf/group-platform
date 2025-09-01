@@ -3,11 +3,11 @@ name: Forum Service CI/CD
 on:
   push:
     paths:
-      - 'backend/forum_service/**'  # 只监控forum-service目录的变更
+      - 'backend/forum-service/**'  # 只监控forum-service目录的变更
     branches: [ "master" ]
   pull_request:
     paths:
-      - 'backend/forum_service/**'
+      - 'backend/forum-service/**'
     branches: [ "master" ]
 
 jobs:
@@ -22,6 +22,11 @@ jobs:
           MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
           - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       - name: Checkout code
@@ -93,3 +98,32 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/forum-service:latest
             ghcr.io/${{ github.repository_owner }}/forum-service:${{ github.sha }}
 
+  deploy-forum-service:
+    runs-on: ubuntu-latest
+    needs: build-and-push-forum-service
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate deployment script for forum service
+        run: |
+          cat > deploy-forum-service.sh << 'EOF'
+          #!/bin/bash
+          echo "Deploying Forum Service..."
+          
+          # Update image version
+          sed -i "s|image:.*forum-service:.*|image: ghcr.io/${{ github.repository }}/forum-service:${{ github.sha }}|g" forum-service/k8s/deployment.yaml
+          
+          # Apply Kubernetes configuration
+          kubectl apply -f forum-service/k8s/
+          
+          echo "Forum Service deployed!"
+          EOF
+          
+          chmod +x deploy-forum-service.sh
+
+      - name: Upload deployment script
+        uses: actions/upload-artifact@v4
+        with:
+          name: forum-service-deployment
+          path: deploy-forum-service.sh
