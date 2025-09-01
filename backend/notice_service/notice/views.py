@@ -2,15 +2,35 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.throttling import UserRateThrottle
 from .models import Notice
 from .serializers import NoticeSerializer
 import logging
+import time
 
 logger = logging.getLogger('notice')
+
+class ModerateThrottle(UserRateThrottle):
+    """自定义限流策略"""
+    scope = 'moderate'
+    rate = '100/hour'  # 每小时100次请求
+
+class HighPriorityThrottle(UserRateThrottle):
+    """高优先级操作限流"""
+    scope = 'high'
+    rate = '10/minute'  # 每分钟10次请求
 
 class NoticeViewSet(viewsets.ModelViewSet):
     serializer_class = NoticeSerializer
     permission_classes = [IsAuthenticated]
+    throttle_classes = [ModerateThrottle]  # 默认限流策略
+
+    def get_throttles(self):
+        """根据操作类型应用不同限流策略"""
+        if self.action in ['mark_as_read', 'mark_all_read']:
+            # 高频操作应用更严格的限流
+            return [HighPriorityThrottle()]
+        return super().get_throttles()
 
     def get_queryset(self):
         user = self.request.user
@@ -19,7 +39,12 @@ class NoticeViewSet(viewsets.ModelViewSet):
         # 按用户角色过滤
         if hasattr(user, 'role') and user.role == 'student':
             # 学生只能看到非置顶公告或已读公告
-            pass  # 根据业务需求实现
+            # 获取当前用户ID
+            user_id = user.id
+            # 查询条件：非置顶公告 OR 已读公告
+            queryset = queryset.filter(
+                Q(is_top=False) | Q(reader_ids__contains=[user_id])
+            )
         
         return queryset.order_by('-is_top', '-date')
 
@@ -34,10 +59,10 @@ class NoticeViewSet(viewsets.ModelViewSet):
             # 分页
             page = self.paginate_queryset(queryset)
             if page is not None:
-                serializer = self.get_serializer(page, many=True)
+                serializer = self.get_serializer(page, many=True, context={'request': request})
                 return self.get_paginated_response(serializer.data)
 
-            serializer = self.get_serializer(queryset, many=True)
+            serializer = self.get_serializer(queryset, many=True, context={'request': request})
             return Response(serializer.data)
         except Exception as e:
             logger.exception("获取公告列表时发生异常")
@@ -69,6 +94,7 @@ class NoticeViewSet(viewsets.ModelViewSet):
         """标记所有公告为已读 - 优化性能"""
         try:
             user = request.user
+            start_time = time.time()  # 记录开始时间
 
             # 只有学生能标记公告
             if not hasattr(user, 'role') or user.role != 'student':
@@ -91,11 +117,14 @@ class NoticeViewSet(viewsets.ModelViewSet):
                     notice.save()
                     marked_count += 1
 
-            logger.info(f"成功为 {marked_count} 条公告添加已读标记")
+            # 记录处理时间
+            duration = time.time() - start_time
+            logger.info(f"成功为 {marked_count} 条公告添加已读标记，耗时 {duration:.2f} 秒")
 
             return Response({
                 "status": "success",
-                "marked_count": marked_count
+                "marked_count": marked_count,
+                "time_taken": f"{duration:.2f}秒"
             }, status=status.HTTP_200_OK)
         except Exception as e:
             logger.exception(f"标记所有公告为已读失败: {str(e)}")
@@ -109,6 +138,7 @@ class NoticeViewSet(viewsets.ModelViewSet):
         try:
             notice = self.get_object()
             user = request.user
+            start_time = time.time()  # 记录开始时间
 
             # 验证用户角色
             if not hasattr(user, 'role') or user.role != 'student':
@@ -130,10 +160,14 @@ class NoticeViewSet(viewsets.ModelViewSet):
                 notice.save()
                 logger.info(f"用户 {user.username} 标记公告 {pk} 为已读")
 
+            # 记录处理时间
+            duration = time.time() - start_time
+            
             # 返回成功响应
             return Response({
                 "status": "success",
-                "read_count": len(notice.reader_ids)
+                "read_count": len(notice.reader_ids),
+                "time_taken": f"{duration:.4f}秒"
             })
         except Exception as e:
             logger.exception(f"标记公告 {pk} 为已读失败: {str(e)}")
@@ -160,7 +194,7 @@ class NoticeViewSet(viewsets.ModelViewSet):
         # 权限验证 - 使用role字段
         if not hasattr(request.user, 'role') or request.user.role != 'teacher':
             logger.warning(
-                f"用户 {request.user.username} 尝试更新公告，极权（角色：{getattr(request.user, 'role', '未设置')}）")
+                f"用户 {request.user.username} 尝试更新公告（角色：{getattr(request.user, 'role', '未设置')}）")
             return Response({
                 "detail": "无权限操作"
             }, status=status.HTTP_403_FORBIDDEN)
@@ -174,7 +208,7 @@ class NoticeViewSet(viewsets.ModelViewSet):
             logger.warning(
                 f"用户 {request.user.username} 尝试删除公告，但无权限（角色：{getattr(request.user, 'role', '未设置')}）")
             return Response({
-                "detail": "极权操作"
+                "detail": "无权限操作"
             }, status=status.HTTP_403_FORBIDDEN)
 
         return super().destroy(request, *args, **kwargs)
