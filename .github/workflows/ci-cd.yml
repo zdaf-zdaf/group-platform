@@ -563,16 +563,16 @@ jobs:
 
       - name: 初始化测试账号
         run: |
-          curl -v -X POST http://localhost:8000/api/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}' || true
-          curl -v -X POST http://localhost:8000/api/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || true
+          curl -v -X POST http://localhost:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}' || true
+          curl -v -X POST http://localhost:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || true
         working-directory: ./frontend
 
       - name: 检查账号登录
         run: |
           echo "登录stuTest："
-          curl -v -X POST http://localhost:8000/api/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
+          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
           echo "登录tchTest："
-          curl -v -X POST http://localhost:8000/api/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
+          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
         working-directory: ./frontend
       
       - name: Run Cypress tests
