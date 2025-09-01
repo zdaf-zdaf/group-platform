@@ -14,9 +14,11 @@ spec:
       labels:
         app: course-backend
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
         - name: backend
-          image: course-backend:latest
+          image: ghcr.io/${{ github.repository_owner }}/backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

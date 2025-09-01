@@ -23,6 +23,7 @@ from experiments.views import ExperimentViewSet, SubmissionViewSet, AnswerViewSe
 def health_check(request):
     return JsonResponse({"status": "ok"})
 
+
 router = DefaultRouter()
 router.register(r'materials', LearningMaterialViewSet, basename='material')
 
@@ -58,7 +59,6 @@ urlpatterns = [
         path('questions/<int:question_id>/comments/', forum_views.CommentCreateView.as_view(), name='comment-create'),
         path('comments/<int:pk>/', forum_views.CommentDeleteView.as_view(), name='comment-delete'),
     ])),
-
 ]
 
 # 修复：正确处理中文字符路径服务

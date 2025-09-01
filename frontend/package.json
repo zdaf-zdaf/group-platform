@@ -16,10 +16,10 @@
     "lint:eslint": "eslint . --fix",
     "lint": "run-s lint:*",
     "format": "prettier --write src/",
-    "start": "react-scripts start",  
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "vite start",  
+    "build": "vite build",
+    "test": "vite test",
+    "eject": "vite eject"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",

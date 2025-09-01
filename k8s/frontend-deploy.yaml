@@ -12,9 +12,11 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
       - name: frontend
-        image: frontend:latest
+        image: ghcr.io/${{ github.repository_owner }}/frontend:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
