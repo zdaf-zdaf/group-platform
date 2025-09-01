@@ -563,9 +563,16 @@ jobs:
       
       - name: Run Cypress tests
         run: |
-          npx cypress run --headless --config baseUrl=http://localhost:8080 --browser chrome --record false --ci-build-id $GITHUB_RUN_ID
-        env:
-          DEBUG: "cypress:*"
+          # 简化命令，移除所有可能导致冲突的参数
+          npx cypress run --headless --config baseUrl=http://localhost:8080
+          
+          # 如果失败，保存截图和视频
+          if [ $? -ne 0 ]; then
+            echo "Cypress测试失败，保存截图和视频..."
+            mkdir -p cypress-failures
+            cp -r cypress/screenshots cypress-failures/
+            cp -r cypress/videos cypress-failures/
+          fi
         working-directory: ./frontend
       
       # =============== 日志收集 ===============
