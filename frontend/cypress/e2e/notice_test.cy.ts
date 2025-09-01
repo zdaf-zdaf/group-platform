@@ -12,7 +12,7 @@ describe('公告模块功能测试', () => {
 
   // 教师端先发布两个公告，编辑第一个，然后筛选搜索
   it('教师端发布、编辑、筛选、搜索公告', () => {
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(teacher.username)
     cy.get('input[placeholder="请输入密码"]').type(teacher.password)
     cy.get('input[type="checkbox"]').check({ force: true })
@@ -88,7 +88,7 @@ describe('公告模块功能测试', () => {
 
   // 学生端查看公告、标记已读、未读数刷新、筛选和搜索
   it('学生端查看公告、标记已读、未读数刷新、筛选和搜索', () => {
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(student.username)
     cy.get('input[placeholder="请输入密码"]').type(student.password)
     cy.get('input[type="checkbox"]').check({ force: true })
@@ -129,7 +129,7 @@ describe('公告模块功能测试', () => {
 
   // 教师端删除发布的两个公告
   it('教师端删除发布的两个公告', () => {
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(teacher.username)
     cy.get('input[placeholder="请输入密码"]').type(teacher.password)
     cy.get('input[type="checkbox"]').check({ force: true })
