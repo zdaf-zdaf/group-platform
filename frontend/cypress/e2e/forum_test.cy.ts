@@ -22,6 +22,19 @@ describe('论坛模块功能测试', () => {
     // 等待接口返回成功
     cy.wait('@loginRequest').its('response.statusCode').should('eq', 200)
 
+    // 打印localStorage内容
+    cy.window().then(win => {
+      cy.log('localStorage token:', win.localStorage.getItem('token'))
+    })
+
+    // 打印页面console错误
+    cy.on('window:before:load', (win) => {
+      win.console.error = (...args) => {
+        // 你可以在CI日志里看到这些错误
+        console.log('console.error:', ...args)
+      }
+    })
+
     // 等待页面跳转到 /profile
     cy.url({ timeout: 20000 }).should('include', '/profile')
     // 新增调试
