@@ -24,6 +24,9 @@ describe('论坛模块功能测试', () => {
 
     // 等待页面跳转到 /profile
     cy.url({ timeout: 20000 }).should('include', '/profile')
+    // 新增调试
+    cy.getCookies().then(cookies => { cy.log('Cookies:', JSON.stringify(cookies)) })
+    cy.window().then(win => { cy.log('localStorage:', JSON.stringify(win.localStorage)) })
   }
 
   // 学生端发帖、点赞、评论、删除
