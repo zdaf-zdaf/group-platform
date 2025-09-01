@@ -499,7 +499,7 @@ jobs:
             npm install
             
             # 创建.env文件配置Vue环境变量
-            echo "VUE_APP_API_BASE_URL=http://localhost:8000" > .env
+            echo "VUE_APP_API_BASE_URL=http://127.0.0.1:8000" > .env
             echo "VUE_APP_DEBUG=true" >> .env
         working-directory: ./frontend
 
@@ -579,7 +579,7 @@ jobs:
           echo "登录stuTest："
           curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
           echo "登录tchTest："
-          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
+          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
         working-directory: ./frontend
       
       - name: Run Cypress tests
@@ -768,8 +768,8 @@ jobs:
           
           # 4. 显示访问信息
           echo "部署完成！"
-          echo "前端访问: http://localhost:30080"
-          echo "后端API: http://localhost:30080/api"
+          echo "前端访问: http://127.0.0.1:30080"
+          echo "后端API: http://127.0.0.1:30080/api"
           echo ""
           echo "运行集成测试:"
           echo "cd postman && newman run collection1-LunTan.json -e environment.json"
@@ -800,6 +800,6 @@ jobs:
           echo "请下载部署包并本地执行:"
           echo "1. 从Artifacts下载 'local-deployment-package'"
           echo "2. 解压后运行: chmod +x deploy-to-local.sh && ./deploy-to-local.sh"
-          echo "3. 访问 http://localhost:30080 验证部署"
+          echo "3. 访问 http://127.0.0.1:30080 验证部署"
           echo ""
           echo "注意: 确保本地Docker Desktop和Kubectl已正确配置"
