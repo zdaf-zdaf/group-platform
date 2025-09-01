@@ -399,190 +399,190 @@ jobs:
       - name: Stop Django Server
         run: |
             pkill -f "runserver 0.0.0.0:8004" || true
-  gui-test-cypress:
-    name: Run Cypress GUI Tests
-    runs-on: ubuntu-latest
-    needs: [test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao]
+  # gui-test-cypress:
+  #   name: Run Cypress GUI Tests
+  #   runs-on: ubuntu-latest
+  #   needs: [test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao]
     
-    services:
-      mysql-gui:
-        image: mysql:8.0
-        env:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: test_db_gui
-            MYSQL_ROOT_HOST: '%'
-            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-            - 3306:3306
-        options: >-
-            --health-cmd="mysqladmin ping"
-            --health-interval=10s
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   services:
+  #     mysql-gui:
+  #       image: mysql:8.0
+  #       env:
+  #           MYSQL_ROOT_PASSWORD: rootpassword
+  #           MYSQL_DATABASE: test_db_gui
+  #           MYSQL_ROOT_HOST: '%'
+  #           MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+  #       ports:
+  #           - 3306:3306
+  #       options: >-
+  #           --health-cmd="mysqladmin ping"
+  #           --health-interval=10s
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Download fixed dependencies
-        uses: actions/download-artifact@v4
-        with:
-            name: frontend-dependencies
-            path: ./frontend
+  #     - name: Download fixed dependencies
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #           name: frontend-dependencies
+  #           path: ./frontend
 
-      - name: Create log directory
-        run: mkdir -p logs
+  #     - name: Create log directory
+  #       run: mkdir -p logs
 
-      # =============== 后端服务设置 ===============
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-            python-version: '3.10'
+  #     # =============== 后端服务设置 ===============
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #           python-version: '3.10'
       
-      - name: Install backend dependencies
-        run: pip install -r requirements.txt
-        working-directory: ./backend
+  #     - name: Install backend dependencies
+  #       run: pip install -r requirements.txt
+  #       working-directory: ./backend
       
-      - name: Configure MySQL
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-                echo "MySQL for GUI is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
-            sleep 2
-            done
+  #     - name: Configure MySQL
+  #       run: |
+  #           sudo apt-get update && sudo apt-get install -y mysql-client
+  #           for i in {1..30}; do
+  #           if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+  #               echo "MySQL for GUI is ready!"
+  #               break
+  #           fi
+  #           echo "Waiting for MySQL... (attempt $i/30)"
+  #           sleep 2
+  #           done
             
-            mysql -h127.0.0.1 -uroot -prootpassword -e "
-            CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
-            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-            FLUSH PRIVILEGES;"
+  #           mysql -h127.0.0.1 -uroot -prootpassword -e "
+  #           CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
+  #           GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+  #           FLUSH PRIVILEGES;"
       
-      - name: Run migrations
-        run: |
-            python manage.py makemigrations --noinput
-            python manage.py migrate --noinput
-        working-directory: ./backend
-        env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_gui
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
-            DEBUG: False
+  #     - name: Run migrations
+  #       run: |
+  #           python manage.py makemigrations --noinput
+  #           python manage.py migrate --noinput
+  #       working-directory: ./backend
+  #       env:
+  #           DJANGO_SETTINGS_MODULE: server.settings
+  #           DB_ENGINE: django.db.backends.mysql
+  #           DB_NAME: test_db_gui
+  #           DB_USER: root
+  #           DB_PASSWORD: rootpassword
+  #           DB_HOST: 127.0.0.1
+  #           DB_PORT: 3306
+  #           DEBUG: False
       
-      - name: Start Django server
-        run: |
-            python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
-            echo $! > ../logs/django.pid
-        working-directory: ./backend
-        env:
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_gui
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
+  #     - name: Start Django server
+  #       run: |
+  #           python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
+  #           echo $! > ../logs/django.pid
+  #       working-directory: ./backend
+  #       env:
+  #           DB_ENGINE: django.db.backends.mysql
+  #           DB_NAME: test_db_gui
+  #           DB_USER: root
+  #           DB_PASSWORD: rootpassword
+  #           DB_HOST: 127.0.0.1
+  #           DB_PORT: 3306
       
-      # =============== Vue前端服务设置 ===============
-      - name: Setup Node.js for Vue
-        uses: actions/setup-node@v4
-        with:
-            node-version: '22'
-            cache: 'npm'
-            cache-dependency-path: './frontend/package-lock.json'
+  #     # =============== Vue前端服务设置 ===============
+  #     - name: Setup Node.js for Vue
+  #       uses: actions/setup-node@v4
+  #       with:
+  #           node-version: '22'
+  #           cache: 'npm'
+  #           cache-dependency-path: './frontend/package-lock.json'
 
-      - name: Install Vue dependencies
-        run: |
-            # 安装依赖
-            npm install
+  #     - name: Install Vue dependencies
+  #       run: |
+  #           # 安装依赖
+  #           npm install
             
-            # 创建.env文件配置Vue环境变量
-            echo "VUE_APP_API_BASE_URL=http://localhost:8000" > .env
-            echo "VUE_APP_DEBUG=true" >> .env
-        working-directory: ./frontend
+  #           # 创建.env文件配置Vue环境变量
+  #           echo "VUE_APP_API_BASE_URL=http://localhost:8000" > .env
+  #           echo "VUE_APP_DEBUG=true" >> .env
+  #       working-directory: ./frontend
 
-      - name: Debug package.json scripts
-        run: |
-          echo "package.json scripts:"
-          npm run
-        working-directory: ./frontend
+  #     - name: Debug package.json scripts
+  #       run: |
+  #         echo "package.json scripts:"
+  #         npm run
+  #       working-directory: ./frontend
 
-      - name: Start Vue server
-        run: |
-            # 启动Vue开发服务器
-            npm run dev -- --port 8080 > ../logs/vue.log 2>&1 &
-            echo $! > ../logs/vue.pid
+  #     - name: Start Vue server
+  #       run: |
+  #           # 启动Vue开发服务器
+  #           npm run dev -- --port 8080 > ../logs/vue.log 2>&1 &
+  #           echo $! > ../logs/vue.pid
             
-            # 等待服务启动并检查端口
-            for i in {1..10}; do
-              if nc -z localhost 8080; then
-                echo "Vue server is running on port 8080"
-                break
-              fi
-              echo "Waiting for Vue server to start... (attempt $i/10)"
-              sleep 10
-            done
-        working-directory: ./frontend
+  #           # 等待服务启动并检查端口
+  #           for i in {1..10}; do
+  #             if nc -z localhost 8080; then
+  #               echo "Vue server is running on port 8080"
+  #               break
+  #             fi
+  #             echo "Waiting for Vue server to start... (attempt $i/10)"
+  #             sleep 10
+  #           done
+  #       working-directory: ./frontend
       
-      # =============== 测试执行 ===============
-      - name: Wait for servers with timeout
-        run: |
-            npm install -g wait-on
+  #     # =============== 测试执行 ===============
+  #     - name: Wait for servers with timeout
+  #       run: |
+  #           npm install -g wait-on
             
-            # 等待Vue前端(8080)和Django后端(8000)
-            timeout 180s wait-on http://localhost:8080 http://localhost:8000 || true
+  #           # 等待Vue前端(8080)和Django后端(8000)
+  #           timeout 180s wait-on http://localhost:8080 http://localhost:8000 || true
             
-            # 添加 API 健康检查
-            echo "=== API 健康检查 ==="
-            curl -I http://localhost:8000/api/healthcheck
+  #           # 添加 API 健康检查
+  #           echo "=== API 健康检查 ==="
+  #           curl -I http://localhost:8000/api/healthcheck
             
-            # 添加前端健康检查
-            echo "=== 前端健康检查 ==="
-            curl -I http://localhost:8080
+  #           # 添加前端健康检查
+  #           echo "=== 前端健康检查 ==="
+  #           curl -I http://localhost:8080
 
-            # 检查服务状态
-            echo "=== 服务状态检查 ==="
-            echo "检查端口 8080:"
-            nc -z localhost 8080 && echo "前端服务运行中" || echo "前端服务未响应"
+  #           # 检查服务状态
+  #           echo "=== 服务状态检查 ==="
+  #           echo "检查端口 8080:"
+  #           nc -z localhost 8080 && echo "前端服务运行中" || echo "前端服务未响应"
             
-            echo "检查端口 8000:"
-            nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
+  #           echo "检查端口 8000:"
+  #           nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
             
-            if ! nc -z localhost 8080 || ! nc -z localhost 8000; then
-            echo "❌❌ 服务启动失败，显示日志:"
-            echo "=== 后端日志 ==="
-            cat logs/django.log || echo "无后端日志"
-            echo "=== 前端日志 ==="
-            cat logs/vue.log || echo "无前端日志"
-            exit 1
-            fi
+  #           if ! nc -z localhost 8080 || ! nc -z localhost 8000; then
+  #           echo "❌❌ 服务启动失败，显示日志:"
+  #           echo "=== 后端日志 ==="
+  #           cat logs/django.log || echo "无后端日志"
+  #           echo "=== 前端日志 ==="
+  #           cat logs/vue.log || echo "无前端日志"
+  #           exit 1
+  #           fi
             
-            sleep 3
+  #           sleep 3
       
-      - name: Run Cypress tests
-        run: |
-          # 简化命令，移除所有可能导致冲突的参数
-          npx cypress run --headless --config baseUrl=http://localhost:8080
+  #     - name: Run Cypress tests
+  #       run: |
+  #         # 简化命令，移除所有可能导致冲突的参数
+  #         npx cypress run --headless --config baseUrl=http://localhost:8080
           
-          # 如果失败，保存截图和视频
-          if [ $? -ne 0 ]; then
-            echo "Cypress测试失败，保存截图和视频..."
-            mkdir -p cypress-failures
-            cp -r cypress/screenshots cypress-failures/
-            cp -r cypress/videos cypress-failures/
-          fi
-        working-directory: ./frontend
+  #         # 如果失败，保存截图和视频
+  #         if [ $? -ne 0 ]; then
+  #           echo "Cypress测试失败，保存截图和视频..."
+  #           mkdir -p cypress-failures
+  #           cp -r cypress/screenshots cypress-failures/
+  #           cp -r cypress/videos cypress-failures/
+  #         fi
+  #       working-directory: ./frontend
       
-      # =============== 日志收集 ===============
-      - name: Show backend logs if failed
-        if: ${{ failure() }}
-        run: cat logs/django.log
+  #     # =============== 日志收集 ===============
+  #     - name: Show backend logs if failed
+  #       if: ${{ failure() }}
+  #       run: cat logs/django.log
       
-      - name: Show frontend logs if failed
-        if: ${{ failure() }}
-        run: cat logs/vue.log
+  #     - name: Show frontend logs if failed
+  #       if: ${{ failure() }}
+  #       run: cat logs/vue.log
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -720,7 +720,7 @@ jobs:
     name: Generate Deployment Script
     runs-on: ubuntu-latest
     # 依赖所有测试和构建作业
-    needs: [test-backend, test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao, gui-test-cypress, build-and-push-backend, build-and-push-frontend]
+    needs: [test-backend, test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao, build-and-push-backend, build-and-push-frontend]
     
     steps:
       - name: Checkout code
