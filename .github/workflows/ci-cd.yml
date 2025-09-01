@@ -511,54 +511,53 @@ jobs:
 
       - name: Start Vue server
         run: |
-            # 启动Vue开发服务器
-            npm run dev -- --port 8080 > ../logs/vue.log 2>&1 &
+            # 启动Vue开发服务器，监听所有地址，保证 127.0.0.1/localhost 都可访问
+            npm run dev -- --host 0.0.0.0 --port 8080 > ../logs/vue.log 2>&1 &
             echo $! > ../logs/vue.pid
             
             # 等待服务启动并检查端口
             for i in {1..10}; do
-              if nc -z localhost 8080; then
-                echo "Vue server is running on port 8080"
+              if nc -z 127.0.0.1 8080 && nc -z localhost 8080; then
+                echo "Vue server is running on 127.0.0.1:8080 and localhost:8080"
                 break
               fi
               echo "Waiting for Vue server to start... (attempt $i/10)"
               sleep 10
             done
+            if ! nc -z 127.0.0.1 8080 || ! nc -z localhost 8080; then
+              echo '❌❌ Vue server failed to start, printing logs:'
+              cat ../logs/vue.log || echo 'No vue log'
+              exit 1
+            fi
         working-directory: ./frontend
       
       # =============== 测试执行 ===============
       - name: Wait for servers with timeout
         run: |
             npm install -g wait-on
-            
-            # 等待Vue前端(8080)和Django后端(8000)
-            timeout 180s wait-on http://localhost:8080 http://localhost:8000 || true
-            
+            # 等待Vue前端(8080)和Django后端(8000)，同时监听 127.0.0.1 和 localhost
+            timeout 180s wait-on http://127.0.0.1:8080 http://localhost:8080 http://localhost:8000 || true
             # 添加 API 健康检查
             echo "=== API 健康检查 ==="
             curl -I http://localhost:8000/api/healthcheck
-            
             # 添加前端健康检查
             echo "=== 前端健康检查 ==="
             curl -I http://localhost:8080
-
             # 检查服务状态
             echo "=== 服务状态检查 ==="
             echo "检查端口 8080:"
-            nc -z localhost 8080 && echo "前端服务运行中" || echo "前端服务未响应"
-            
+            nc -z 127.0.0.1 8080 && echo "127.0.0.1:8080 运行中" || echo "127.0.0.1:8080 未响应"
+            nc -z localhost 8080 && echo "localhost:8080 运行中" || echo "localhost:8080 未响应"
             echo "检查端口 8000:"
             nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
-            
-            if ! nc -z localhost 8080 || ! nc -z localhost 8000; then
-            echo "❌❌ 服务启动失败，显示日志:"
-            echo "=== 后端日志 ==="
-            cat logs/django.log || echo "无后端日志"
-            echo "=== 前端日志 ==="
-            cat logs/vue.log || echo "无前端日志"
-            exit 1
+            if ! nc -z 127.0.0.1 8080 || ! nc -z localhost 8080 || ! nc -z localhost 8000; then
+              echo "❌❌ 服务启动失败，显示日志:"
+              echo "=== 后端日志 ==="
+              cat logs/django.log || echo "无后端日志"
+              echo "=== 前端日志 ==="
+              cat logs/vue.log || echo "无前端日志"
+              exit 1
             fi
-            
             sleep 3
 
       - name: 初始化测试账号
