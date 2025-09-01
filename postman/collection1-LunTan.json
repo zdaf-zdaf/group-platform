@@ -1,0 +1,644 @@
+{
+  "info": {
+    "name": "Lab Platform API Tests",
+    "description": "集成测试集，用于测试实验室平台的认证和论坛功能",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "testUsername",
+      "value": "testuser_{{$timestamp}}",
+      "type": "string"
+    },
+    {
+      "key": "testPassword",
+      "value": "Testpass123!",
+      "type": "string"
+    },
+    {
+      "key": "testEmail",
+      "value": "testuser{{$timestamp}}@example.com",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication Tests",
+      "item": [
+        {
+          "name": "Register User - Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test user registration with student role",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "// Save credentials for later use",
+                  "pm.collectionVariables.set(\"testUsername\", pm.variables.get(\"testUsername\"));",
+                  "pm.collectionVariables.set(\"testPassword\", pm.variables.get(\"testPassword\"));",
+                  "pm.collectionVariables.set(\"testEmail\", pm.variables.get(\"testEmail\"));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{testUsername}}\",\n    \"password\": \"{{testPassword}}\",\n    \"email\": \"{{testEmail}}\",\n    \"role\": \"student\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 统一解析JSON并处理错误",
+                  "try {",
+                  "    const jsonData = pm.response.json();",
+                  "    ",
+                  "    // 检查响应结构 - 只检查必要的token字段",
+                  "    pm.test(\"Response has required tokens\", function() {",
+                  "        pm.expect(jsonData).to.have.property('access');",
+                  "        pm.expect(jsonData).to.have.property('refresh');",
+                  "    });",
+                  "    ",
+                  "    // 仅在响应结构正确时设置变量",
+                  "    if (jsonData.access && jsonData.refresh) {",
+                  "        pm.environment.set(\"access_token\", jsonData.access);",
+                  "        pm.collectionVariables.set(\"authToken\", jsonData.access);",
+                  "        pm.collectionVariables.set(\"refreshToken\", jsonData.refresh);",
+                  "        console.log(\"Tokens set successfully\");",
+                  "    } else {",
+                  "        console.warn(\"响应缺少token字段\");",
+                  "    }",
+                  "} catch (e) {",
+                  "    console.error(\"JSON解析失败:\", e.message);",
+                  "}",
+                  "",
+                  "// 状态码测试（始终执行）",
+                  "pm.test(\"Status code is 200\", function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"{{testUsername}}\",\n    \"password\": \"{{testPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test token refresh",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Save new tokens",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"authToken\", jsonData.access);",
+                  "pm.collectionVariables.set(\"refreshToken\", jsonData.refresh);",
+                  "",
+                  "console.log(\"Token refreshed successfully\");"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refresh\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Info",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test getting user info with valid token",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response contains user info\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('username');",
+                  "    pm.expect(jsonData.data).to.have.property('email');",
+                  "    pm.expect(jsonData.data.username).to.eql(pm.collectionVariables.get(\"testUsername\"));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/user/profile/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "user", "profile", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test updating user profile",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"student_id\": \"S12345\",\n    \"faculty\": \"Computer Science\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/user/profile/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "user", "profile", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Forum Tests",
+      "item": [
+        {
+          "name": "Get Questions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test getting questions list",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Verify response is an array",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/forum/questions/",
+              "host": ["{{baseUrl}}"],
+              "path": ["forum", "questions", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Question",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test creating a new question",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "// Save question ID for later use",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"createdQuestionId\", jsonData.id);",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response contains question data\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('title');",
+                  "    pm.expect(jsonData).to.have.property('content');",
+                  "    pm.expect(jsonData).to.have.property('author');",
+                  "    pm.expect(jsonData.author.username).to.eql(pm.collectionVariables.get(\"testUsername\"));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Test Question {{$timestamp}}\",\n    \"content\": \"This is a test question created by Postman integration tests.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/forum/questions/",
+              "host": ["{{baseUrl}}"],
+              "path": ["forum", "questions", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Toggle Question Like",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test toggling like on a question",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response contains like status\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('likes_count');",
+                  "    pm.expect(jsonData).to.have.property('liked');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/forum/questions/{{createdQuestionId}}/toggle-like/",
+              "host": ["{{baseUrl}}"],
+              "path": ["forum", "questions", "{{createdQuestionId}}", "toggle-like", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Comment to Question",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test adding a comment to a question",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "// Save comment ID for later use",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"createdCommentId\", jsonData.id);",
+                  "",
+                  "// Verify response structure",
+                  "pm.test(\"Response contains comment data\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('content');",
+                  "    pm.expect(jsonData).to.have.property('author');",
+                  "    pm.expect(jsonData.author.username).to.eql(pm.collectionVariables.get(\"testUsername\"));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content\": \"This is a test comment added by Postman integration tests.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/forum/questions/{{createdQuestionId}}/comments/",
+              "host": ["{{baseUrl}}"],
+              "path": ["forum", "questions", "{{createdQuestionId}}", "comments", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test deleting a comment",
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/forum/comments/{{createdCommentId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["forum", "comments", "{{createdCommentId}}", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Question",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test deleting a question",
+                  "pm.test(\"Status code is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/forum/questions/{{createdQuestionId}}/",
+              "host": ["{{baseUrl}}"],
+              "path": ["forum", "questions", "{{createdQuestionId}}", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Error Case Tests",
+      "item": [
+        {
+          "name": "Register User - Invalid Data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test registration with invalid data",
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// Verify error response structure",
+                  "pm.test(\"Response contains error details\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', false);",
+                  "    pm.expect(jsonData).to.have.property('errors');",
+
+                  "    pm.expect(jsonData.errors).to.have.property('username');",
+                  "    pm.expect(jsonData.errors).to.have.property('email');",
+                  "    pm.expect(jsonData.errors).to.have.property('role');",
+
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"\",\n    \"password\": \"short\",\n    \"email\": \"not-an-email\",\n    \"role\": \"invalid_role\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User - Invalid Credentials",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test login with invalid credentials",
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// Verify error response structure",
+                  "pm.test(\"Response contains error details\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', false);",
+                  "    pm.expect(jsonData).to.have.property('errors');",
+                  "    pm.expect(jsonData.errors).to.have.property('detail');",
+                  "    pm.expect(jsonData.errors.detail).to.be.an('array').that.includes('用户名或密码错误，请重新输入');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"username\": \"nonexistentuser\",\n    \"password\": \"wrongpassword\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/auth/login/",
+                "host": ["{{baseUrl}}"],
+                "path": ["auth", "login", ""]
+              }
+          },
+          "response": []
+        },
+        {
+          "name": "Access Protected Route Without Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test accessing protected route without token",
+                  "pm.test(\"Status code is 401 without token\", function () {",
+                      "pm.response.to.have.status(401);",
+                  "});",
+
+                  "pm.test(\"Response contains error details\", function () {",
+                      "var jsonData = pm.response.json();",
+                      "pm.expect(jsonData).to.have.property('error', true);",
+                      "pm.expect(jsonData).to.have.property('message', 'Authentication credentials were not provided.');",
+                      "pm.expect(jsonData).to.have.property('code', 401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/user/profile/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "user","profile",""]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

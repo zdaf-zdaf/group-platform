@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="6.632" tests="8" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-08-29T08:14:04" tests="0" file="cypress\e2e\2-advanced-examples\connectors.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Connectors" timestamp="2025-08-29T08:14:04" tests="4" time="0.000" failures="0">
+    <testcase name="Connectors .each() - iterate over an array of elements" time="2.848" classname=".each() - iterate over an array of elements">
+    </testcase>
+    <testcase name="Connectors .its() - get properties on the current subject" time="0.205" classname=".its() - get properties on the current subject">
+    </testcase>
+    <testcase name="Connectors .invoke() - invoke a function on the current subject" time="0.202" classname=".invoke() - invoke a function on the current subject">
+    </testcase>
+    <testcase name="Connectors .spread() - spread an array as individual args to callback function" time="0.284" classname=".spread() - spread an array as individual args to callback function">
+    </testcase>
+  </testsuite>
+  <testsuite name=".then()" timestamp="2025-08-29T08:14:09" tests="4" time="0.996" failures="0">
+    <testcase name="Connectors .then() invokes a callback function with the current subject" time="0.211" classname="invokes a callback function with the current subject">
+    </testcase>
+    <testcase name="Connectors .then() yields the returned value to the next command" time="0.256" classname="yields the returned value to the next command">
+    </testcase>
+    <testcase name="Connectors .then() yields the original subject without return" time="0.255" classname="yields the original subject without return">
+    </testcase>
+    <testcase name="Connectors .then() yields the value yielded by the last Cypress command inside" time="0.200" classname="yields the value yielded by the last Cypress command inside">
+    </testcase>
+  </testsuite>
+</testsuites>

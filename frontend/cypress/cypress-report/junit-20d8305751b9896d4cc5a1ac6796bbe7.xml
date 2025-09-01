@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="5.177" tests="5" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-08-29T08:15:52" tests="0" file="cypress\e2e\2-advanced-examples\utilities.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Utilities" timestamp="2025-08-29T08:15:53" tests="5" time="5.175" failures="0">
+    <testcase name="Utilities Cypress._ - call a lodash method" time="0.886" classname="Cypress._ - call a lodash method">
+    </testcase>
+    <testcase name="Utilities Cypress.$ - call a jQuery method" time="0.480" classname="Cypress.$ - call a jQuery method">
+    </testcase>
+    <testcase name="Utilities Cypress.Blob - blob utilities and base64 string conversion" time="0.546" classname="Cypress.Blob - blob utilities and base64 string conversion">
+    </testcase>
+    <testcase name="Utilities Cypress.minimatch - test out glob patterns against strings" time="0.165" classname="Cypress.minimatch - test out glob patterns against strings">
+    </testcase>
+    <testcase name="Utilities Cypress.Promise - instantiate a bluebird promise" time="1.259" classname="Cypress.Promise - instantiate a bluebird promise">
+    </testcase>
+  </testsuite>
+</testsuites>

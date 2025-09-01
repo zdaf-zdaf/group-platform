@@ -60,7 +60,7 @@
 
         <!-- 选择公告类型 -->
         <el-form-item label="公告类型">
-          <el-select v-model="setForm.type" placeholder="选择公告类型">
+          <el-select v-model="setForm.type" placeholder="选择公告类型" :teleported="false">
             <el-option
               v-for="type in noticeTypes"
               :key="type.value"

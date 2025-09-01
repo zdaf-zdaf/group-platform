@@ -1,0 +1,182 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 5,
+    "passes": 5,
+    "pending": 0,
+    "failures": 0,
+    "start": "2025-08-29T08:11:55.621Z",
+    "end": "2025-08-29T08:12:25.178Z",
+    "duration": 29557,
+    "testsRegistered": 5,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "461582f3-a5b0-4108-a741-baece23bed0a",
+      "title": "",
+      "fullFile": "cypress\\e2e\\frontend_test.cy.ts",
+      "file": "cypress\\e2e\\frontend_test.cy.ts",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "ce1c0123-fd99-4002-b629-5f126c706c41",
+          "title": "灵狐智验前端完整流程集成测试",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "学生注册流程",
+              "fullTitle": "灵狐智验前端完整流程集成测试 学生注册流程",
+              "timedOut": null,
+              "duration": 2860,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/register');\ncy.get('input[placeholder=\"请输入3-16位用户名\"]').type(studentUsername);\ncy.get('input[placeholder=\"请输入邮箱地址\"]').type(\"\".concat(studentUsername, \"@example.com\"));\ncy.get('input[placeholder=\"请输入6-18位密码\"]').type(password);\ncy.get('input[placeholder=\"请再次输入密码\"]').type(password);\ncy.get('.el-select').click();\ncy.get('.el-select-dropdown__item').contains('学生').click({ force: true });\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('注册账号').click();\ncy.contains('注册成功！').should('be.visible');",
+              "err": {},
+              "uuid": "692bddf8-5652-46b7-9f6d-a7d56ed5b424",
+              "parentUUID": "ce1c0123-fd99-4002-b629-5f126c706c41",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "教师注册后登录并修改个人信息和密码",
+              "fullTitle": "灵狐智验前端完整流程集成测试 教师注册后登录并修改个人信息和密码",
+              "timedOut": null,
+              "duration": 5911,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// 注册\ncy.visit('http://localhost:5173/register');\ncy.get('input[placeholder=\"请输入3-16位用户名\"]').type(teacherUsername);\ncy.get('input[placeholder=\"请输入邮箱地址\"]').type(\"\".concat(teacherUsername, \"@example.com\"));\ncy.get('input[placeholder=\"请输入6-18位密码\"]').type(password);\ncy.get('input[placeholder=\"请再次输入密码\"]').type(password);\ncy.get('.el-select').click();\ncy.get('.el-select-dropdown__item').contains('教师').click({ force: true });\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('注册账号').click();\ncy.contains('注册成功！').should('be.visible');\n// 登录\ncy.visit('http://localhost:5173/login');\ncy.get('input[placeholder=\"请输入用户名\"]').type(teacherUsername);\ncy.get('input[placeholder=\"请输入密码\"]').type(password);\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\n// 进入个人信息页\ncy.contains('个人信息').click({ force: true });\ncy.url().should('include', '/profile');\ncy.get('.personal-info').should('exist');\n// 点击编辑信息\ncy.contains('编辑信息').click({ force: true });\n// 生成学工号 2337+用户名\nvar teacherId = \"2337\".concat(teacherUsername);\ncy.get('input[placeholder=\"请输入学工号\"]').clear().type(teacherId, { force: true });\ncy.get('input[placeholder=\"请输入学院名称\"]').clear().type('软件学院', { force: true });\n// 保存信息\ncy.contains('保存信息').click({ force: true });\ncy.contains('个人信息已保存').should('be.visible');\ncy.get('input[placeholder=\"请输入学工号\"]').should('have.value', teacherId);\ncy.get('input[placeholder=\"请输入学院名称\"]').should('have.value', '软件学院');\n// 修改密码\ncy.contains('修改密码').click({ force: true });\ncy.get('input[placeholder=\"请输入当前密码\"]').type(password, { force: true });\ncy.get('input[placeholder=\"8-20位字母数字组合\"]').type('TTest1234', { force: true });\ncy.get('input[placeholder=\"请再次输入新密码\"]').type('TTest1234', { force: true });\ncy.contains('确认修改').click({ force: true });\ncy.contains('密码修改成功').should('be.visible');\n// 退出登录并用新密码登录验证\ncy.contains('退出登录').click({ force: true });\n// 弹窗点击“确定”按钮\ncy.get('.el-message-box').should('be.visible');\ncy.get('.el-message-box__btns button').contains('确定').click({ force: true });\ncy.contains('已安全退出').should('be.visible');",
+              "err": {},
+              "uuid": "00d76ea8-3daf-4784-959d-72f18bf9b42b",
+              "parentUUID": "ce1c0123-fd99-4002-b629-5f126c706c41",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "教师登录并创建实验",
+              "fullTitle": "灵狐智验前端完整流程集成测试 教师登录并创建实验",
+              "timedOut": null,
+              "duration": 9194,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/login');\ncy.get('input[placeholder=\"请输入用户名\"]').type(teacherUsername);\ncy.get('input[placeholder=\"请输入密码\"]').type(password);\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\ncy.contains('创建实验').click({ force: true });\ncy.get('.publish-set .set-card', { timeout: 10000 }).should('be.visible');\n// 填写实验信息\ncy.get('.publish-set .set-card').within(function () {\n    cy.get('input[placeholder^=\"如：数组与字符串题组\"]').type(experimentTitle);\n    cy.get('input[placeholder^=\"如：描述实验的目的和内容\"]').type(experimentDescription);\n    // 修改开始时间选择方式 - 使用原生Date对象\n    var now = new Date();\n    var startTime = new Date(now.getTime() + 60 * 60 * 1000); // 当前时间+1小时\n    var startTimeStr = startTime.toLocaleString('zh-CN', {\n        year: 'numeric',\n        month: '2-digit',\n        day: '2-digit',\n        hour: '2-digit',\n        minute: '2-digit',\n        second: '2-digit',\n        hour12: false\n    }).replace(/\\//g, '-');\n    // 修改截止时间选择方式 - 使用原生Date对象\n    var deadlineTime = new Date(now.getTime() + 25 * 60 * 60 * 1000); // 当前时间+25小时\n    var deadlineTimeStr = deadlineTime.toLocaleString('zh-CN', {\n        year: 'numeric',\n        month: '2-digit',\n        day: '2-digit',\n        hour: '2-digit',\n        minute: '2-digit',\n        second: '2-digit',\n        hour12: false\n    }).replace(/\\//g, '-');\n    cy.get('input[placeholder=\"选择开始时间\"]').clear({ force: true }).type(startTimeStr, { force: true });\n    cy.get('input[placeholder=\"选择截止时间\"]').clear({ force: true }).type(deadlineTimeStr, { force: true });\n    // 等待学生数据加载完成\n    cy.get('.el-transfer-panel__list').should('be.visible');\n    cy.get('.el-transfer-panel__item').should('have.length.gt', 0);\n    // 根据图片修改学生选择逻辑\n    // 1. 先点击\"未选学生\"左侧的全选复选框\n    cy.get('.el-transfer-panel__header input[type=\"checkbox\"]').first().check({ force: true });\n    // 2. 然后点击向右箭头按钮（第二个按钮）\n    cy.get('.el-transfer__buttons button').eq(1).click({ force: true });\n});\n// 选择题\ncy.get('.publish-set .set-card .question-card').last().within(function () {\n    // 打开“题目类型”下拉框\n    cy.get('.el-select').click({ force: true });\n    // 直接在当前上下文里找 dropdown（因为 teleported=false）\n    cy.get('.el-select__popper')\n        .should('exist')\n        .within(function () {\n        cy.get('.el-select-dropdown__item').contains('选择题').click({ force: true });\n    });\n    // 断言\n    cy.get('.el-select').should('contain.text', '选择题');\n    cy.get('textarea[placeholder=\"请输入题目描述\"]').type('选择题示例题干', { force: true });\n    // 填写分值（第一个数字输入框是分值）\n    cy.get('.el-input-number input')\n        .first()\n        .clear()\n        .type('10', { force: true });\n    // 添加选项 A\n    cy.get('input[placeholder=\"选项文本\"]').last().type('选项A', { force: true });\n    cy.contains('button', '添加选项').click({ force: true });\n    cy.get('input[placeholder=\"选项文本\"]').last().type('选项B', { force: true });\n    // 添加选项 B\n    cy.contains('button', '添加选项').click({ force: true });\n    cy.get('input[placeholder=\"选项文本\"]').last().type('选项C', { force: true });\n    // 设置正确答案（选择第一个单选框）\n    cy.get('.el-radio__original').first().check({ force: true });\n});\n// 添加题目（填空题）\ncy.get('.publish-set .set-card').contains('添加题目').click({ force: true });\ncy.get('.publish-set .set-card .question-card').last().within(function () {\n    cy.get('.el-select').click({ force: true });\n    cy.get('.el-select__popper')\n        .should('exist')\n        .within(function () {\n        cy.get('.el-select-dropdown__item').contains('填空题').click({ force: true });\n    });\n    cy.get('.el-select').should('contain.text', '填空题');\n    cy.get('textarea[placeholder=\"请输入题目描述\"]').type('填空题示例题干', { force: true });\n    cy.get('.el-input-number input').first().clear().type('5', { force: true });\n    cy.get('input[placeholder=\"请输入标准答案\"]').type('标准答案', { force: true });\n});\n// 添加题目（编程题）\ncy.get('.publish-set .set-card').contains('添加题目').click({ force: true });\ncy.get('.publish-set .set-card .question-card').last().within(function () {\n    cy.get('.el-select').click({ force: true });\n    cy.get('.el-select__popper')\n        .should('exist')\n        .within(function () {\n        cy.get('.el-select-dropdown__item').contains('编程题').click({ force: true });\n    });\n    cy.get('.el-select').should('contain.text', '编程题');\n    cy.get('textarea[placeholder=\"请输入题目描述\"]').type('编程题示例题干', { force: true });\n    cy.get('.el-input-number input').first().clear().type('20', { force: true });\n    cy.get('input[placeholder=\"请输入时间限制（秒）\"]').type('2', { force: true });\n    cy.get('input[placeholder=\"请输入内存限制（MB）\"]').type('256', { force: true });\n    // 添加测试点\n    cy.get('.el-button').contains('添加测试点').click({ force: true });\n    cy.get('input[placeholder=\"输入\"]').last().type('1 2', { force: true });\n    cy.get('input[placeholder=\"期望输出\"]').last().type('3', { force: true });\n});\ncy.get('.publish-set .set-card').contains('发布实验').click({ force: true });\ncy.contains(experimentTitle).should('be.visible');",
+              "err": {},
+              "uuid": "2adc56d5-c595-43a6-805c-7ab09a6f5e4c",
+              "parentUUID": "ce1c0123-fd99-4002-b629-5f126c706c41",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "学生登录完成实验",
+              "fullTitle": "灵狐智验前端完整流程集成测试 学生登录完成实验",
+              "timedOut": null,
+              "duration": 7080,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/login');\ncy.get('input[placeholder=\"请输入用户名\"]').type(studentUsername);\ncy.get('input[placeholder=\"请输入密码\"]').type(password);\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\ncy.contains('实验中心').click({ force: true });\ncy.contains(experimentTitle).click({ force: true });\n// ========================\n// 选择题完成\n// ========================\ncy.get('#choice-section .question-card').each(function ($card) {\n    cy.wrap($card).within(function () {\n        cy.get('input[type=\"radio\"]').first().check({ force: true });\n    });\n});\n// ========================\n// 填空题完成\n// ========================\ncy.get('#fill-section .question-card').each(function ($card) {\n    cy.wrap($card).within(function () {\n        cy.get('input[placeholder=\"请输入答案\"]').type('答案');\n    });\n});\n// ========================\n// 编程题完成\n// ========================\ncy.get('#coding-section .question-card').each(function ($card) {\n    cy.wrap($card).within(function () {\n        cy.intercept('GET', '**/coding/*').as('fetchProblem');\n        // 点击开始编程\n        cy.contains('开始编程').click();\n    });\n    // 等待新页面跳转并加载编辑器\n    cy.url({ timeout: 10000 }).should('include', '/coding/');\n    // 等待编程题接口返回，保证题目加载完成\n    cy.wait('@fetchProblem', { timeout: 20000 }).its('response.statusCode').should('eq', 200);\n    // 确保编辑器与题干渲染出来\n    cy.get('.coding-editor', { timeout: 30000 }).should('be.visible');\n    cy.get('.editor-panel', { timeout: 30000 }).should('exist').and('be.visible');\n    // Monaco Editor 输入代码 - 使用更可靠的选择器\n    cy.get('.editor-panel textarea', { timeout: 15000 })\n        .should('be.visible')\n        .type(codeSample, {\n        parseSpecialCharSequences: false,\n        delay: 5,\n        force: true\n    });\n    // 上传文件\n    var filePath = 'cypress/fixtures/test.py'; // 确保文件存在于这个路径\n    cy.readFile(filePath, 'utf8').then(function (fileContent) {\n        cy.get('.problem-panel input[type=\"file\"]').selectFile({\n            contents: Cypress.Buffer.from(fileContent),\n            fileName: 'test.py',\n            mimeType: 'text/x-python'\n        }, { force: true });\n    });\n    // 提交代码并等待接口响应\n    cy.intercept('POST', '**/experiments/judge/').as('submitCode');\n    cy.contains('提交代码').click();\n    cy.wait('@submitCode').its('response.statusCode').should('eq', 200);\n    // 等待结果面板出现\n    cy.get('.result-panel .el-alert', { timeout: 30000 }).should('exist');\n    // 返回实验详情\n    cy.contains('返回实验详情').click();\n});\ncy.url().should('include', '/experiment/');\n// ========================\n// 返回实验详情并提交实验\n// ========================\ncy.contains('提交实验').click();\ncy.get('.el-dialog__footer').within(function () {\n    cy.contains('确认提交').click({ force: true });\n});\ncy.contains('总得分').should('be.visible');",
+              "err": {},
+              "uuid": "a545290f-e372-40dd-9376-5f26c49bc292",
+              "parentUUID": "ce1c0123-fd99-4002-b629-5f126c706c41",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "教师查看学生提交记录与详情",
+              "fullTitle": "灵狐智验前端完整流程集成测试 教师查看学生提交记录与详情",
+              "timedOut": null,
+              "duration": 2264,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// 教师登录\ncy.visit('http://localhost:5173/login');\ncy.get('input[placeholder=\"请输入用户名\"]').type(teacherUsername);\ncy.get('input[placeholder=\"请输入密码\"]').type(password);\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\n// 进入“实验管理”或“批改作业”页面（假设有入口按钮/菜单）\ncy.contains('查看学生提交').click({ force: true });\n// 等待提交卡片加载\ncy.get('.submission-card', { timeout: 10000 }).should('exist');\n// 检查至少有一条提交记录，且包含学生名、题组、提交时间等\ncy.get('.submission-card').first().within(function () {\n    cy.contains('学生：').should('exist');\n    cy.contains('题组：').should('exist');\n    cy.contains('提交时间：').should('exist');\n});\n// 点击第一条提交，进入详情页\ncy.get('.submission-card').first().click();\n// 检查详情页内容\ncy.url().should('include', 'submission-detail');\ncy.get('.submission-detail').should('exist');\ncy.get('.student-info').should('contain.text', '学生：');\ncy.get('.student-info').should('contain.text', '提交时间：');\ncy.get('.question-card').should('exist');\ncy.get('.q-header').should('exist');\ncy.get('.q-content').should('exist');\n// 检查保存批改结果按钮\ncy.contains('保存批改结果').should('exist');",
+              "err": {},
+              "uuid": "9759d2df-1ae4-4823-bc90-a6e7778568f0",
+              "parentUUID": "ce1c0123-fd99-4002-b629-5f126c706c41",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "692bddf8-5652-46b7-9f6d-a7d56ed5b424",
+            "00d76ea8-3daf-4784-959d-72f18bf9b42b",
+            "2adc56d5-c595-43a6-805c-7ab09a6f5e4c",
+            "a545290f-e372-40dd-9376-5f26c49bc292",
+            "9759d2df-1ae4-4823-bc90-a6e7778568f0"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 27309,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "id": "default",
+        "reportDir": "cypress/cypress-report",
+        "overwrite": false,
+        "html": true,
+        "json": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}

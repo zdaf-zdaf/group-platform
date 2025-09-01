@@ -58,7 +58,7 @@
         </el-form-item>
 
         <el-form-item label="资料类型" required>
-          <el-select v-model="materialForm.type" placeholder="选择资料类型">
+          <el-select v-model="materialForm.type" placeholder="选择资料类型" :teleported="false">
             <el-option
               v-for="type in materialTypes"
               :key="type.value"

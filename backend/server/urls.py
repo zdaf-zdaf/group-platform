@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.db import router
 from django.urls import path, include
+from django.http import JsonResponse
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -19,10 +20,15 @@ from user.views import (
 )
 from experiments.views import ExperimentViewSet, SubmissionViewSet, AnswerViewSet, StudentViewSet
 
+def health_check(request):
+    return JsonResponse({"status": "ok"})
+
+
 router = DefaultRouter()
 router.register(r'materials', LearningMaterialViewSet, basename='material')
 
 urlpatterns = [
+    path("health/", health_check),   # 这里加一个健康检查接口
     path('admin/', admin.site.urls),
     path('api/auth/', include([
         path('register/', RegisterView.as_view(), name='register'),
@@ -53,7 +59,6 @@ urlpatterns = [
         path('questions/<int:question_id>/comments/', forum_views.CommentCreateView.as_view(), name='comment-create'),
         path('comments/<int:pk>/', forum_views.CommentDeleteView.as_view(), name='comment-delete'),
     ])),
-
 ]
 
 # 修复：正确处理中文字符路径服务

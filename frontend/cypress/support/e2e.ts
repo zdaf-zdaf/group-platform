@@ -15,3 +15,11 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+import 'cypress-file-upload'
+
+// cypress/support/e2e.js
+before(() => {
+  cy.request('GET', Cypress.config().baseUrl + '/health').its('status').should('eq', 200)
+  cy.request('GET', Cypress.config().baseUrl + '/').its('status').should('eq', 200)
+  Cypress.env('API_BASE_URL', Cypress.config().baseUrl)
+});

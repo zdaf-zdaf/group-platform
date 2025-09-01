@@ -2,33 +2,601 @@ name: group-pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
+  # ================== 后端测试（容器化） ==================
   test-backend:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db
+          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Wait for MySQL ready and configure root
+        run: |
+          sudo apt-get update && sudo apt-get install -y mysql-client
+          for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+              echo "MySQL is ready!"; break
+            fi
+            echo "Waiting for MySQL... (attempt $i/30)"; sleep 2
+          done
+          mysql -h"127.0.0.1" -uroot -prootpassword -e "
+            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
+            ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
+            FLUSH PRIVILEGES;"
+      - name: Build backend image
+        run: docker build -t course-backend:latest ./backend
+
+      - name: Run backend container with docker.sock
+        run: |
+          docker run -d --name course-backend-container \
+            --network host \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -e DJANGO_SETTINGS_MODULE=server.settings \
+            -e DB_ENGINE=django.db.backends.mysql \
+            -e DB_NAME=test_db \
+            -e DB_USER=root \
+            -e DB_PASSWORD=rootpassword \
+            -e DB_HOST=127.0.0.1 \
+            -e DB_PORT=3306 \
+            -e DEBUG=False \
+            course-backend:latest
+      - name: Run migrations in backend container
+        run: |
+          docker exec course-backend-container python manage.py makemigrations --noinput
+          docker exec course-backend-container python manage.py migrate --noinput
+      - name: Run Django tests in backend container
+        run: docker exec course-backend-container python manage.py test --verbosity=2
+
+  # 并行论坛测试
+  api-test-luntan:
+    name: Parallel Forum Tests
+    runs-on: ubuntu-latest
+    needs: [test-backend]
+    
+    services:
+      mysql-luntan:  # 服务名称唯一
+        image: mysql:8.0
+        env:
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_DATABASE: test_db_luntan  # 独立的数据库名
+            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+            - 3307:3306  # 使用不同端口映射
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.10'
+        
+      - name: Install dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+        working-directory: ./backend
+        
+      - name: Configure MySQL
+        run: |
+            sudo apt-get update && sudo apt-get install -y mysql-client
+            # 等待MySQL启动（使用新端口3307）
+            for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -P 3307 -uroot -prootpassword --silent; then
+                echo "MySQL for Luntan is ready!"
+                break
+            fi
+            echo "Waiting for MySQL... (attempt $i/30)"
+            sleep 2
+            done
+    #  新增：执行数据库迁移
+      - name: Run migrations
+        run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+        working-directory: ./backend
+        env:
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_luntan
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3307
+          DEBUG: False
+
+      - name: Start Django Server (Port 8001)
+        run: |
+            python manage.py runserver 127.0.0.1:8001 &
+            sleep 5  # 等待服务器启动
+        working-directory: ./backend
+        env:
+            DJANGO_SETTINGS_MODULE: server.settings
+            DB_ENGINE: django.db.backends.mysql
+            DB_NAME: test_db_luntan  # 指定独立数据库
+            DB_USER: root
+            DB_PASSWORD: rootpassword
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3307  # 使用3307端口
+            DEBUG: False
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Forum Tests
+        run: |
+            newman run postman/collection1-LunTan.json \
+            --environment postman/environment.json \
+            --env-var "baseUrl=http://127.0.0.1:8001/api" \
+            --reporters cli
+      - name: Stop Django Server
+        run: |
+            pkill -f "runserver 0.0.0.0:8001" || true
+  # 并行实验测试（配置类似，但使用不同端口和数据库名）
+  api-test-lab:
+    name: Parallel Lab Tests
+    runs-on: ubuntu-latest
+    needs: [test-backend]
+    
+    services:
+      mysql-lab:
+        image: mysql:8.0
+        env:
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_DATABASE: test_db_lab  # 独立数据库名
+            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+            - 3308:3306  # 不同端口
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.10'
+        
+      - name: Install dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+        working-directory: ./backend
+        
+      - name: Configure MySQL
+        run: |
+            sudo apt-get update && sudo apt-get install -y mysql-client
+            # 等待MySQL启动（使用新端口3308）
+            for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -P 3308 -uroot -prootpassword --silent; then
+                echo "MySQL for Lab is ready!"
+                break
+            fi
+            echo "Waiting for MySQL... (attempt $i/30)"
+            sleep 2
+            done
+    #  新增：执行数据库迁移
+      - name: Run migrations
+        run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+        working-directory: ./backend
+        env:
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_lab
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3308
+          DEBUG: False
+
+      - name: Start Django Server (Port 8002)
+        run: |
+            python manage.py runserver 127.0.0.1:8002 &
+            sleep 5  # 等待服务器启动
+        working-directory: ./backend
+        env:
+            DJANGO_SETTINGS_MODULE: server.settings
+            DB_ENGINE: django.db.backends.mysql
+            DB_NAME: test_db_lab  # 指定独立数据库
+            DB_USER: root
+            DB_PASSWORD: rootpassword
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3308  # 使用3308端口
+            DEBUG: False
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Lab Tests
+        run: |
+            newman run postman/collection2-Lab.json \
+            --environment postman/environment.json \
+            --env-var "baseUrl=http://127.0.0.1:8002/api" \
+            --reporters cli
+      - name: Display Server Logs on Failure
+        if: failure()  
+        run: |
+            echo "===== Django Server Logs ====="
+            cat backend/debug.log  # 假设服务器日志输出到backend/debug.log
+            echo "===== End Logs ====="
+      - name: Stop Django Server
+        run: |
+            pkill -f "runserver 0.0.0.0:8002" || true
+  # 并行公告测试（配置类似，但使用不同端口和数据库名）
+  api-test-gonggao:
+    name: Parallel Announcement Tests
+    runs-on: ubuntu-latest
+    needs: [test-backend]
+    
+    services:
+      mysql-gonggao:
+        image: mysql:8.0
+        env:
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_DATABASE: test_db_gonggao  # 独立数据库名
+            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+            - 3309:3306  # 不同端口
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.10'
+        
+      - name: Install dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+        working-directory: ./backend
+        
+      - name: Configure MySQL
+        run: |
+            sudo apt-get update && sudo apt-get install -y mysql-client
+            # 等待MySQL启动（使用新端口3309）
+            for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -P 3309 -uroot -prootpassword --silent; then
+                echo "MySQL for GongGao is ready!"
+                break
+            fi
+            echo "Waiting for MySQL... (attempt $i/30)"
+            sleep 2
+            done
+    # 新增：执行数据库迁移
+      - name: Run migrations
+        run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+        working-directory: ./backend
+        env:
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_gonggao
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3309
+          DEBUG: False
+
+      - name: Start Django Server (Port 8003)
+        run: |
+            python manage.py runserver 127.0.0.1:8003 &
+            sleep 5  # 等待服务器启动
+        working-directory: ./backend
+        env:
+            DJANGO_SETTINGS_MODULE: server.settings
+            DB_ENGINE: django.db.backends.mysql
+            DB_NAME: test_db_gonggao  # 指定独立数据库
+            DB_USER: root
+            DB_PASSWORD: rootpassword
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3309  # 使用3309端口
+            DEBUG: False
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Announcement Tests
+        run: |
+            newman run postman/collection3-GongGao.json \
+            --environment postman/environment.json \
+            --env-var "baseUrl=http://127.0.0.1:8003/api" \
+            --reporters cli
+      - name: Stop Django Server
+        run: |
+            pkill -f "runserver 0.0.0.0:8003" || true
+    # 并行学习资料测试
+  api-test-ziliao:
+    name: Parallel Learning Materials Tests
+    runs-on: ubuntu-latest
+    needs: [test-backend] # 依赖后端单元测试
+    
+    services:
+      mysql-ziliao:  # 服务名称唯一
+        image: mysql:8.0
+        env:
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_DATABASE: test_db_ziliao  # 独立的数据库名
+            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+            - 3310:3306  # 使用新端口（3310）
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.10'
+        
+      - name: Install dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+        working-directory: ./backend
+        
+      - name: Configure MySQL
+        run: |
+            sudo apt-get update && sudo apt-get install -y mysql-client
+            # 等待MySQL启动（使用新端口3310）
+            for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -P 3310 -uroot -prootpassword --silent; then
+                echo "MySQL for Learning Materials is ready!"
+                break
+            fi
+            echo "Waiting for MySQL... (attempt $i/30)"
+            sleep 2
+            done
+      - name: Start Django Server (Port 8004)
+        run: |
+            python manage.py runserver 0.0.0.0:8004 &
+            sleep 5
+        working-directory: ./backend
+        env:
+            DJANGO_SETTINGS_MODULE: server.settings
+            DB_ENGINE: django.db.backends.mysql
+            DB_NAME: test_db_ziliao  # 指定独立数据库
+            DB_USER: root
+            DB_PASSWORD: rootpassword
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3310  # 使用3310端口
+            DEBUG: False
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Learning Materials Tests
+        run: |
+            newman run postman/collection4-ziliao.json \
+            --environment postman/materials_environment.json \
+            --env-var "baseUrl=http://127.0.0.1:8004" \
+            --reporters cli
+      - name: Stop Django Server
+        run: |
+            pkill -f "runserver 0.0.0.0:8004" || true
+  gui-test-cypress:
+    name: Run Cypress GUI Tests
+    runs-on: ubuntu-latest
+    needs: [test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao]
+    
+    services:
+      mysql-gui:
+        image: mysql:8.0
+        env:
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_DATABASE: test_db_gui
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+            - 3306:3306
+        options: >-
+            --health-cmd="mysqladmin ping"
+            --health-interval=10s
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download fixed dependencies
+        uses: actions/download-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend
+
+      - name: Create log directory
+        run: mkdir -p logs
+
+      # =============== 后端服务设置 ===============
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.10'
+      
+      - name: Install backend dependencies
+        run: pip install -r requirements.txt
+        working-directory: ./backend
+      
+      - name: Configure MySQL
+        run: |
+            sudo apt-get update && sudo apt-get install -y mysql-client
+            for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+                echo "MySQL for GUI is ready!"
+                break
+            fi
+            echo "Waiting for MySQL... (attempt $i/30)"
+            sleep 2
+            done
+            
+            mysql -h127.0.0.1 -uroot -prootpassword -e "
+            CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
+            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+            FLUSH PRIVILEGES;"
+      
+      - name: Run migrations
+        run: |
+            python manage.py makemigrations --noinput
+            python manage.py migrate --noinput
+        working-directory: ./backend
+        env:
+            DJANGO_SETTINGS_MODULE: server.settings
+            DB_ENGINE: django.db.backends.mysql
+            DB_NAME: test_db_gui
+            DB_USER: root
+            DB_PASSWORD: rootpassword
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3306
+            DEBUG: False
+      
+      - name: Start Django server
+        run: |
+            python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
+            echo $! > ../logs/django.pid
+        working-directory: ./backend
+        env:
+            DB_ENGINE: django.db.backends.mysql
+            DB_NAME: test_db_gui
+            DB_USER: root
+            DB_PASSWORD: rootpassword
+            DB_HOST: 127.0.0.1
+            DB_PORT: 3306
+      
+      # =============== Vue前端服务设置 ===============
+      - name: Setup Node.js for Vue
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: './backend/package-lock.json'
+            node-version: '22'
+            cache: 'npm'
+            cache-dependency-path: './frontend/package-lock.json'
 
-      - name: Install backend dependencies
-        run: npm ci
+      - name: Install Vue dependencies
+        run: |
+            # 安装依赖
+            npm install
+            
+            # 创建.env文件配置Vue环境变量
+            echo "VUE_APP_API_BASE_URL=http://localhost:8000" > .env
+            echo "VUE_APP_DEBUG=true" >> .env
+        working-directory: ./frontend
 
-      - name: Run backend unit tests
-        run: npm test
-        # 这里的 ‘npm test’ 命令会运行成员A写好的所有测试用例
+      - name: Debug package.json scripts
+        run: |
+          echo "package.json scripts:"
+          npm run
+        working-directory: ./frontend
+
+      - name: Start Vue server
+        run: |
+            # 启动Vue开发服务器
+            npm run dev -- --port 8080 > ../logs/vue.log 2>&1 &
+            echo $! > ../logs/vue.pid
+            
+            # 等待服务启动并检查端口
+            for i in {1..10}; do
+              if nc -z localhost 8080; then
+                echo "Vue server is running on port 8080"
+                break
+              fi
+              echo "Waiting for Vue server to start... (attempt $i/10)"
+              sleep 10
+            done
+        working-directory: ./frontend
+      
+      # =============== 测试执行 ===============
+      - name: Wait for servers with timeout
+        run: |
+            npm install -g wait-on
+            
+            # 等待Vue前端(8080)和Django后端(8000)
+            timeout 180s wait-on http://localhost:8080 http://localhost:8000 || true
+            
+            # 添加 API 健康检查
+            echo "=== API 健康检查 ==="
+            curl -I http://localhost:8000/api/healthcheck
+            
+            # 添加前端健康检查
+            echo "=== 前端健康检查 ==="
+            curl -I http://localhost:8080
+
+            # 检查服务状态
+            echo "=== 服务状态检查 ==="
+            echo "检查端口 8080:"
+            nc -z localhost 8080 && echo "前端服务运行中" || echo "前端服务未响应"
+            
+            echo "检查端口 8000:"
+            nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
+            
+            if ! nc -z localhost 8080 || ! nc -z localhost 8000; then
+            echo "❌❌ 服务启动失败，显示日志:"
+            echo "=== 后端日志 ==="
+            cat logs/django.log || echo "无后端日志"
+            echo "=== 前端日志 ==="
+            cat logs/vue.log || echo "无前端日志"
+            exit 1
+            fi
+            
+            sleep 3
+
+      - name: 初始化测试账号
+        run: |
+          curl -v -X POST http://localhost:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}' || true
+          curl -v -X POST http://localhost:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || true
+        working-directory: ./frontend
+
+      - name: 检查账号登录
+        run: |
+          echo "登录stuTest："
+          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
+          echo "登录tchTest："
+          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
+        working-directory: ./frontend
+      
+      - name: Run Cypress tests
+        run: |
+          # 简化命令，移除所有可能导致冲突的参数
+          npx cypress run --headless --config baseUrl=http://localhost:8080
+          
+          # 如果失败，保存截图和视频
+          if [ $? -ne 0 ]; then
+            echo "Cypress测试失败，保存截图和视频..."
+            mkdir -p cypress-failures
+            cp -r cypress/screenshots cypress-failures/
+            cp -r cypress/videos cypress-failures/
+          fi
+        working-directory: ./frontend
+      
+      # =============== 日志收集 ===============
+      - name: Show backend logs if failed
+        if: ${{ failure() }}
+        run: cat logs/django.log
+      
+      - name: Show frontend logs if failed
+        if: ${{ failure() }}
+        run: cat logs/vue.log
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -42,23 +610,59 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: './frontend/package-lock.json'
 
-      - name: Install frontend dependencies
-        run: npm ci
+        # 修复依赖步骤
+      - name: Repair and install dependencies
+        run: |
+            # 确保使用正确的 npm 版本
+            npm install -g npm@11.5.2
+            
+            # 完全重新生成 lockfile
+            rm -rf node_modules
+            rm -f package-lock.json
+            
+            # 安装依赖并生成新的 lockfile
+            npm install --package-lock-only
+            
+            # 完整安装依赖
+            npm install
+            
+            # 验证依赖是否同步
+            npm ls --package-lock-only
 
       - name: Run frontend unit tests
-        run: npm test
+        run: npm run test:unit  # 确保package.json中有test:unit脚本
+
+      - name: Save fixed dependencies
+        uses: actions/upload-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend/package*.json
+            retention-days: 1
+
+      - name: Run frontend unit tests
+        run: npm run test:unit
 
   build-and-push-backend:
     runs-on: ubuntu-latest
-    needs: [test-backend] # 只有后端测试通过了，才做这个工作
+    needs: [test-backend]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+    # 从 test-frontend 作业获取修复后的 lockfile
+      - name: Download fixed lockfile
+        uses: actions/download-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend
+
+      - name: Update Dockerfile
+        run: |
+            sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -74,13 +678,41 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/backend:latest
             ghcr.io/${{ github.repository_owner }}/backend:${{ github.sha }}
-
   build-and-push-frontend:
     runs-on: ubuntu-latest
     needs: [test-frontend]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+
+        # 确保下载修复后的依赖文件
+      - name: Download fixed dependencies
+        uses: actions/download-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend
+      - name: Update Dockerfile
+        run: |
+          # 仅更新Node版本
+          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
+          
+          # 添加--legacy-peer-deps参数
+          sed -i 's/npm install/npm install --legacy-peer-deps/' frontend/dockerfile
+          
+          # 添加vue-cli-service安装
+          sed -i '/npm install --legacy-peer-deps/a RUN npm install -g @vue/cli-service' frontend/dockerfile
+          
+          # 添加调试命令
+          sed -i '/COPY \. \./a RUN npm ls --depth=0' frontend/dockerfile
+          
+          # 打印验证
+          cat frontend/dockerfile
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -98,13 +730,69 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/frontend:latest
             ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}
 
+  generate-deployment-script:
+    name: Generate Deployment Script
+    runs-on: ubuntu-latest
+    # 依赖所有测试和构建作业
+    needs: [test-backend, test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao, gui-test-cypress, build-and-push-backend, build-and-push-frontend]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 生成部署脚本
+      - name: Generate Local Deployment Package
+        run: |
+          # 创建一键部署脚本
+          cat > deploy-to-local.sh << 'EOF'
+          #!/bin/bash
+          echo "开始部署到本地K8s环境..."
+          
+          # 1. 更新镜像版本
+          sed -i "s|image:.*backend:.*|image: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}|g" k8s/backend-deployment.yaml
+          sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
+          
+          # 2. 部署到K8s
+          kubectl apply -f k8s/
+          
+          # 3. 等待服务就绪
+          echo "等待服务启动..."
+          sleep 30
+          
+          # 4. 显示访问信息
+          echo "部署完成！"
+          echo "前端访问: http://localhost:30080"
+          echo "后端API: http://localhost:30080/api"
+          echo ""
+          echo "运行集成测试:"
+          echo "cd postman && newman run collection1-LunTan.json -e environment.json"
+          EOF
+          
+          chmod +x deploy-to-local.sh
+          echo "生成了一键部署脚本: deploy-to-local.sh"
+
+      # 上传部署包
+      - name: Upload Deployment Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-deployment-package
+          path: |
+            k8s/
+            deploy-to-local.sh
+          retention-days: 7
+
   notify-deployment-ready:
     runs-on: ubuntu-latest
-    needs: [build-and-push-backend, build-and-push-frontend] # 等所有镜像都推送成功
+    # 依赖部署脚本生成作业
+    needs: [generate-deployment-script] 
     steps:
       - name: Notify Team
         run: |
-          echo "🎉 CI/CD 流水线成功完成！"
-          echo "所有Docker镜像已推送至 GitHub Container Registry。"
-          echo "请成员C在本地执行以下命令进行部署："
-          echo "kubectl apply -f k8s-manifests/"
+          echo "CI流程完成！"
+          echo ""
+          echo "请下载部署包并本地执行:"
+          echo "1. 从Artifacts下载 'local-deployment-package'"
+          echo "2. 解压后运行: chmod +x deploy-to-local.sh && ./deploy-to-local.sh"
+          echo "3. 访问 http://localhost:30080 验证部署"
+          echo ""
+          echo "注意: 确保本地Docker Desktop和Kubectl已正确配置"

@@ -12,12 +12,17 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
       - name: frontend
-        image: frontend:latest
-        imagePullPolicy: Never
+        image: ghcr.io/${{ github.repository_owner }}/frontend:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
+        env:
+          - name: VUE_APP_API_URL
+            value: "http://course-backend:8000"
 ---
 apiVersion: v1
 kind: Service

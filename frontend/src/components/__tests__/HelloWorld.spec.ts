@@ -8,4 +8,10 @@ describe('HelloWorld', () => {
     const wrapper = mount(HelloWorld, { props: { msg: 'Hello Vitest' } })
     expect(wrapper.text()).toContain('Hello Vitest')
   })
+
+  it('renders empty h1 if msg is empty', () => {
+    const wrapper = mount(HelloWorld, { props: { msg: '' } })
+    expect(wrapper.find('h1').text()).toBe('')
+    expect(wrapper.text()).toContain('You’ve successfully created a project')
+  })
 })

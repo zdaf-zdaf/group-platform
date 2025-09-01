@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="56" failures="0" errors="0" time="0.4505594">
+    <testsuite name="src/api/__tests__/auth.spec.ts" timestamp="2025-08-29T06:48:56.247Z" hostname="LAPTOP-4C3RJLJ6" tests="7" failures="0" errors="0" skipped="0" time="0.0275824">
+        <testcase classname="src/api/__tests__/auth.spec.ts" name="authService &gt; login 正例: 正确用户名密码" time="0.0063083">
+        </testcase>
+        <testcase classname="src/api/__tests__/auth.spec.ts" name="authService &gt; login 反例: 错误用户名密码" time="0.0060873">
+        </testcase>
+        <testcase classname="src/api/__tests__/auth.spec.ts" name="authService &gt; getUserInfo 正例" time="0.0010461">
+        </testcase>
+        <testcase classname="src/api/__tests__/auth.spec.ts" name="authService &gt; register 正例: 注册成功" time="0.0030713">
+        </testcase>
+        <testcase classname="src/api/__tests__/auth.spec.ts" name="authService &gt; register 反例: 注册失败" time="0.001978">
+        </testcase>
+        <testcase classname="src/api/__tests__/auth.spec.ts" name="authService &gt; updateUserProfile 正例: 更新成功" time="0.0014427">
+        </testcase>
+        <testcase classname="src/api/__tests__/auth.spec.ts" name="authService &gt; updateUserProfile 反例: 更新失败" time="0.002083">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/api/__tests__/material.spec.ts" timestamp="2025-08-29T06:48:56.266Z" hostname="LAPTOP-4C3RJLJ6" tests="18" failures="0" errors="0" skipped="0" time="0.0311335">
+        <testcase classname="src/api/__tests__/material.spec.ts" name="Material Functions &gt; addMaterial &gt; 应该成功添加新材料" time="0.0026795">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="Material Functions &gt; addMaterial &gt; 添加重复 ID 的材料时应抛出错误" time="0.0018674">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="Material Functions &gt; removeMaterial &gt; 应该成功移除已存在的材料" time="0.0018039">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="Material Functions &gt; removeMaterial &gt; 尝试移除不存在的材料时应抛出错误" time="0.0012933">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="Material Functions &gt; updateMaterial &gt; 应该成功更新材料信息" time="0.0007706">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="Material Functions &gt; updateMaterial &gt; 尝试更新不存在的材料时应抛出错误" time="0.0007145">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="Material Functions &gt; getMaterial &gt; 应该正确返回已存在的材料" time="0.0008874">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="Material Functions &gt; getMaterial &gt; 尝试获取不存在的材料时应返回 null" time="0.0002581">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="MaterialApi &gt; getMaterials &gt; 正例: 获取材料列表" time="0.0018844">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="MaterialApi &gt; getMaterials &gt; 反例: 获取失败" time="0.0017315">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="MaterialApi &gt; createMaterial &gt; 正例: 创建成功" time="0.0008697">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="MaterialApi &gt; createMaterial &gt; 反例: 创建失败" time="0.0005941">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="MaterialApi &gt; updateMaterial &gt; 正例: 更新成功" time="0.0003439">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="MaterialApi &gt; updateMaterial &gt; 反例: 更新失败" time="0.0003427">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="MaterialApi &gt; deleteMaterial &gt; 正例: 删除成功" time="0.0027208">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="MaterialApi &gt; deleteMaterial &gt; 反例: 删除失败" time="0.0010653">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="MaterialApi &gt; downloadMaterial &gt; 正例: 下载成功" time="0.0019072">
+        </testcase>
+        <testcase classname="src/api/__tests__/material.spec.ts" name="MaterialApi &gt; downloadMaterial &gt; 反例: 下载失败" time="0.000495">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/api/__tests__/notice.spec.ts" timestamp="2025-08-29T06:48:56.277Z" hostname="LAPTOP-4C3RJLJ6" tests="14" failures="0" errors="0" skipped="0" time="0.0155606">
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; getNotices &gt; 正例: 返回公告列表" time="0.0051009">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; getNotices &gt; 反例: 获取失败抛出错误" time="0.0019197">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; createNotice &gt; 正例: 创建成功" time="0.0004137">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; createNotice &gt; 反例: 创建失败" time="0.0004339">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; updateNotice &gt; 正例: 更新成功" time="0.0005043">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; updateNotice &gt; 反例: 更新失败" time="0.0005424">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; deleteNotice &gt; 正例: 删除成功" time="0.0006004">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; deleteNotice &gt; 反例: 删除失败" time="0.0003702">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; getUnreadCount &gt; 正例: 返回未读数" time="0.0006401">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; getUnreadCount &gt; 反例: 获取失败返回0" time="0.0006015">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; markAllAsRead &gt; 正例: 标记全部已读成功" time="0.0004747">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; markAllAsRead &gt; 反例: 标记全部已读失败" time="0.0004027">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; markAsRead &gt; 正例: 标记单个已读成功" time="0.0005586">
+        </testcase>
+        <testcase classname="src/api/__tests__/notice.spec.ts" name="NoticeApi &gt; markAsRead &gt; 反例: 标记单个已读失败" time="0.000439">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/api/__tests__/questionSet.spec.ts" timestamp="2025-08-29T06:48:56.285Z" hostname="LAPTOP-4C3RJLJ6" tests="7" failures="0" errors="0" skipped="0" time="0.0205826">
+        <testcase classname="src/api/__tests__/questionSet.spec.ts" name="questionSetService &gt; getAllSets 正例" time="0.004029">
+        </testcase>
+        <testcase classname="src/api/__tests__/questionSet.spec.ts" name="questionSetService &gt; getAllSets 反例" time="0.0054584">
+        </testcase>
+        <testcase classname="src/api/__tests__/questionSet.spec.ts" name="questionSetService &gt; createSet 正例" time="0.0009943">
+        </testcase>
+        <testcase classname="src/api/__tests__/questionSet.spec.ts" name="questionSetService &gt; updateSet 正例" time="0.0008502">
+        </testcase>
+        <testcase classname="src/api/__tests__/questionSet.spec.ts" name="questionSetService &gt; updateSet 反例" time="0.002504">
+        </testcase>
+        <testcase classname="src/api/__tests__/questionSet.spec.ts" name="questionSetService &gt; deleteSet 正例" time="0.0011903">
+        </testcase>
+        <testcase classname="src/api/__tests__/questionSet.spec.ts" name="questionSetService &gt; deleteSet 反例" time="0.0015732">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/components/__tests__/HelloWorld.spec.ts" timestamp="2025-08-29T06:48:56.290Z" hostname="LAPTOP-4C3RJLJ6" tests="2" failures="0" errors="0" skipped="0" time="0.1099885">
+        <testcase classname="src/components/__tests__/HelloWorld.spec.ts" name="HelloWorld &gt; renders properly" time="0.0684652">
+        </testcase>
+        <testcase classname="src/components/__tests__/HelloWorld.spec.ts" name="HelloWorld &gt; renders empty h1 if msg is empty" time="0.0370753">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/components/__tests__/TheWelcome.spec.ts" timestamp="2025-08-29T06:48:56.293Z" hostname="LAPTOP-4C3RJLJ6" tests="2" failures="0" errors="0" skipped="0" time="0.1112246">
+        <testcase classname="src/components/__tests__/TheWelcome.spec.ts" name="TheWelcome &gt; renders all WelcomeItem slots" time="0.079779">
+        </testcase>
+        <testcase classname="src/components/__tests__/TheWelcome.spec.ts" name="TheWelcome &gt; handles missing slot content gracefully" time="0.0262092">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/components/__tests__/WelcomeItem.spec.ts" timestamp="2025-08-29T06:48:56.295Z" hostname="LAPTOP-4C3RJLJ6" tests="2" failures="0" errors="0" skipped="0" time="0.0867231">
+        <testcase classname="src/components/__tests__/WelcomeItem.spec.ts" name="WelcomeItem &gt; renders slot content" time="0.0785691">
+        </testcase>
+        <testcase classname="src/components/__tests__/WelcomeItem.spec.ts" name="WelcomeItem &gt; renders gracefully with missing slots" time="0.0057842">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/utils/__tests__/axios.spec.ts" timestamp="2025-08-29T06:48:56.297Z" hostname="LAPTOP-4C3RJLJ6" tests="2" failures="0" errors="0" skipped="0" time="0.0150617">
+        <testcase classname="src/utils/__tests__/axios.spec.ts" name="axios util &gt; should inject token in request headers" time="0.0076037">
+        </testcase>
+        <testcase classname="src/utils/__tests__/axios.spec.ts" name="axios util &gt; should handle error response" time="0.0026981">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/utils/__tests__/request.spec.ts" timestamp="2025-08-29T06:48:56.299Z" hostname="LAPTOP-4C3RJLJ6" tests="2" failures="0" errors="0" skipped="0" time="0.0327024">
+        <testcase classname="src/utils/__tests__/request.spec.ts" name="request util &gt; should inject token in request headers" time="0.0218968">
+        </testcase>
+        <testcase classname="src/utils/__tests__/request.spec.ts" name="request util &gt; should handle 401 response" time="0.0053167">
+        </testcase>
+    </testsuite>
+</testsuites>

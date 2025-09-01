@@ -1,0 +1,144 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 3,
+    "passes": 3,
+    "pending": 0,
+    "failures": 0,
+    "start": "2025-08-29T08:12:54.235Z",
+    "end": "2025-08-29T08:13:09.480Z",
+    "duration": 15245,
+    "testsRegistered": 3,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "bdfd60fc-b3be-4b9a-bb4c-2ba31eb99f97",
+      "title": "",
+      "fullFile": "cypress\\e2e\\notice_test.cy.ts",
+      "file": "cypress\\e2e\\notice_test.cy.ts",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "66358289-dac2-436d-a8a1-eaccb25e1137",
+          "title": "公告模块功能测试",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "教师端发布、编辑、筛选、搜索公告",
+              "fullTitle": "公告模块功能测试 教师端发布、编辑、筛选、搜索公告",
+              "timedOut": null,
+              "duration": 7700,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/login');\ncy.get('input[placeholder=\"请输入用户名\"]').type(teacher.username);\ncy.get('input[placeholder=\"请输入密码\"]').type(teacher.password);\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\ncy.contains('通知公告').click({ force: true });\ncy.url().should('include', '/notices');\ncy.get('.notice-page').should('exist');\n// 发布第一个公告\ncy.contains('发布公告').click({ force: true });\ncy.get('.set-card').should('exist');\ncy.get('input[placeholder=\"请输入公告标题\"]').clear().type(noticeTitle1);\ncy.get('textarea[placeholder=\"请输入公告内容\"]').clear().type(noticeContent1);\ncy.get('.set-card .el-select').click({ force: true });\ncy.get('.el-select-dropdown__item').contains('课程通知').click({ force: true });\ncy.get('.set-card').within(function () {\n    cy.get('button').contains('发布公告').click({ force: true });\n});\ncy.contains('公告发布成功').should('be.visible');\ncy.get('.notice-list').should('contain.text', noticeTitle1);\n// 发布第二个公告\ncy.contains('发布公告').click({ force: true });\ncy.get('.set-card').should('exist');\ncy.get('input[placeholder=\"请输入公告标题\"]').clear().type(noticeTitle2);\ncy.get('textarea[placeholder=\"请输入公告内容\"]').clear().type(noticeContent2);\ncy.get('.set-card .el-select').click({ force: true });\ncy.get('.el-select-dropdown__item').contains('安全公告').click({ force: true });\ncy.get('.set-card').within(function () {\n    cy.get('button').contains('发布公告').click({ force: true });\n});\ncy.contains('公告发布成功').should('be.visible');\ncy.get('.notice-list').should('contain.text', noticeTitle2);\n// 编辑第一个公告\ncy.get('.notice-list .notice-item').contains(noticeTitle1).parents('.notice-item').within(function () {\n    cy.contains('编辑').click({ force: true });\n});\ncy.get('.set-card').should('exist');\ncy.get('input[placeholder=\"请输入公告标题\"]').clear().type(noticeEditTitle);\ncy.get('textarea[placeholder=\"请输入公告内容\"]').clear().type(noticeEditContent);\ncy.get('.set-card .el-select').click({ force: true });\ncy.get('.el-select-dropdown__item').contains('设备维护').click({ force: true });\ncy.get('.set-card').within(function () {\n    cy.get('button').contains('更新公告').click({ force: true });\n});\ncy.contains('公告更新成功').should('be.visible');\ncy.get('.notice-list').should('contain.text', noticeEditTitle);\n// 筛选类型\ncy.get('.filter-bar .el-select').click({ force: true });\ncy.get('.el-select-dropdown__item').contains('设备维护').click({ force: true });\ncy.get('.notice-list').should('contain.text', noticeEditTitle);\n// 清空筛选类型（重置下拉框）\ncy.get('.filter-bar .el-select').trigger('mouseenter'); // 先让清空按钮出现\ncy.get('.filter-bar .el-select .el-select__clear').click({ force: true }); // 点击清空按钮\n// 校验 placeholder 恢复为“全部类型”，说明筛选已清空\ncy.get('.filter-bar .el-select .el-select__placeholder')\n    .should('contain.text', '全部类型');\n// 列表应恢复到未筛选状态\ncy.get('.notice-list').should('contain.text', noticeEditTitle);\n// 搜索\ncy.get('input[placeholder=\"搜索公告...\"]').clear().type('已编辑');\ncy.get('.notice-list').should('contain.text', noticeEditTitle);\ncy.get('input[placeholder=\"搜索公告...\"]').clear();",
+              "err": {},
+              "uuid": "4f7ac2a0-45bd-4c7e-91bd-00d20ec75fdb",
+              "parentUUID": "66358289-dac2-436d-a8a1-eaccb25e1137",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "学生端查看公告、标记已读、未读数刷新、筛选和搜索",
+              "fullTitle": "公告模块功能测试 学生端查看公告、标记已读、未读数刷新、筛选和搜索",
+              "timedOut": null,
+              "duration": 2939,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/login');\ncy.get('input[placeholder=\"请输入用户名\"]').type(student.username);\ncy.get('input[placeholder=\"请输入密码\"]').type(student.password);\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\ncy.contains('公告').click({ force: true });\ncy.url().should('include', '/notices');\ncy.get('.notice-page').should('exist');\n// 检查未读数显示，兼容无未读公告的情况，自动等待未读数变化\ncy.get('.unread-info .unread-count').invoke('text').then(function (countText) {\n    var unreadBefore = parseInt(countText);\n    if (unreadBefore > 0) {\n        cy.get('.notice-list .notice-item.unread').first().within(function () {\n            cy.get('.notice-header .title').click({ force: true });\n        });\n        // 自动等待未读数变小\n        cy.get('.unread-info .unread-count').should(function ($span) {\n            var countAfter = parseInt($span.text());\n            expect(countAfter).to.be.lessThan(unreadBefore);\n        });\n    }\n    else {\n        cy.log('无未读公告，跳过已读数减少断言');\n    }\n});\n// 筛选类型\ncy.get('.filter-bar .el-select').click({ force: true });\ncy.get('.el-select-dropdown__item').contains('设备维护').click({ force: true });\ncy.get('.notice-list').should('exist');\n// 搜索\ncy.get('input[placeholder=\"搜索公告...\"]').clear().type('公告');\ncy.get('.notice-list').should('exist');\ncy.get('input[placeholder=\"搜索公告...\"]').clear();",
+              "err": {},
+              "uuid": "8e9aa685-6330-44f9-878c-b83bce36241d",
+              "parentUUID": "66358289-dac2-436d-a8a1-eaccb25e1137",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "教师端删除发布的两个公告",
+              "fullTitle": "公告模块功能测试 教师端删除发布的两个公告",
+              "timedOut": null,
+              "duration": 2801,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/login');\ncy.get('input[placeholder=\"请输入用户名\"]').type(teacher.username);\ncy.get('input[placeholder=\"请输入密码\"]').type(teacher.password);\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\ncy.contains('通知公告').click({ force: true });\ncy.url().should('include', '/notices');\ncy.get('.notice-page').should('exist');\n// 删除已编辑的公告\ncy.get('.notice-list .notice-item').contains(noticeEditTitle).parents('.notice-item').within(function () {\n    cy.contains('删除').click({ force: true });\n});\ncy.contains('公告删除成功').should('be.visible');\ncy.get('.notice-list').should('not.contain.text', noticeEditTitle);\n// 删除第二个公告\ncy.get('.notice-list .notice-item').contains(noticeTitle2).parents('.notice-item').within(function () {\n    cy.contains('删除').click({ force: true });\n});\ncy.contains('公告删除成功').should('be.visible');\ncy.get('.notice-list').should('not.contain.text', noticeTitle2);",
+              "err": {},
+              "uuid": "184f3522-7fd6-486a-881b-4d15f133f7f8",
+              "parentUUID": "66358289-dac2-436d-a8a1-eaccb25e1137",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "4f7ac2a0-45bd-4c7e-91bd-00d20ec75fdb",
+            "8e9aa685-6330-44f9-878c-b83bce36241d",
+            "184f3522-7fd6-486a-881b-4d15f133f7f8"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 13440,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "id": "default",
+        "reportDir": "cypress/cypress-report",
+        "overwrite": false,
+        "html": true,
+        "json": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}

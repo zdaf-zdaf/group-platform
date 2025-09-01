@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="7.412" tests="6" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-08-29T08:15:03" tests="0" file="cypress\e2e\2-advanced-examples\network_requests.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Network Requests" timestamp="2025-08-29T08:15:03" tests="6" time="7.410" failures="0">
+    <testcase name="Network Requests cy.request() - make an XHR request" time="1.244" classname="cy.request() - make an XHR request">
+    </testcase>
+    <testcase name="Network Requests cy.request() - verify response using BDD syntax" time="0.599" classname="cy.request() - verify response using BDD syntax">
+    </testcase>
+    <testcase name="Network Requests cy.request() with query parameters" time="0.589" classname="cy.request() with query parameters">
+    </testcase>
+    <testcase name="Network Requests cy.request() - pass result to the second request" time="0.984" classname="cy.request() - pass result to the second request">
+    </testcase>
+    <testcase name="Network Requests cy.request() - save response in the shared test context" time="0.829" classname="cy.request() - save response in the shared test context">
+    </testcase>
+    <testcase name="Network Requests cy.intercept() - route responses to matching requests" time="1.303" classname="cy.intercept() - route responses to matching requests">
+    </testcase>
+  </testsuite>
+</testsuites>

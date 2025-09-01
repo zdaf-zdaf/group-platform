@@ -63,22 +63,32 @@ class StudentTestView(APIView):
 
     def get(self, request):
         return Response({"message": "学生专属接口"})
-    
+
 class UserProfileUpdateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    
+
+    def get(self, request):
+        # 获取用户信息
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response({
+            "success": True,
+            "message": "获取用户信息成功",
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)
+
     def patch(self, request):
         user = request.user
         # 只允许更新学工号和学院
         student_id = request.data.get('student_id', '').strip()
         faculty = request.data.get('faculty', '').strip()
-        
+
         # 验证并更新数据
         if student_id:
             user.student_id = student_id
         if faculty:
             user.faculty = faculty
-        
+
         try:
             user.save()
             return Response({

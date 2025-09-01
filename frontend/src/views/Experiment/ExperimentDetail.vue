@@ -450,44 +450,50 @@ const handleAnswerChange = (type: string, question: any) => {
   })
 }
 
-// 保存进度
+// 保存进度到 localStorage
 const saveProgress = () => {
   const answers = {
-    choice: Object.fromEntries(
-      questions.value.choice.map(q => [q.id, q.selected])
-    ),
-    fill: Object.fromEntries(
-      questions.value.fill.map(q => [q.id, q.answer])
-    ),
-    coding: Object.fromEntries(
-      questions.value.coding.map(q => [q.id, q.submissions?.[0]?.code || ''])
-    )
+    choice: Object.fromEntries(questions.value.choice.map(q => [q.id, q.selected])),
+    fill: Object.fromEntries(questions.value.fill.map(q => [q.id, q.answer])),
+    coding: Object.fromEntries(questions.value.coding.map(q => [q.id, q.submissions?.[0]?.code || '']))
   }
 
-  experimentProgressStore.saveProgress(experimentId.value, answers)
   lastSaved.value = new Date().toISOString()
+  localStorage.setItem(
+    'experiment-progress-' + experimentId.value,
+    JSON.stringify({ answers, lastSaved: lastSaved.value })
+  )
 }
 
 // 加载保存的进度
 const loadSavedProgress = () => {
-  const savedProgress = experimentProgressStore.loadProgress(experimentId.value)
-  if (savedProgress) {
-    // 恢复选择题答案
-    questions.value.choice.forEach(q => {
-      if (savedProgress.answers.choice[q.id]) {
-        q.selected = savedProgress.answers.choice[q.id]
-      }
-    })
+  const saved = localStorage.getItem('experiment-progress-' + experimentId.value)
+  if (!saved) return
+  const savedProgress = JSON.parse(saved)
+  questions.value.choice.forEach(q => {
+    if (savedProgress.answers.choice && q.id in savedProgress.answers.choice) {
+      q.selected = savedProgress.answers.choice[q.id]
+    }
+  })
 
-    // 恢复填空题答案
-    questions.value.fill.forEach(q => {
-      if (savedProgress.answers.fill[q.id]) {
-        q.answer = savedProgress.answers.fill[q.id]
-      }
-    })
+  questions.value.fill.forEach(q => {
+    if (savedProgress.answers.fill && q.id in savedProgress.answers.fill) {
+      q.answer = savedProgress.answers.fill[q.id]
+    }
+  })
 
-    lastSaved.value = savedProgress.lastSaved
-  }
+  questions.value.coding.forEach(q => {
+    if (savedProgress.answers.coding && q.id in savedProgress.answers.coding) {
+      q.submissions = q.submissions || []
+      q.submissions[0] = q.submissions[0] || {}
+      q.submissions[0].code = savedProgress.answers.coding[q.id]
+    }
+  })
+
+  lastSaved.value = savedProgress.lastSaved
+}
+const saveAutosave = () => {
+  saveProgress()
 }
 
 // 获取实验题目数据
@@ -618,7 +624,7 @@ const submitExperiment = async () => {
 
     ElMessage.success(`提交成功，得分：${totalScore.value} 分`);
 
-    experimentProgressStore.clearProgress(experimentId.value);
+    localStorage.removeItem('experiment-progress-' + experimentId.value);
   } catch (error) {
     console.error('提交过程中出错:', error);
     if (error.response) {
@@ -678,6 +684,7 @@ let autoSaveInterval: number | undefined = undefined
 
 onMounted(() => {
   fetchExperiment().then(() => {
+    loadSavedProgress() // 确保加载保存的进度
     // 获取数据后立即执行一次保存
     saveProgress()
     // 设置定时保存（每分钟）
