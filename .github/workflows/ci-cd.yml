@@ -560,6 +560,12 @@ jobs:
             fi
             
             sleep 3
+
+      - name: 初始化测试账号
+        run: |
+          curl -X POST http://localhost:8000/api/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}' || true
+          curl -X POST http://localhost:8000/api/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}' || true
+        working-directory: ./frontend
       
       - name: Run Cypress tests
         run: |
