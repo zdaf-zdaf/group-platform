@@ -563,22 +563,22 @@ jobs:
 
       - name: 初始化测试账号
         run: |
-          curl -v -X POST http://localhost:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}' || true
-          curl -v -X POST http://localhost:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || true
+          curl -v -X POST http://127.0.0.1:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}' || true
+          curl -v -X POST http://127.0.0.1:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || true
         working-directory: ./frontend
 
       - name: 检查登录接口响应
         run: |
           echo "登录stuTest："
-          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
+          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
           echo "登录tchTest："
-          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
+          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
         working-directory: ./frontend
 
       - name: 检查账号登录
         run: |
           echo "登录stuTest："
-          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
+          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
           echo "登录tchTest："
           curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
         working-directory: ./frontend
@@ -586,8 +586,8 @@ jobs:
       - name: Run Cypress tests
         run: |
           # 简化命令，移除所有可能导致冲突的参数
-          npx cypress run --headless --config baseUrl=http://localhost:8080
-          
+          npx cypress run --headless --config baseUrl=http://127.0.0.1:8080
+
           # 如果失败，保存截图和视频
           if [ $? -ne 0 ]; then
             echo "Cypress测试失败，保存截图和视频..."
