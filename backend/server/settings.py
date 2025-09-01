@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'experiments',
     'materials',
     'notice.apps.NoticeConfig',
-    'health',
 ]
 
 MIDDLEWARE = [
