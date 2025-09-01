@@ -20,7 +20,7 @@ print(a + b)
   // 学生注册
   // ========================
   it('学生注册流程', () => {
-    cy.visit('http://localhost:5173/register')
+    cy.visit('/register')
     cy.get('input[placeholder="请输入3-16位用户名"]').type(studentUsername)
     cy.get('input[placeholder="请输入邮箱地址"]').type(`${studentUsername}@example.com`)
     cy.get('input[placeholder="请输入6-18位密码"]').type(password)
@@ -37,7 +37,7 @@ print(a + b)
   // ========================
   it('教师注册后登录并修改个人信息和密码', () => {
     // 注册
-    cy.visit('http://localhost:5173/register')
+    cy.visit('/register')
     cy.get('input[placeholder="请输入3-16位用户名"]').type(teacherUsername)
     cy.get('input[placeholder="请输入邮箱地址"]').type(`${teacherUsername}@example.com`)
     cy.get('input[placeholder="请输入6-18位密码"]').type(password)
@@ -49,7 +49,7 @@ print(a + b)
     cy.contains('注册成功！').should('be.visible')
 
     // 登录
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
     cy.get('input[placeholder="请输入密码"]').type(password)
     cy.get('input[type="checkbox"]').check({ force: true })
@@ -95,7 +95,7 @@ print(a + b)
   // 教师登录并创建实验
   // ========================
   it('教师登录并创建实验', () => {
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
     cy.get('input[placeholder="请输入密码"]').type(password)
     cy.get('input[type="checkbox"]').check({ force: true })
@@ -232,7 +232,7 @@ print(a + b)
   // 学生登录完成实验
   // ========================
   it('学生登录完成实验', () => {
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(studentUsername)
     cy.get('input[placeholder="请输入密码"]').type(password)
     cy.get('input[type="checkbox"]').check({ force: true })
@@ -325,7 +325,7 @@ print(a + b)
   // ========================
   it('教师查看学生提交记录与详情', () => {
     // 教师登录
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
     cy.get('input[placeholder="请输入密码"]').type(password)
     cy.get('input[type="checkbox"]').check({ force: true })

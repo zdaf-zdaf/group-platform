@@ -5,7 +5,7 @@ describe('学习资料模块功能测试', () => {
   // 教师端依次发布四种类型的学习资料（合并为一个用例）
   // ========================
   it('教师端依次发布四种类型学习资料', () => {
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type('tchTest')
     cy.get('input[placeholder="请输入密码"]').type('Test1234@')
     cy.get('input[type="checkbox"]').check({ force: true })
@@ -41,7 +41,7 @@ describe('学习资料模块功能测试', () => {
   // 学生端查看并预览四种类型资料，下载第一个
   // ========================
   it('学生端查看并预览四种类型资料，下载第一个', () => {
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type('stuTest')
     cy.get('input[placeholder="请输入密码"]').type('Test1234@')
     cy.get('input[type="checkbox"]').check({ force: true })
@@ -70,7 +70,7 @@ describe('学习资料模块功能测试', () => {
   // 教师端删除资料
   // ========================
   it('教师端删除学习资料', () => {
-    cy.visit('http://localhost:5173/login')
+    cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type('tchTest')
     cy.get('input[placeholder="请输入密码"]').type('Test1234@')
     cy.get('input[type="checkbox"]').check({ force: true })
