@@ -721,52 +721,53 @@ jobs:
     steps:
       - name: Notify Team
         run: |
-          echo "CI/CD 流水线成功完成！"
-          echo "所有测试（单元、API、GUI）均已通过！"
-          echo "所有Docker镜像已推送至 GitHub Container Registry。"
-          echo "请成员C在本地执行以下命令进行部署："
-          echo "kubectl apply -f k8s-manifests/"
-    # 在现有notify-deployment-ready作业后添加：
-  deploy-to-k8s:
-    name: Deploy to Kubernetes
-    runs-on: ubuntu-latest
-    needs: [notify-deployment-ready]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+            echo "CI流程完成！"
+            echo ""
+            echo "请下载部署包并本地执行:"
+            echo "1. 从Artifacts下载 'local-deployment-package'"
+            echo "2. 解压后运行: chmod +x deploy-to-local.sh && ./deploy-to-local.sh"
+            echo "3. 访问 http://localhost:30080 验证部署"
+            echo ""
+            echo "注意: 确保本地Docker Desktop和Kubectl已正确配置"
+ 
+
+  Deploy to Kubernetes:
+    # 替换现有的 Deploy to Kubernetes 步骤
+    - name: Generate Local Deployment Package
+      run: |
+        # 创建一键部署脚本
+        cat > deploy-to-local.sh << 'EOF'
+        #!/bin/bash
+        echo "开始部署到本地K8s环境..."
         
-      - name: Configure kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-            version: 'latest'
-            
-      - name: Setup Kubernetes context
-        uses: azure/k8s-set-context@v3
-        with:
-            method: kubeconfig
-            kubeconfig: ${{ secrets.KUBE_CONFIG }}
-            
-      - name: Deploy MySQL Secret
-        run: kubectl apply -f k8s/mysql-secret.yaml
+        # 1. 更新镜像版本
+        sed -i "s|image:.*backend:.*|image: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}|g" k8s/backend-deployment.yaml
+        sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
         
-      - name: Deploy Backend
-        run: kubectl apply -f k8s/backend-deployment.yaml
+        # 2. 部署到K8s
+        kubectl apply -f k8s/
         
-      - name: Deploy Frontend
-        run: kubectl apply -f k8s/frontend-deploy.yaml
+        # 3. 等待服务就绪
+        echo "等待服务启动..."
+        sleep 30
         
-      - name: Verify Deployment
-        run: |
-            kubectl get pods
-            kubectl get svc
-  test-secrets:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Test KUBE_CONFIG
-        run: |
-            echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > test-config
-            kubectl --kubeconfig=test-config get nodes
-            
-      - name: Test GHCR_PAT
-        run: |
-            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        # 4. 显示访问信息
+        echo "部署完成！"
+        echo "前端访问: http://localhost:30080"
+        echo "后端API: http://localhost:30080/api"
+        echo ""
+        echo "运行集成测试:"
+        echo "cd postman && newman run collection1-LunTan.json -e environment.json"
+        EOF
+        
+        chmod +x deploy-to-local.sh
+        echo "生成了一键部署脚本: deploy-to-local.sh"
+
+    - name: Upload Deployment Package
+      uses: actions/upload-artifact@v4
+      with:
+        name: local-deployment-package
+        path: |
+          k8s/
+          deploy-to-local.sh
+        retention-days: 7
