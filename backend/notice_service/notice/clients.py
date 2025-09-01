@@ -15,13 +15,18 @@ class BaseAPIClient:
         
     def _get(self, endpoint, params=None):
         url = f"{self.service_url}{endpoint}"
-        try:
-            response = requests.get(url, headers=self.headers, params=params, timeout=5)
-            response.raise_for_status()
-            return response.json()
-        except requests.RequestException as e:
-            logger.error(f"请求失败: {str(e)}")
-            return None
+        for attempt in range(3):  
+            try:
+                response = requests.get(url, headers=self.headers, params=params, timeout=5)
+                response.raise_for_status()
+                return response.json()
+            except RequestException as e:
+                logger.warning(f"请求尝试 {attempt + 1} 失败: {str(e)}")
+                if attempt < 2:  # 前两次失败后等待并重试
+                    time.sleep(0.5 * (attempt + 1))
+                else:
+                    logger.error(f"最终请求失败: {str(e)}")
+                    return None  # 最后返回None让服务层处理降级
             
     def _post(self, endpoint, data):
         url = f"{self.service_url}{endpoint}"
