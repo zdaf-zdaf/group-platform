@@ -1,6 +1,0 @@
-Django==5.2.1
-djangorestframework==3.16.0
-djangorestframework-simplejwt==5.5.0
-psycopg2-binary==2.9.10
-requests==2.32.3
-django-cors-headers==4.7.0
