@@ -562,12 +562,14 @@ jobs:
 
       - name: 初始化测试账号
         run: |
+          echo "注册stuTest："
           curl -v -X POST http://127.0.0.1:8000/api/auth/register/ \
             -H "Content-Type: application/json" \
-            -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}'
+            -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}' || exit 1
+          echo "注册tchTest："
           curl -v -X POST http://127.0.0.1:8000/api/auth/register/ \
             -H "Content-Type: application/json" \
-            -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}'
+            -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || exit 1
         working-directory: ./frontend
 
       - name: 检查登录接口响应
@@ -581,15 +583,13 @@ jobs:
       - name: 检查账号登录
         run: |
           echo "登录stuTest："
-          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
+          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}' || exit 1
           echo "登录tchTest："
-          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
+          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}' || exit 1
         working-directory: ./frontend
       
       - name: Run Cypress tests
         run: |
-          export DBUS_SESSION_BUS_ADDRESS=/dev/null
-          export TERM=xterm
           # 简化命令，移除所有可能导致冲突的参数
           npx cypress run --headless --config baseUrl=http://127.0.0.1:8080
 
