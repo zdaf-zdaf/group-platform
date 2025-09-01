@@ -567,6 +567,22 @@ jobs:
           curl -v -X POST http://localhost:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || true
         working-directory: ./frontend
 
+      - name: 检查注册账号是否存在
+        run: |
+          echo "查询stuTest账号："
+          curl -v "http://localhost:8000/api/user/?username=stuTest"
+          echo "查询tchTest账号："
+          curl -v "http://localhost:8000/api/user/?username=tchTest"
+        working-directory: ./frontend
+
+      - name: 检查登录接口响应
+        run: |
+          echo "登录stuTest："
+          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
+          echo "登录tchTest："
+          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
+        working-directory: ./frontend
+
       - name: 检查账号登录
         run: |
           echo "登录stuTest："
