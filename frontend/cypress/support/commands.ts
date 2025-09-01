@@ -35,6 +35,4 @@
 //     }
 //   }
 // }
-Cypress.Cookies.defaults({
-  preserve: 'sessionid'
-})
+
