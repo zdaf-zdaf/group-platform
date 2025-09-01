@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Question, Comment
+from .services import UserService
 # 移除对UserSerializer的依赖
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -13,11 +14,12 @@ class CommentSerializer(serializers.ModelSerializer):
     def get_author_info(self, obj):
         # 这里需要调用用户微服务API获取用户信息
         # 暂时返回模拟数据
-        return {
-            "id": obj.author_id,
-            "username": f"user{obj.author_id}",
-            "avatar": "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-        }
+        # return {
+        #     "id": obj.author_id,
+        #     "username": f"user{obj.author_id}",
+        #     "avatar": "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+        # }
+        return UserService.get_user_info(obj.author_id)
 
 class QuestionSerializer(serializers.ModelSerializer):
     author_info = serializers.SerializerMethodField()
@@ -34,11 +36,12 @@ class QuestionSerializer(serializers.ModelSerializer):
     def get_author_info(self, obj):
         # 这里需要调用用户微服务API获取用户信息
         # 暂时返回模拟数据
-        return {
-            "id": obj.author_id,
-            "username": f"user{obj.author_id}",
-            "avatar": "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-        }
+        # return {
+        #     "id": obj.author_id,
+        #     "username": f"user{obj.author_id}",
+        #     "avatar": "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+        # }
+        return UserService.get_user_info(obj.author_id)
 
     def get_liked(self, obj):
         request = self.context.get('request')
