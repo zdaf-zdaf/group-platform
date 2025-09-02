@@ -43,4 +43,4 @@ HEALTHCHECK --interval=30s --timeout=3s \
     CMD curl -f http://localhost:$PORT/healthcheck/ || exit 1
 
 # 启动命令
-CMD ["sh", "-c", "python manage.py migrate && gunicorn server.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
+CMD ["sh", "-c", "python manage.py migrate || true && gunicorn server.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
