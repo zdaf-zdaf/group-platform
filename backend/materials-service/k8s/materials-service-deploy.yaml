@@ -9,11 +9,46 @@ spec:
   selector:
     matchLabels:
       app: materials-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   template:
     metadata:
       labels:
         app: materials-service
     spec:
+      # 添加初始化容器处理数据库迁移
+      initContainers:
+        - name: db-migration
+          image: yourrepo/materials-service:latest
+          command: ["python", "manage.py", "migrate", "--noinput"]
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: server.settings
+            - name: DB_ENGINE
+              value: django.db.backends.mysql
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: materials-mysql-secret  # 使用专属secret
+                  key: MYSQL_DATABASE
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: materials-mysql-secret
+                  key: MYSQL_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: materials-mysql-secret
+                  key: MYSQL_PASSWORD
+            - name: DB_HOST
+              value: materials-mysql-service  # 指向专属数据库服务
+            - name: DB_PORT
+              value: "3306"
+      
       containers:
         - name: materials-service
           image: yourrepo/materials-service:latest
@@ -34,51 +69,71 @@ spec:
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secret
+                  name: materials-mysql-secret  # 专属secret
                   key: MYSQL_DATABASE
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secret
+                  name: materials-mysql-secret
                   key: MYSQL_USER
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secret
+                  name: materials-mysql-secret
                   key: MYSQL_PASSWORD
             - name: DB_HOST
-              value: mysql
+              value: materials-mysql-service  # 专属数据库服务
             - name: DB_PORT
               value: "3306"
             - name: CORS_ALLOW_ALL_ORIGINS
               value: "true"
-            # 可选：若与用户服务共享 JWT 密钥
-            # - name: JWT_SIGNING_KEY
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: jwt-secret
-            #       key: SIGNING_KEY
+            # 添加其他服务访问URL
+            - name: USER_SERVICE_URL
+              value: "http://user-service:8000"
+            - name: NOTICE_SERVICE_URL
+              value: "http://notice-service:8000"
+          
+          # 添加资源请求和限制
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          
           readinessProbe:
             httpGet:
-              path: /health/
+              path: /health/  # 确保此端点存在
               port: 8000
-            initialDelaySeconds: 10
-            periodSeconds: 5
+            initialDelaySeconds: 15  # 给应用更多启动时间
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          
           livenessProbe:
             httpGet:
-              path: /health/
+              path: /health/  # 确保此端点存在
               port: 8000
-            initialDelaySeconds: 20
-            periodSeconds: 10
+            initialDelaySeconds: 30  # 比readiness更长
+            periodSeconds: 15
             failureThreshold: 3
+          
           volumeMounts:
             - name: media
               mountPath: /app/media
-          # 若镜像 CMD 不做 migrate，可添加 postStart hook 或使用 initContainer 迁移
+            # 添加配置映射挂载（如果需要）
+            - name: config-volume
+              mountPath: /app/config
+      
       volumes:
         - name: media
           persistentVolumeClaim:
             claimName: materials-media-pvc
+        - name: config-volume
+          configMap:
+            name: materials-config
+
 ---
 apiVersion: v1
 kind: Service
@@ -91,5 +146,6 @@ spec:
     app: materials-service
   type: ClusterIP
   ports:
-    - port: 8000
+    - name: http
+      port: 8000
       targetPort: 8000

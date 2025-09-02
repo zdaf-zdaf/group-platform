@@ -1,49 +1,58 @@
+# k8s/ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: microservices-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   rules:
   - http:
       paths:
-      - path: /api/users
+      # 用户服务路由
+      - path: /api/user(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: user-service
             port:
               number: 8000
-      - path: /api/notices
+      # 通知服务路由
+      - path: /api/notice(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: notice-service
             port:
               number: 8000
-      - path: /api/materials
+      # 学习资料服务路由
+      - path: /api/materials(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: materials-service
             port:
               number: 8000
-      - path: /api/forum
+      # 论坛服务路由
+      - path: /api/forum(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: forum-service
             port:
               number: 8000
-      - path: /api/lab
+      # 实验服务路由
+      - path: /api/lab(/|$)(.*)
         pathType: Prefix
         backend:
           service:
             name: lab-service
             port:
               number: 8000
-      - path: /
+      # 前端路由
+      - path: /()(.*)
         pathType: Prefix
         backend:
           service:

@@ -7,69 +7,459 @@ on:
     branches: [ "master" ]
 
 jobs:
-  # ================== 后端测试（容器化） ==================
-  test-backend:
+  # ================ 检测变更的微服务 ================
+  detect-changed-services:
     runs-on: ubuntu-latest
+    outputs:
+      changed-services: ${{ steps.changed.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整提交历史
+          
+      - name: 识别变更的微服务
+        id: changed
+        run: |
+          # 识别backend目录下有变更的子目录（微服务）
+          changed_dirs=$(git diff --name-only HEAD^ HEAD | grep -o '^backend/[^/]*' | sort | uniq)
+          # 如果没有变更，默认构建所有服务
+          if [ -z "$changed_dirs" ]; then
+            changed_dirs="backend/experiments-service backend/forum-service backend/materials-service backend/notice-service backend/user-service"
+          fi
+          # 转换为JSON数组格式
+          json_list=$(echo $changed_dirs | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          echo "changed_services=$json_list" >> $GITHUB_OUTPUT
+  
+  # ================ 论坛微服务单元测试 ================
+  test-forum-service:
+    runs-on: ubuntu-latest
+    needs: detect-changed-services
+    # 仅当forum-service有变更时运行
+    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/forum-service') }}
     services:
       mysql:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: test_db
+          MYSQL_DATABASE: test_db_forum  # 服务专属数据库
           MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
           - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+          
     steps:
-      - name: Checkout code
+      - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: Wait for MySQL ready and configure root
+      - name: 等待MySQL就绪
         run: |
           sudo apt-get update && sudo apt-get install -y mysql-client
           for i in {1..30}; do
             if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-              echo "MySQL is ready!"; break
+              echo "MySQL已就绪"; break
             fi
-            echo "Waiting for MySQL... (attempt $i/30)"; sleep 2
+            echo "等待MySQL...($i/30)"; sleep 2
           done
+          # 配置远程访问
           mysql -h"127.0.0.1" -uroot -prootpassword -e "
             ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
             FLUSH PRIVILEGES;"
-      - name: Build backend image
-        run: docker build -t course-backend:latest ./backend
-
-      - name: Run backend container with docker.sock
+            
+      - name: 构建论坛微服务镜像
+        run: docker build -t forum-service:test ./backend/forum-service
+        
+      - name: 运行论坛微服务容器
         run: |
-          docker run -d --name course-backend-container \
-            --network host \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -e DJANGO_SETTINGS_MODULE=server.settings \
+          docker run -d --name forum-service \
             -e DB_ENGINE=django.db.backends.mysql \
-            -e DB_NAME=test_db \
+            -e DB_NAME=test_db_forum \
             -e DB_USER=root \
             -e DB_PASSWORD=rootpassword \
             -e DB_HOST=127.0.0.1 \
             -e DB_PORT=3306 \
             -e DEBUG=False \
-            course-backend:latest
-      - name: Run migrations in backend container
+            forum-service:test
+            
+      - name: 执行数据库迁移
+        run: docker exec forum-service python manage.py migrate --noinput
+        
+      - name: 运行单元测试
+        run: docker exec forum-service python manage.py test --verbosity=2
+
+  # ================ 资料微服务单元测试 ================
+  test-materials-service:
+    runs-on: ubuntu-latest
+    needs: detect-changed-services
+    # 仅当materials-service有变更时运行
+    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/materials-service') }}
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db_materials  # 服务专属数据库
+          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 等待MySQL就绪
         run: |
-          docker exec course-backend-container python manage.py makemigrations --noinput
-          docker exec course-backend-container python manage.py migrate --noinput
-      - name: Run Django tests in backend container
-        run: docker exec course-backend-container python manage.py test --verbosity=2
+          sudo apt-get update && sudo apt-get install -y mysql-client
+          for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+              echo "MySQL已就绪"; break
+            fi
+            echo "等待MySQL...($i/30)"; sleep 2
+          done
+          # 配置远程访问
+          mysql -h"127.0.0.1" -uroot -prootpassword -e "
+            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
+            FLUSH PRIVILEGES;"
+            
+      - name: 构建论坛微服务镜像
+        run: docker build -t materials-service:test ./backend/materials-service
+        
+      - name: 运行论坛微服务容器
+        run: |
+          docker run -d --name materials-service \
+            -e DB_ENGINE=django.db.backends.mysql \
+            -e DB_NAME=test_db_materials \
+            -e DB_USER=root \
+            -e DB_PASSWORD=rootpassword \
+            -e DB_HOST=127.0.0.1 \
+            -e DB_PORT=3306 \
+            -e DEBUG=False \
+            materials-service:test
+            
+      - name: 执行数据库迁移
+        run: docker exec materials-service python manage.py migrate --noinput
+        
+      - name: 运行单元测试
+        run: docker exec materials-service python manage.py test --verbosity=2
+
+  # ================ 公告微服务单元测试 ================
+  test-notice-service:
+    runs-on: ubuntu-latest
+    needs: detect-changed-services
+    # 仅当notice-service有变更时运行
+    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/notice-service') }}
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db_notice  # 服务专属数据库
+          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 等待MySQL就绪
+        run: |
+          sudo apt-get update && sudo apt-get install -y mysql-client
+          for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+              echo "MySQL已就绪"; break
+            fi
+            echo "等待MySQL...($i/30)"; sleep 2
+          done
+          # 配置远程访问
+          mysql -h"127.0.0.1" -uroot -prootpassword -e "
+            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
+            FLUSH PRIVILEGES;"
+            
+      - name: 构建论坛微服务镜像
+        run: docker build -t notice-service:test ./backend/notice-service
+        
+      - name: 运行论坛微服务容器
+        run: |
+          docker run -d --name notice-service \
+            -e DB_ENGINE=django.db.backends.mysql \
+            -e DB_NAME=test_db_notice \
+            -e DB_USER=root \
+            -e DB_PASSWORD=rootpassword \
+            -e DB_HOST=127.0.0.1 \
+            -e DB_PORT=3306 \
+            -e DEBUG=False \
+            notice-service:test
+            
+      - name: 执行数据库迁移
+        run: docker exec notice-service python manage.py migrate --noinput
+        
+      - name: 运行单元测试
+        run: docker exec notice-service python manage.py test --verbosity=2
+
+  # ================ 实验微服务单元测试 ================
+  test-experiments-service:
+    runs-on: ubuntu-latest
+    needs: detect-changed-services
+    # 仅当experiments-service有变更时运行
+    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/experiments-service') }}
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db_experiments  # 服务专属数据库
+          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 等待MySQL就绪
+        run: |
+          sudo apt-get update && sudo apt-get install -y mysql-client
+          for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+              echo "MySQL已就绪"; break
+            fi
+            echo "等待MySQL...($i/30)"; sleep 2
+          done
+          # 配置远程访问
+          mysql -h"127.0.0.1" -uroot -prootpassword -e "
+            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
+            FLUSH PRIVILEGES;"
+            
+      - name: 构建论坛微服务镜像
+        run: docker build -t experiments-service:test ./backend/experiments-service
+        
+      - name: 运行论坛微服务容器
+        run: |
+          docker run -d --name experiments-service \
+            -e DB_ENGINE=django.db.backends.mysql \
+            -e DB_NAME=test_db_experiments \
+            -e DB_USER=root \
+            -e DB_PASSWORD=rootpassword \
+            -e DB_HOST=127.0.0.1 \
+            -e DB_PORT=3306 \
+            -e DEBUG=False \
+            experiments-service:test
+            
+      - name: 执行数据库迁移
+        run: docker exec experiments-service python manage.py migrate --noinput
+        
+      - name: 运行单元测试
+        run: docker exec experiments-service python manage.py test --verbosity=2
+
+  # ================ 用户微服务单元测试 ================
+  test-user-service:
+    runs-on: ubuntu-latest
+    needs: detect-changed-services
+    # 仅当user-service有变更时运行
+    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/user-service') }}
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db_user  # 服务专属数据库
+          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 等待MySQL就绪
+        run: |
+          sudo apt-get update && sudo apt-get install -y mysql-client
+          for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+              echo "MySQL已就绪"; break
+            fi
+            echo "等待MySQL...($i/30)"; sleep 2
+          done
+          # 配置远程访问
+          mysql -h"127.0.0.1" -uroot -prootpassword -e "
+            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
+            FLUSH PRIVILEGES;"
+            
+      - name: 构建论坛微服务镜像
+        run: docker build -t user-service:test ./backend/user-service
+        
+      - name: 运行论坛微服务容器
+        run: |
+          docker run -d --name user-service \
+            -e DB_ENGINE=django.db.backends.mysql \
+            -e DB_NAME=test_db_user \
+            -e DB_USER=root \
+            -e DB_PASSWORD=rootpassword \
+            -e DB_HOST=127.0.0.1 \
+            -e DB_PORT=3306 \
+            -e DEBUG=False \
+            user-service:test
+            
+      - name: 执行数据库迁移
+        run: docker exec user-service python manage.py migrate --noinput
+        
+      - name: 运行单元测试
+        run: docker exec user-service python manage.py test --verbosity=2
+        
+  # ================ 论坛镜像构建 ================
+  build-forum-service:
+    runs-on: ubuntu-latest
+    needs: [detect-changed-services, test-forum-service]
+    # 仅当forum-service有变更时运行
+    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/forum-service') }}
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        
+      - name: 登录GitHub容器仓库
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}  # 需要提前在仓库Secrets中配置
+          
+      - name: 构建并推送镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/forum-service  # 关键：指向微服务目录
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/forum-service:latest
+            ghcr.io/${{ github.repository_owner }}/forum-service:${{ github.sha }}
+
+  # ================ 资料镜像构建 ================
+  build-materials-service:
+    runs-on: ubuntu-latest
+    needs: [detect-changed-services, test-materials-service]
+    # 仅当materials-service有变更时运行
+    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/materials-service') }}
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        
+      - name: 登录GitHub容器仓库
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}  # 需要提前在仓库Secrets中配置
+          
+      - name: 构建并推送镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/materials-service  # 关键：指向微服务目录
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/materials-service:latest
+            ghcr.io/${{ github.repository_owner }}/materials-service:${{ github.sha }}
+
+  # ================ 公告镜像构建 ================
+  build-notice-service:
+    runs-on: ubuntu-latest
+    needs: [detect-changed-services, test-notice-service]
+    # 仅当notice-service有变更时运行
+    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/notice-service') }}
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        
+      - name: 登录GitHub容器仓库
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}  # 需要提前在仓库Secrets中配置
+          
+      - name: 构建并推送镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/notice-service  # 关键：指向微服务目录
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/notice-service:latest
+            ghcr.io/${{ github.repository_owner }}/notice-service:${{ github.sha }}
+
+  # ================ 实验镜像构建 ================
+  build-experiments-service:
+    runs-on: ubuntu-latest
+    needs: [detect-changed-services, test-experiments-service]
+    # 仅当experiments-service有变更时运行
+    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/experiments-service') }}
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        
+      - name: 登录GitHub容器仓库
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}  # 需要提前在仓库Secrets中配置
+          
+      - name: 构建并推送镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/experiments-service  # 关键：指向微服务目录
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/experiments-service:latest
+            ghcr.io/${{ github.repository_owner }}/experiments-service:${{ github.sha }}
+            
+  # ================ 用户镜像构建 ================
+  build-user-service:
+    runs-on: ubuntu-latest
+    needs: [detect-changed-services, test-user-service]
+    # 仅当user-service有变更时运行
+    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/user-service') }}
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        
+      - name: 登录GitHub容器仓库
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}  # 需要提前在仓库Secrets中配置
+          
+      - name: 构建并推送镜像
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/user-service  # 关键：指向微服务目录
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/user-service:latest
+            ghcr.io/${{ github.repository_owner }}/user-service:${{ github.sha }}
 
   # 并行论坛测试
   api-test-luntan:
     name: Parallel Forum Tests
     runs-on: ubuntu-latest
-    needs: [test-backend]
+    needs: [build-forum-service]
     
     services:
       mysql-luntan:  # 服务名称唯一
@@ -151,11 +541,12 @@ jobs:
       - name: Stop Django Server
         run: |
             pkill -f "runserver 0.0.0.0:8001" || true
-  # 并行实验测试（配置类似，但使用不同端口和数据库名）
+
+  # 并行实验测试
   api-test-lab:
     name: Parallel Lab Tests
     runs-on: ubuntu-latest
-    needs: [test-backend]
+    needs: [build-experiments-service]
     
     services:
       mysql-lab:
@@ -243,11 +634,12 @@ jobs:
       - name: Stop Django Server
         run: |
             pkill -f "runserver 0.0.0.0:8002" || true
-  # 并行公告测试（配置类似，但使用不同端口和数据库名）
+
+  # 并行公告测试
   api-test-gonggao:
     name: Parallel Announcement Tests
     runs-on: ubuntu-latest
-    needs: [test-backend]
+    needs: [build-notice-service]
     
     services:
       mysql-gonggao:
@@ -329,11 +721,12 @@ jobs:
       - name: Stop Django Server
         run: |
             pkill -f "runserver 0.0.0.0:8003" || true
-    # 并行学习资料测试
+
+  # 并行学习资料测试
   api-test-ziliao:
     name: Parallel Learning Materials Tests
     runs-on: ubuntu-latest
-    needs: [test-backend] # 依赖后端单元测试
+    needs: [build-materials-service] # 依赖后端单元测试
     
     services:
       mysql-ziliao:  # 服务名称唯一
@@ -399,10 +792,19 @@ jobs:
       - name: Stop Django Server
         run: |
             pkill -f "runserver 0.0.0.0:8004" || true
+
+  # ================ GUI 测试 ================
   gui-test-cypress:
     name: Run Cypress GUI Tests
     runs-on: ubuntu-latest
-    needs: [test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao]
+    needs: 
+      - test-frontend 
+      - build-experiments-service
+      - build-forum-service
+      - build-materials-service
+      - build-notice-service
+      - build-user-service
+      - build-and-push-frontend
     
     services:
       mysql-gui:
@@ -646,38 +1048,6 @@ jobs:
       - name: Run frontend unit tests
         run: npm run test:unit
 
-  build-and-push-backend:
-    runs-on: ubuntu-latest
-    needs: [test-backend]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-    # 从 test-frontend 作业获取修复后的 lockfile
-      - name: Download fixed lockfile
-        uses: actions/download-artifact@v4
-        with:
-            name: frontend-dependencies
-            path: ./frontend
-
-      - name: Update Dockerfile
-        run: |
-            sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
-
-      - name: Build and Push Backend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/backend:latest
-            ghcr.io/${{ github.repository_owner }}/backend:${{ github.sha }}
   build-and-push-frontend:
     runs-on: ubuntu-latest
     needs: [test-frontend]
@@ -731,53 +1101,71 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}
 
   generate-deployment-script:
-    name: Generate Deployment Script
+    name: 生成部署脚本
     runs-on: ubuntu-latest
-    # 依赖所有测试和构建作业
-    needs: [test-backend, test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao, gui-test-cypress, build-and-push-backend, build-and-push-frontend]
-    
+    # 依赖所有微服务和前端
+    needs: 
+      - build-experiments-service
+      - build-forum-service
+      - build-materials-service
+      - build-notice-service
+      - build-user-service
+      - build-and-push-frontend
+      
     steps:
-      - name: Checkout code
+      - name: 检出代码
         uses: actions/checkout@v4
 
-      # 生成部署脚本
-      - name: Generate Local Deployment Package
+      - name: 生成部署脚本
         run: |
-          # 创建一键部署脚本
           cat > deploy-to-local.sh << 'EOF'
           #!/bin/bash
-          echo "开始部署到本地K8s环境..."
+          echo "=== 开始部署微服务到本地K8s ==="
           
-          # 1. 更新镜像版本
-          sed -i "s|image:.*backend:.*|image: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}|g" k8s/backend-deployment.yaml
-          sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
+          # 1. 更新所有微服务镜像版本
+          sed -i "s|image:.*experiments-service:.*|image: ghcr.io/${{ github.repository_owner }}/experiments-service:${{ github.sha }}|g" backend/experiments-service/k8s/deployment.yaml
+          sed -i "s|image:.*forum-service:.*|image: ghcr.io/${{ github.repository_owner }}/forum-service:${{ github.sha }}|g" backend/forum-service/k8s/deployment.yaml
+          sed -i "s|image:.*materials-service:.*|image: ghcr.io/${{ github.repository_owner }}/materials-service:${{ github.sha }}|g" backend/materials-service/k8s/deployment.yaml
+          sed -i "s|image:.*notice-service:.*|image: ghcr.io/${{ github.repository_owner }}/notice-service:${{ github.sha }}|g" backend/notice-service/k8s/deployment.yaml
+          sed -i "s|image:.*user-service:.*|image: ghcr.io/${{ github.repository_owner }}/user-service:${{ github.sha }}|g" backend/user-service/k8s/deployment.yaml
           
-          # 2. 部署到K8s
-          kubectl apply -f k8s/
+          # 2. 更新前端镜像
+          sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
           
-          # 3. 等待服务就绪
-          echo "等待服务启动..."
-          sleep 30
+          # 3. 应用K8s配置
+          echo "应用实验微服务配置..."
+          kubectl apply -f backend/experiments-service/k8s/
+          echo "应用论坛微服务配置..."
+          kubectl apply -f backend/forum-service/k8s/
+          echo "应用资料微服务配置..."
+          kubectl apply -f backend/materials-service/k8s/
+          echo "应用通知微服务配置..."
+          kubectl apply -f backend/notice-service/k8s/
+          echo "应用用户微服务配置..."
+          kubectl apply -f backend/user-service/k8s/
+          echo "应用前端配置..."
+          kubectl apply -f k8s/frontend-deploy.yaml
           
-          # 4. 显示访问信息
-          echo "部署完成！"
+          # 4. 等待服务就绪
+          echo "等待服务启动(约60秒)..."
+          sleep 60
+          
+          # 5. 显示访问信息
+          echo "=== 部署完成 ==="
           echo "前端访问: http://localhost:30080"
-          echo "后端API: http://localhost:30080/api"
-          echo ""
-          echo "运行集成测试:"
-          echo "cd postman && newman run collection1-LunTan.json -e environment.json"
+          echo "API文档: http://localhost:30080/api/docs"
           EOF
           
           chmod +x deploy-to-local.sh
-          echo "生成了一键部署脚本: deploy-to-local.sh"
+          echo "已生成部署脚本: deploy-to-local.sh"
 
-      # 上传部署包
-      - name: Upload Deployment Package
+      - name: 打包部署文件
         uses: actions/upload-artifact@v4
         with:
-          name: local-deployment-package
+          name: microservices-deployment
           path: |
-            k8s/
+            backend/*/k8s/*.yaml  # 包含所有微服务的K8s配置
+            k8s/frontend-deploy.yaml
             deploy-to-local.sh
           retention-days: 7
 
