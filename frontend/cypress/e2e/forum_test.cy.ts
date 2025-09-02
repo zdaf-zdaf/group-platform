@@ -33,6 +33,8 @@ describe('论坛模块功能测试', () => {
         }
       });
       cy.wait(1000);
+      cy.reload(); // 强制刷新，确保 token 生效
+      cy.wait(1000);
       cy.window().then(win => {
         expect(win.localStorage.getItem('token')).to.exist;
       });
