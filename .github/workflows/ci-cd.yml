@@ -644,6 +644,15 @@ jobs:
         if: always()
         run: cat logs/vue.log || true
 
+      # =============== 上传 logs 文件夹为 artifact ===============
+      - name: Upload logs folder as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-logs
+          path: logs/
+          retention-days: 7
+
   test-frontend:
     runs-on: ubuntu-latest
     defaults:
