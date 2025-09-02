@@ -25875,3 +25875,84 @@ DEBUG 2025-09-02 11:26:06,934 autoreload File /usr/local/lib/python3.11/site-pac
 DEBUG 2025-09-02 11:26:06,935 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/locale/nl_NL/LC_MESSAGES/django.mo first seen with mtime 1756717838.0
 DEBUG 2025-09-02 11:26:06,936 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/locale/cs/LC_MESSAGES/django.mo first seen with mtime 1756717838.0
 DEBUG 2025-09-02 11:26:06,936 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/locale/ru_RU/LC_MESSAGES/django.mo first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,096 autoreload File /app/materials/migrations/__init__.py first seen with mtime 1756542291.6713398
+DEBUG 2025-09-02 11:26:08,096 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0001_initial.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,097 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0003_auto_20171017_2007.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,098 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/admin/migrations/0002_logentry_remove_auto_add.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:08,098 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0009_alter_user_last_name_max_length.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,100 autoreload File /app/server/wsgi.py first seen with mtime 1756542291.6803463
+DEBUG 2025-09-02 11:26:08,106 autoreload File /app/materials/migrations/0001_initial.py first seen with mtime 1756709844.5334668
+DEBUG 2025-09-02 11:26:08,107 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0012_alter_user_first_name_max_length.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,107 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/admin/migrations/__init__.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:08,108 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/__init__.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,108 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0007_alter_validators_add_error_messages.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,112 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0012_alter_outstandingtoken_user.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,113 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0004_auto_20171017_2013.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,114 autoreload File /usr/local/lib/python3.11/site-packages/MySQLdb/cursors.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:08,116 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/contenttypes/migrations/0001_initial.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,116 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0005_remove_outstandingtoken_jti.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,117 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0008_alter_user_username_max_length.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,117 autoreload File /usr/local/lib/python3.11/site-packages/django/db/models/sql/compiler.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,119 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0001_initial.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,121 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0011_update_proxy_permissions.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,124 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0006_require_contenttypes_0002.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,125 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0007_auto_20171017_2214.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,128 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/admin/migrations/0003_logentry_add_action_flag_choices.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:08,129 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/sessions/migrations/0001_initial.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,130 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/contenttypes/migrations/0002_remove_content_type_name.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,135 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/contenttypes/migrations/__init__.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,136 autoreload File /usr/local/lib/python3.11/site-packages/MySQLdb/connections.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:08,139 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0011_linearizes_history.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,140 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0006_auto_20171017_2113.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,142 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0002_alter_permission_name_max_length.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,143 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/sessions/migrations/__init__.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,147 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0005_alter_user_last_login_null.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,148 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/sessions/backends/db.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,153 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0002_outstandingtoken_jti_hex.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,155 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0010_fix_migrate_to_bigautofield.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,156 autoreload File /usr/local/lib/python3.11/site-packages/django/db/backends/mysql/compiler.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,157 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/__init__.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,160 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0003_alter_user_email_max_length.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,161 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0010_alter_group_name_max_length.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:08,161 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/token_blacklist/migrations/0008_migrate_to_bigautofield.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:08,164 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/admin/migrations/0001_initial.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:08,164 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/auth/migrations/0004_alter_user_username_opts.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:13,189 utils (0.001) 
+                SELECT VERSION(),
+                       @@sql_mode,
+                       @@default_storage_engine,
+                       @@sql_auto_is_null,
+                       @@lower_case_table_names,
+                       CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
+            ; args=None; alias=default
+DEBUG 2025-09-02 11:26:13,191 utils (0.001) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None; alias=default
+DEBUG 2025-09-02 11:26:13,195 utils (0.003) SELECT `materials_learningmaterial`.`id`, `materials_learningmaterial`.`title`, `materials_learningmaterial`.`description`, `materials_learningmaterial`.`type`, `materials_learningmaterial`.`file`, `materials_learningmaterial`.`size`, `materials_learningmaterial`.`downloads`, `materials_learningmaterial`.`created_at`, `materials_learningmaterial`.`uploader_username`, `materials_learningmaterial`.`question_set` FROM `materials_learningmaterial` ORDER BY `materials_learningmaterial`.`created_at` DESC; args=(); alias=default
+INFO 2025-09-02 11:26:13,198 basehttp "GET /materials/ HTTP/1.0" 200 314
+DEBUG 2025-09-02 11:26:13,682 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/messages/storage/session.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:13,689 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/state.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:13,691 autoreload File /usr/local/lib/python3.11/site-packages/jwt/api_jwk.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:13,693 autoreload File /usr/local/lib/python3.11/site-packages/jwt/jwks_client.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:13,697 autoreload File /usr/local/lib/python3.11/site-packages/jwt/algorithms.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:13,698 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/messages/storage/cookie.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:13,701 autoreload File /usr/local/lib/python3.11/site-packages/jwt/warnings.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:13,703 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/messages/storage/fallback.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:13,705 autoreload File /usr/local/lib/python3.11/site-packages/rest_framework_simplejwt/backends.py first seen with mtime 1756717838.0
+DEBUG 2025-09-02 11:26:13,708 autoreload File /usr/local/lib/python3.11/site-packages/django/contrib/sessions/serializers.py first seen with mtime 1756717836.0
+DEBUG 2025-09-02 11:26:13,708 autoreload File /usr/local/lib/python3.11/site-packages/jwt/api_jws.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:13,709 autoreload File /usr/local/lib/python3.11/site-packages/jwt/__init__.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:13,711 autoreload File /usr/local/lib/python3.11/site-packages/jwt/jwk_set_cache.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:13,715 autoreload File /usr/local/lib/python3.11/site-packages/jwt/types.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:13,715 autoreload File /usr/local/lib/python3.11/site-packages/jwt/utils.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:13,716 autoreload File /usr/local/lib/python3.11/site-packages/jwt/exceptions.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:13,717 autoreload File /usr/local/lib/python3.11/site-packages/jwt/api_jwt.py first seen with mtime 1756717835.0
+DEBUG 2025-09-02 11:26:23,608 utils (0.001) 
+                SELECT VERSION(),
+                       @@sql_mode,
+                       @@default_storage_engine,
+                       @@sql_auto_is_null,
+                       @@lower_case_table_names,
+                       CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
+            ; args=None; alias=default
+DEBUG 2025-09-02 11:26:23,609 utils (0.001) SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; args=None; alias=default
+DEBUG 2025-09-02 11:26:23,611 utils (0.001) SELECT `materials_learningmaterial`.`id`, `materials_learningmaterial`.`title`, `materials_learningmaterial`.`description`, `materials_learningmaterial`.`type`, `materials_learningmaterial`.`file`, `materials_learningmaterial`.`size`, `materials_learningmaterial`.`downloads`, `materials_learningmaterial`.`created_at`, `materials_learningmaterial`.`uploader_username`, `materials_learningmaterial`.`question_set` FROM `materials_learningmaterial` ORDER BY `materials_learningmaterial`.`created_at` DESC; args=(); alias=default
+INFO 2025-09-02 11:26:23,614 basehttp "GET /materials/ HTTP/1.0" 200 314
