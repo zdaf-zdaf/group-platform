@@ -83,6 +83,17 @@ jobs:
             
       - name: 构建论坛微服务镜像
         run: docker build -t forum-service:test ./backend/forum-service
+
+      - name: 检查容器状态和日志
+        run: |
+          echo "=== 列出所有容器 ==="
+          docker ps -a # 查看所有容器（包括已退出的）
+
+          echo "=== 查看论坛服务容器日志 ==="
+          docker logs forum-service-test || echo "无法获取日志，容器可能不存在"
+
+          echo "=== 检查容器退出代码 ==="
+          docker inspect forum-service-test --format='{{.State.ExitCode}}' || echo "容器检查失败"
         
       - name: 运行论坛微服务容器
         run: |
