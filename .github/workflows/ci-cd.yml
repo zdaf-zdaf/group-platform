@@ -571,13 +571,22 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || exit 1
 
-          echo "stuTest信息："
+          echo "stuTest登录并获取token："
           curl -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}' > token.json
+          echo "stuTest token内容："
+          cat token.json
           TOKEN=$(cat token.json | python3 -c "import sys, json; print(json.load(sys.stdin).get('access', ''))")
+          echo "stuTest TOKEN: $TOKEN"
+          echo "stuTest用户信息："
           curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/api/auth/user/profile/
-          echo "tchTest信息："
+
+          echo "tchTest登录并获取token："
           curl -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}' > token.json
+          echo "tchTest token内容："
+          cat token.json
           TOKEN=$(cat token.json | python3 -c "import sys, json; print(json.load(sys.stdin).get('access', ''))")
+          echo "tchTest TOKEN: $TOKEN"
+          echo "tchTest用户信息："
           curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/api/auth/user/profile/
         working-directory: ./frontend
 
