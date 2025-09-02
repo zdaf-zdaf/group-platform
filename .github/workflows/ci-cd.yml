@@ -653,6 +653,23 @@ jobs:
           path: logs/
           retention-days: 7
 
+      # =============== 上传 Cypress 截图和视频为 artifact ===============
+      - name: Upload Cypress screenshots as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots/
+          retention-days: 7
+
+      - name: Upload Cypress videos as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos
+          path: frontend/cypress/videos/
+          retention-days: 7
+
   test-frontend:
     runs-on: ubuntu-latest
     defaults:
