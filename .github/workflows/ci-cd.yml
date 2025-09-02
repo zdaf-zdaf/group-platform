@@ -201,15 +201,15 @@ jobs:
             echo "等待容器启动...($i/30)"; sleep 2
           done
           
-          # 等待应用就绪
+          # 使用 Django 命令检查数据库连接
           docker exec materials-service-test bash -c '
             for i in {1..30}; do
-              if curl -s http://localhost:8000/healthcheck; then
-                echo "应用已就绪"; exit 0
+              if python manage.py check_db_connection; then
+                echo "数据库连接正常"; exit 0
               fi
-              echo "等待应用启动...($i/30)"; sleep 2
+              echo "等待数据库连接...($i/30)"; sleep 2
             done
-            echo "应用启动超时"; exit 1
+            echo "数据库连接超时"; exit 1
           '
 
       - name: 检查容器状态和日志
