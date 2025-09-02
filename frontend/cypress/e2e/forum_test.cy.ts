@@ -60,11 +60,15 @@ describe('论坛模块功能测试', () => {
       if (status !== 201) {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
+        // 新增：发帖后请求帖子列表并输出日志，便于CI调试
+        cy.request('GET', 'http://localhost:8000/api/forum/questions/').then(res => {
+          cy.log('帖子列表:', JSON.stringify(res.body))
+        })
     })
     cy.reload()
     cy.wait(2000)
-    cy.get('.post-card', { timeout: 20000 }).should('contain.text', postTitle)
-    cy.get('.post-card').should('contain.text', postTitle)
+      cy.get('.post-card', { timeout: 20000 }).should('exist')
+      cy.get('.post-card').should('contain.text', postTitle)
 
     // 点赞和取消点赞
     cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
@@ -116,11 +120,15 @@ describe('论坛模块功能测试', () => {
       if (status !== 201) {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
+        // 新增：发帖后请求帖子列表并输出日志，便于CI调试
+        cy.request('GET', 'http://localhost:8000/api/forum/questions/').then(res => {
+          cy.log('帖子列表:', JSON.stringify(res.body))
+        })
     })
     cy.reload()
     cy.wait(2000)
-    cy.get('.post-card', { timeout: 20000 }).should('contain.text', postTitle)
-    cy.get('.post-card').should('contain.text', postTitle)
+      cy.get('.post-card', { timeout: 20000 }).should('exist')
+      cy.get('.post-card').should('contain.text', postTitle)
 
     // 置顶和取消置顶
     cy.get('.post-card').first().within(() => {
