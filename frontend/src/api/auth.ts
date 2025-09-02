@@ -24,6 +24,15 @@ apiClient.interceptors.request.use(config => {
   return config;
 });
 
+// 强制每次请求都从 localStorage/sessionStorage 获取最新 token
+apiClient.interceptors.request.use(config => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // 添加响应拦截器 - 统一处理响应和错误
 apiClient.interceptors.response.use(
   response => response, // 直接返回data
