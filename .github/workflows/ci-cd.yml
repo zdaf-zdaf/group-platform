@@ -603,6 +603,8 @@ jobs:
         working-directory: ./frontend
       
       # =============== 日志收集 ===============
+      - name: Show Cypress token
+        run: cat frontend/cypress/logs/token.txt || echo 'token file not found'
       - name: Show backend logs if failed
         if: ${{ failure() }}
         run: cat logs/django.log
@@ -610,7 +612,7 @@ jobs:
       - name: List logs directory if failed
         if: ${{ failure() }}
         run: ls -lh logs || echo 'logs dir not found'
-        
+
       - name: Show frontend logs if failed
         if: ${{ failure() }}
         run: cat logs/vue.log
