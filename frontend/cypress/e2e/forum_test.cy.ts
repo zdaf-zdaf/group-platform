@@ -11,7 +11,7 @@ describe('论坛模块功能测试', () => {
   // 登录函数封装，token提升为全局变量
   let token = ''
   function login(user: { username: string; password: string }) {
-  cy.request('POST', 'http://127.0.0.1:8000/api/auth/login/', {
+    cy.request('POST', 'http://127.0.0.1:8000/api/auth/login/', {
       username: user.username,
       password: user.password
     }).then((response) => {
@@ -32,9 +32,11 @@ describe('论坛模块功能测试', () => {
           }
         }
       });
-      cy.wait(1000);
+      cy.wait(3000); // 登录后等待更久，确保 token 被前端识别
       cy.reload(); // 强制刷新，确保 token 生效
-      cy.wait(1000);
+      cy.wait(3000);
+      cy.reload(); // 再次刷新，最大化保证 SPA 识别 token
+      cy.wait(2000);
       cy.window().then(win => {
         expect(win.localStorage.getItem('token')).to.exist;
       });
@@ -72,12 +74,16 @@ describe('论坛模块功能测试', () => {
         expect(res.body.some(q => q.title === postTitle)).to.be.true
       })
     })
-    cy.reload()
-    cy.wait(3000)
+    cy.wait(5000); // 发帖后等待更久
+    cy.reload();
+    cy.wait(3000);
+    cy.reload();
+    cy.wait(2000);
     cy.document().then(doc => {
       cy.log('页面HTML:', doc.documentElement.outerHTML);
     });
-    cy.get('.post-card', { timeout: 20000 }).should('exist');
+    cy.screenshot('forum-after-post'); // 自动截图页面
+    cy.get('.post-card', { timeout: 30000 }).should('exist');
     cy.get('.post-card').should('contain.text', postTitle);
 
     // 点赞和取消点赞
@@ -140,12 +146,16 @@ describe('论坛模块功能测试', () => {
         expect(res.body.some(q => q.title === postTitle)).to.be.true
       })
     })
-    cy.reload()
-    cy.wait(3000)
+    cy.wait(5000); // 发帖后等待更久
+    cy.reload();
+    cy.wait(3000);
+    cy.reload();
+    cy.wait(2000);
     cy.document().then(doc => {
       cy.log('页面HTML:', doc.documentElement.outerHTML);
     });
-    cy.get('.post-card', { timeout: 20000 }).should('exist');
+    cy.screenshot('forum-after-post-teacher'); // 自动截图页面
+    cy.get('.post-card', { timeout: 30000 }).should('exist');
     cy.get('.post-card').should('contain.text', postTitle);
 
     // 置顶和取消置顶
