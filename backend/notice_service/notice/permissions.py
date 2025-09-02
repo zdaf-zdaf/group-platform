@@ -11,4 +11,4 @@ class IsTeacherOrReadOnly(BasePermission):
             return True
 
         # 只有教师可以创建、修改和删除公告
-        return hasattr(request.user, 'role') and request.user.role == 'TEACHER'
+        return hasattr(request.user, 'role') and request.user.role == 'teacher'
