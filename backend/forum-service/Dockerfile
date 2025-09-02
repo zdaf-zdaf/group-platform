@@ -1,38 +1,38 @@
-# Use an official Python runtime as a base image
-FROM python:3.9-slim-buster
+# Materials Service Dockerfile
+# - Uses Python slim image
+# - Installs build deps for mysqlclient
+# - Installs Python deps
+# - Runs migrations then starts Django server
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SETTINGS_MODULE=forum_service.settings
+FROM python:3.10-slim
 
-# Set work directory
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
-    netcat-openbsd \
-    && rm -rf /var/lib/apt/lists/*
+# System deps for mysqlclient
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    build-essential \
+    default-libmysqlclient-dev \
+    pkg-config \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Install Python deps first for better cache
+COPY requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
-COPY . /app/
+# Copy source
+COPY . .
 
-# Create and set permissions for logs directory
-RUN mkdir -p /app/logs && chmod 755 /app/logs
+# Ensure media/static directories exist (can be mounted as volumes)
+RUN mkdir -p /app/media /app/static
 
-# Create a non-root user and switch to it
-RUN adduser --disabled-password --gecos '' myuser
-RUN chown -R myuser:myuser /app
-USER myuser
+ENV DJANGO_SETTINGS_MODULE=forum_service.settings \
+    PORT=8000
 
-# Expose the port the app runs on
 EXPOSE 8000
 
-# Command to run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "forum_service.wsgi:application"]
+# Start: run migrations then app; PORT can be overridden via env
+CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:${PORT:-8000}"]

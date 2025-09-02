@@ -21,7 +21,7 @@ class QuestionDetailView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         # 检查用户是否有权限删除（作者或管理员）
-        if instance.author_id != request.user_id and not request.is_admin:
+        if instance.author_id != request.user_id and not getattr(request, 'is_admin', False):
             return Response({"error": "您没有权限删除此问题"}, status=status.HTTP_403_FORBIDDEN)
         return super().delete(request, *args, **kwargs)
 
@@ -42,7 +42,7 @@ class CommentDeleteView(generics.DestroyAPIView):
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         # 检查用户是否有权限删除（作者或管理员）
-        if instance.author_id != request.user_id and not request.is_admin:
+        if instance.author_id != request.user_id and not getattr(request, 'is_admin', False):
             return Response({"error": "您没有权限删除此评论"}, status=status.HTTP_403_FORBIDDEN)
         return super().delete(request, *args, **kwargs)
 

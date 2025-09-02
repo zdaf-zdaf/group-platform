@@ -1,12 +1,12 @@
+# 微服务版本 tests.py 修改
 from django.test import TestCase
-from user.models import User
 from .models import Question, Comment
-
 
 class QuestionModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='alice', password='pwd', email='a@b.com')
-        self.q = Question.objects.create(title='T1', content='C1', author=self.user)
+        # 使用模拟用户ID而不是User对象
+        self.user_id = 1
+        self.q = Question.objects.create(title='T1', content='C1', author_id=self.user_id)
 
     def test_str_positive(self):
         self.assertEqual(str(self.q), 'T1')
@@ -15,24 +15,17 @@ class QuestionModelTest(TestCase):
         self.q.title = ''
         self.assertEqual(str(self.q), '')
 
-
 class CommentModelTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='bob', password='pwd', email='b@b.com')
-        self.q = Question.objects.create(title='T2', content='C2', author=self.user)
-        self.c = Comment.objects.create(question=self.q, content='Nice', author=self.user)
+        self.user_id = 2
+        self.q = Question.objects.create(title='T2', content='C2', author_id=self.user_id)
+        self.c = Comment.objects.create(question=self.q, content='Nice', author_id=self.user_id)
 
     def test_str_positive(self):
-        expected = f"Comment by {self.user.username} on {self.q.title}"
-        self.assertEqual(str(self.c), expected)
-
-    def test_str_negative(self):
-        # 用户名为空时返回中的用户名段为空
-        self.user.username = ''
-        expected = f"Comment by  on {self.q.title}"
+        expected = f"Comment by user {self.user_id} on {self.q.title}"
         self.assertEqual(str(self.c), expected)
 
     def test_str_negative_title_empty(self):
         self.q.title = ''
-        expected = "Comment by  on " if self.user.username == '' else f"Comment by {self.user.username} on "
-        self.assertTrue(str(self.c).startswith(expected))
+        expected = f"Comment by user {self.user_id} on "
+        self.assertEqual(str(self.c), expected)
