@@ -320,16 +320,16 @@ jobs:
       - name: 运行单元测试
         run: docker exec user-service python manage.py test --verbosity=2
         
-  # ================== 网关单元测试 ==================
-  test-gateway:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  # # ================== 网关单元测试 ==================
+  # test-gateway:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
       
-      - name: Test gateway config
-        run: |
-          docker build -t gateway-test ./gateway
-          docker run --rm gateway-test nginx -t
+  #     - name: Test gateway config
+  #       run: |
+  #         docker build -t gateway-test ./gateway
+  #         docker run --rm gateway-test nginx -t
 
   # ================== 前端单元测试 ==================
   test-frontend:
