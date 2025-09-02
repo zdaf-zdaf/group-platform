@@ -1,6 +1,5 @@
 from rest_framework.permissions import BasePermission
 
-
 class IsTeacherOrReadOnly(BasePermission):
     """
     允许教师创建、修改和删除公告，学生只能查看
@@ -12,4 +11,4 @@ class IsTeacherOrReadOnly(BasePermission):
             return True
 
         # 只有教师可以创建、修改和删除公告
-        return request.user.role == 'TEACHER'
+        return hasattr(request.user, 'role') and request.user.role == 'TEACHER'
