@@ -48,10 +48,15 @@ describe('论坛模块功能测试', () => {
     cy.get('.forum').should('exist')
 
     // 发布帖子
+    cy.intercept('POST', '/api/forum/questions/').as('postQuestion')
     cy.get('.publish-card input[placeholder="请输入问题标题"]').clear().type(postTitle)
     cy.get('.publish-card textarea[placeholder="请输入问题内容"]').clear().type(postContent)
     cy.get('.publish-card button').contains('发布问题').click({ force: true })
-    cy.contains('问题发布成功').should('be.visible')
+    cy.wait('@postQuestion').then(interception => {
+      cy.log('发帖响应:', JSON.stringify(interception.response?.body))
+      cy.log('发帖状态:', interception.response?.statusCode)
+    })
+    cy.contains('问题发布成功', { timeout: 10000 }).should('be.visible')
     cy.get('.post-card').should('contain.text', postTitle)
 
     // 点赞和取消点赞
@@ -90,10 +95,15 @@ describe('论坛模块功能测试', () => {
     cy.get('.forum').should('exist')
 
     // 发布帖子
+    cy.intercept('POST', '/api/forum/questions/').as('postQuestion')
     cy.get('.publish-card input[placeholder="请输入问题标题"]').clear().type(postTitle)
     cy.get('.publish-card textarea[placeholder="请输入问题内容"]').clear().type(postContent)
     cy.get('.publish-card button').contains('发布问题').click({ force: true })
-    cy.contains('问题发布成功').should('be.visible')
+    cy.wait('@postQuestion').then(interception => {
+      cy.log('发帖响应:', JSON.stringify(interception.response?.body))
+      cy.log('发帖状态:', interception.response?.statusCode)
+    })
+    cy.contains('问题发布成功', { timeout: 10000 }).should('be.visible')
     cy.get('.post-card').should('contain.text', postTitle)
 
     // 置顶和取消置顶
