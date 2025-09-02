@@ -69,9 +69,20 @@ class NoticeViewSet(viewsets.ModelViewSet):
         try:
             notice = self.get_object()
             user = request.user
-
-            # 验证用户角色 - 改为小写 'student'
-            if not hasattr(user, 'role') or user.role != 'student':
+            
+            logger.info(f"标记公告请求: 用户ID={user.id}, 角色={user.role}, 公告ID={pk}")
+            
+            # 验证用户角色 - 确保使用小写 'student'
+            if not hasattr(user, 'role'):
+                logger.warning("用户对象缺少role属性")
+                return Response(
+                    {"detail": "用户信息不完整"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+                
+            # 修改这里：检查用户角色是否为 'student'
+            if user.role != 'student':
+                logger.warning(f"用户角色不是student: {user.role}")
                 return Response(
                     {"detail": "只允许学生标记公告为已读"},
                     status=status.HTTP_403_FORBIDDEN
@@ -79,10 +90,13 @@ class NoticeViewSet(viewsets.ModelViewSet):
 
             # 检查是否已读
             if user.id not in notice.readers:
+                logger.info(f"用户 {user.id} 首次阅读公告 {pk}")
                 # 添加阅读标记
                 notice.readers.append(user.id)
                 notice.save()
                 logger.info(f"用户 {user.id} 标记公告 {pk} 为已读")
+            else:
+                logger.info(f"用户 {user.id} 已阅读过公告 {pk}")
 
             # 返回成功响应
             return Response({
@@ -95,7 +109,7 @@ class NoticeViewSet(viewsets.ModelViewSet):
                 "detail": "标记失败，请稍后再试",
                 "error": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+        
     def create(self, request, *args, **kwargs):
         # 手动设置作者ID
         request.data['author_id'] = request.user.id
