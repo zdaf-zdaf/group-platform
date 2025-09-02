@@ -459,3 +459,14 @@ INFO 2025-09-02 14:22:15,803 autoreload Watching for file changes with StatReloa
 INFO 2025-09-02 14:22:51,297 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
 INFO 2025-09-02 14:22:51,504 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
 INFO 2025-09-02 14:25:18,156 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 16:17:45,846 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 16:38:18,583 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 16:39:10,700 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 16:39:10,906 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 16:51:46,707 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 17:03:43,480 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 17:04:49,543 basehttp "POST /api/auth/register/ HTTP/1.0" 201 47
+INFO 2025-09-02 17:05:07,080 basehttp "POST /api/auth/login/ HTTP/1.0" 200 869
+INFO 2025-09-02 17:05:07,297 basehttp "POST /api/auth/login/ HTTP/1.0" 200 869
+INFO 2025-09-02 17:06:18,648 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 17:06:18,872 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975

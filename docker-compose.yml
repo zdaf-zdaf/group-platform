@@ -16,6 +16,8 @@ services:
         condition: service_started
       materials_service:
         condition: service_started
+      notice_service:
+        condition: service_started
     restart: always
   # 用户微服务
   user_service:
@@ -60,6 +62,28 @@ services:
       - materials_db 
     restart: always
 
+  # 公告微服务
+  notice_service:
+    build:
+      context: ./backend/notice-service
+      dockerfile: Dockerfile
+    command: >
+      sh -c "python manage.py makemigrations notice &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8002"
+    volumes:
+      - ./backend/notice-service:/app
+    environment:
+      - DB_HOST=notice_db
+      - DB_NAME=notice_db_name
+      - DB_USER=root
+      - DB_PASSWORD=my-secret-pw-123
+      - SECRET_KEY=django-insecure-9ekm#x74ns6(j*h)3+jb-v*sz7bho2edo%g)uktin)ugf-5!s%
+    depends_on:
+      notice_db: # 关键修改
+        condition: service_healthy # 等待数据库健康检查通过
+    restart: always
+
   # 前端服务
   frontend:
     build:
@@ -74,6 +98,7 @@ services:
     depends_on:
       - user_service
       - materials_service
+      - notice_service
     restart: always
 
   # 用户服务的数据库
@@ -112,7 +137,26 @@ services:
       retries: 5
     restart: always
 
+  # 公告服务的数据库
+  notice_db:
+    image: mysql:8.0
+    container_name: notice_db
+    volumes:
+      - notice_mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw-123
+      MYSQL_DATABASE: notice_db_name
+    ports:
+      - "3309:3306" # 映射到主机的3309端口
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
 volumes:
   user_mysql_data:
   materials_mysql_data:
   materials_media:
+  notice_mysql_data:
