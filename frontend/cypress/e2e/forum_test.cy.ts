@@ -11,7 +11,7 @@ describe('论坛模块功能测试', () => {
   // 登录函数封装，token提升为全局变量
   let token = ''
   function login(user: { username: string; password: string }) {
-    cy.request('POST', 'http://localhost:8000/api/auth/login/', {
+  cy.request('POST', 'http://127.0.0.1:8000/api/auth/login/', {
       username: user.username,
       password: user.password
     }).then((response) => {
@@ -65,7 +65,7 @@ describe('论坛模块功能测试', () => {
       // 新增：发帖后请求帖子列表并输出日志，便于CI调试
       cy.request({
         method: 'GET',
-        url: 'http://localhost:8000/api/forum/questions/',
+        url: 'http://127.0.0.1:8000/api/forum/questions/',
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         cy.log('帖子列表:', JSON.stringify(res.body))
@@ -133,7 +133,7 @@ describe('论坛模块功能测试', () => {
       // 新增：发帖后请求帖子列表并输出日志，便于CI调试
       cy.request({
         method: 'GET',
-        url: 'http://localhost:8000/api/forum/questions/',
+        url: 'http://127.0.0.1:8000/api/forum/questions/',
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         cy.log('帖子列表:', JSON.stringify(res.body))
