@@ -72,9 +72,12 @@ describe('论坛模块功能测试', () => {
       })
     })
     cy.reload()
-    cy.wait(2000)
-      cy.get('.post-card', { timeout: 20000 }).should('exist')
-      cy.get('.post-card').should('contain.text', postTitle)
+    cy.wait(3000)
+    cy.document().then(doc => {
+      cy.log('页面HTML:', doc.documentElement.outerHTML);
+    });
+    cy.get('.post-card', { timeout: 20000 }).should('exist');
+    cy.get('.post-card').should('contain.text', postTitle);
 
     // 点赞和取消点赞
     cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
@@ -137,9 +140,12 @@ describe('论坛模块功能测试', () => {
       })
     })
     cy.reload()
-    cy.wait(2000)
-      cy.get('.post-card', { timeout: 20000 }).should('exist')
-      cy.get('.post-card').should('contain.text', postTitle)
+    cy.wait(3000)
+    cy.document().then(doc => {
+      cy.log('页面HTML:', doc.documentElement.outerHTML);
+    });
+    cy.get('.post-card', { timeout: 20000 }).should('exist');
+    cy.get('.post-card').should('contain.text', postTitle);
 
     // 置顶和取消置顶
     cy.get('.post-card').first().within(() => {
