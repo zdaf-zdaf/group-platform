@@ -294,7 +294,7 @@ jobs:
         run: |
           docker run -d --name notice_service-test \
             -p 8001:8000 \
-            -e DJANGO_SETTINGS_MODULE=notice_service.settings \
+            -e DJANGO_SETTINGS_MODULE=server.settings \
             -e DB_ENGINE=django.db.backends.mysql \
             -e DB_NAME=test_db_notice \
             -e DB_USER=root \
