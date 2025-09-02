@@ -10,14 +10,41 @@ describe('公告模块功能测试', () => {
   const noticeEditTitle = '自动化测试公告1-已编辑'
   const noticeEditContent = '这是编辑后的公告内容1'
 
+  // 登录函数封装，token提升为全局变量
+  let token = ''
+  function login(user: { username: string; password: string }) {
+    cy.request('POST', 'http://localhost:8000/api/auth/login/', {
+      username: user.username,
+      password: user.password
+    }).then((response) => {
+      expect(response.status).to.eq(200)
+      token = response.body.access || response.body.token || response.body.data?.token
+      expect(token, 'token should exist').to.not.be.null
+
+      cy.visit('/profile', {
+        onBeforeLoad(win) {
+          win.localStorage.setItem('token', token)
+          // 写入 userInfo，便于前端鉴权
+          if (response.body.username) {
+            win.localStorage.setItem('userInfo', JSON.stringify({
+              username: response.body.username,
+              role: response.body.role,
+              email: response.body.email,
+              student_id: response.body.student_id,
+              faculty: response.body.faculty
+            }))
+          }
+        }
+      })
+      cy.reload()
+      cy.visit('/')
+      cy.wait(1000)
+    })
+  }
+
   // 教师端先发布两个公告，编辑第一个，然后筛选搜索
   it('教师端发布、编辑、筛选、搜索公告', () => {
-    cy.visit('/login')
-    cy.get('input[placeholder="请输入用户名"]').type(teacher.username)
-    cy.get('input[placeholder="请输入密码"]').type(teacher.password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-    cy.url().should('include', '/profile')
+    login(teacher)
 
     cy.contains('通知公告').click({ force: true })
     cy.url().should('include', '/notices')
@@ -88,12 +115,7 @@ describe('公告模块功能测试', () => {
 
   // 学生端查看公告、标记已读、未读数刷新、筛选和搜索
   it('学生端查看公告、标记已读、未读数刷新、筛选和搜索', () => {
-    cy.visit('/login')
-    cy.get('input[placeholder="请输入用户名"]').type(student.username)
-    cy.get('input[placeholder="请输入密码"]').type(student.password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-    cy.url().should('include', '/profile')
+    login(student)
 
     cy.contains('公告').click({ force: true })
     cy.url().should('include', '/notices')
@@ -129,12 +151,7 @@ describe('公告模块功能测试', () => {
 
   // 教师端删除发布的两个公告
   it('教师端删除发布的两个公告', () => {
-    cy.visit('/login')
-    cy.get('input[placeholder="请输入用户名"]').type(teacher.username)
-    cy.get('input[placeholder="请输入密码"]').type(teacher.password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-    cy.url().should('include', '/profile')
+    login(teacher)
 
     cy.contains('通知公告').click({ force: true })
     cy.url().should('include', '/notices')

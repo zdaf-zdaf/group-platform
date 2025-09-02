@@ -68,6 +68,7 @@ describe('论坛模块功能测试', () => {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         cy.log('帖子列表:', JSON.stringify(res.body))
+        expect(res.body.some(q => q.title === postTitle)).to.be.true
       })
     })
     cy.reload()
@@ -132,6 +133,7 @@ describe('论坛模块功能测试', () => {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         cy.log('帖子列表:', JSON.stringify(res.body))
+        expect(res.body.some(q => q.title === postTitle)).to.be.true
       })
     })
     cy.reload()
@@ -157,14 +159,14 @@ describe('论坛模块功能测试', () => {
     cy.get('.post-card').first().within(() => {
       cy.get('input[placeholder="写下你的评论..."]').type(teacherComment + '{enter}')
     })
-  cy.get('.post-card').contains(teacherComment).should('exist')
+    cy.get('.post-card').contains(teacherComment).should('exist')
     cy.get('.post-card').contains(teacherComment).should('exist')
 
     // 删除评论
     cy.get('.post-card').contains(teacherComment).parents('.comment').within(() => {
       cy.get('button').contains('删除评论').click({ force: true })
     })
-  cy.get('.post-card').contains(teacherComment).should('not.exist')
+    cy.get('.post-card').contains(teacherComment).should('not.exist')
 
     // 删除帖子
     cy.get('.post-card').first().within(() => {

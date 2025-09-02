@@ -1,16 +1,46 @@
 /// <reference types="cypress" />
 
 describe('学习资料模块功能测试', () => {
+  const teacher = { username: 'tchTest', password: 'Test1234@' }
+  const student = { username: 'stuTest', password: 'Test1234@' }
+  // 登录函数封装，token提升为全局变量
+  let token = ''
+  function login(user: { username: string; password: string }) {
+    cy.request('POST', 'http://localhost:8000/api/auth/login/', {
+      username: user.username,
+      password: user.password
+    }).then((response) => {
+      expect(response.status).to.eq(200)
+      token = response.body.access || response.body.token || response.body.data?.token
+      expect(token, 'token should exist').to.not.be.null
+
+      cy.visit('/profile', {
+        onBeforeLoad(win) {
+          win.localStorage.setItem('token', token)
+          // 写入 userInfo，便于前端鉴权
+          if (response.body.username) {
+            win.localStorage.setItem('userInfo', JSON.stringify({
+              username: response.body.username,
+              role: response.body.role,
+              email: response.body.email,
+              student_id: response.body.student_id,
+              faculty: response.body.faculty
+            }))
+          }
+        }
+      })
+      cy.reload()
+      cy.visit('/')
+      cy.wait(1000)
+    })
+  }
+
   // ========================
   // 教师端依次发布四种类型的学习资料（合并为一个用例）
   // ========================
   it('教师端依次发布四种类型学习资料', () => {
-    cy.visit('/login')
-    cy.get('input[placeholder="请输入用户名"]').type('tchTest')
-    cy.get('input[placeholder="请输入密码"]').type('Test1234@')
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-    cy.url().should('include', '/profile')
+    login(teacher)
+
     cy.contains('学习资料').click({ force: true })
     cy.url().should('include', '/studyfile')
     cy.get('.material-page').should('exist')
@@ -41,12 +71,7 @@ describe('学习资料模块功能测试', () => {
   // 学生端查看并预览四种类型资料，下载第一个
   // ========================
   it('学生端查看并预览四种类型资料，下载第一个', () => {
-    cy.visit('/login')
-    cy.get('input[placeholder="请输入用户名"]').type('stuTest')
-    cy.get('input[placeholder="请输入密码"]').type('Test1234@')
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-    cy.url().should('include', '/profile')
+    login(student)
 
     cy.contains('学习资料').click({ force: true })
     cy.url().should('include', '/studyfile')
@@ -70,12 +95,7 @@ describe('学习资料模块功能测试', () => {
   // 教师端删除资料
   // ========================
   it('教师端删除学习资料', () => {
-    cy.visit('/login')
-    cy.get('input[placeholder="请输入用户名"]').type('tchTest')
-    cy.get('input[placeholder="请输入密码"]').type('Test1234@')
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-    cy.url().should('include', '/profile')
+    login(teacher)
 
     cy.contains('学习资料').click({ force: true })
     cy.url().should('include', '/studyfile')
