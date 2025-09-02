@@ -23,7 +23,8 @@ RUN sed -i 's|http://deb.debian.org/debian|https://mirrors.aliyun.com/debian|g' 
 
 # 复制依赖文件并安装
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install --no-cache-dir -r requirements.txt
+#  -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 复制整个项目
 COPY . .
