@@ -322,21 +322,21 @@ jobs:
           sleep 5
           docker ps -a | grep "notice-service-test" || echo "容器已消失"
 
-      - name: 重置迁移历史
-        run: |
-          # 删除所有迁移文件
-          docker exec notice-service-test bash -c 'rm notice/migrations/0*.py'
+      # - name: 重置迁移历史
+      #   run: |
+      #     # 删除所有迁移文件
+      #     docker exec notice-service-test bash -c 'rm notice/migrations/0*.py'
           
-          # 创建新的初始迁移
-          docker exec notice-service-test python manage.py makemigrations notice
+      #     # 创建新的初始迁移
+      #     docker exec notice-service-test python manage.py makemigrations notice
           
-          # 应用迁移
-          docker exec notice-service-test python manage.py migrate
+      #     # 应用迁移
+      #     docker exec notice-service-test python manage.py migrate
         
-      - name: 运行数据库迁移
-        run: |
-          docker exec notice-service-test python manage.py makemigrations notice
-          docker exec notice-service-test python manage.py migrate
+      # - name: 运行数据库迁移
+      #   run: |
+      #     docker exec notice-service-test python manage.py makemigrations notice
+      #     docker exec notice-service-test python manage.py migrate
         
       - name: 运行单元测试
         run: docker exec notice-service-test python manage.py test --verbosity=2
