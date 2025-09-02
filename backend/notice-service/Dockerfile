@@ -1,5 +1,4 @@
-FROM python:3.11-slim-bullseye  # 使用特定版本的基础镜像
-
+FROM python:3.11-slim-bullseye 
 # 设置环境变量
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
