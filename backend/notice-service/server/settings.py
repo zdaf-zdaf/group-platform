@@ -4,8 +4,7 @@ from datetime import timedelta
 import django
 django.setup()
 
-# 从 authentication.py 导入自定义认证类
-from server.authentication import CustomJWTAuthentication
+# 移除这行：from server.authentication import CustomJWTAuthentication
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,11 +16,10 @@ TIME_ZONE = 'Asia/Shanghai'
 
 # Application definition
 INSTALLED_APPS = [
-    'server.apps.ServerConfig',  # 添加应用配置
     'notice.apps.NoticeConfig',
-    'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.admin',
+    'django.contrib.auth', 
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -96,7 +94,7 @@ if any([DB_ENGINE, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT]):
 # REST Framework 配置
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'server.authentication.CustomJWTAuthentication',  # 使用字符串引用
+        'server.authentication.CustomJWTAuthentication',  # 使用自定义认证类
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -140,7 +138,8 @@ SIMPLE_JWT = {
     'VERIFYING_KEY': None,
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
-AUTH_USER_MODEL = None
+
+AUTHENTICATION_BACKENDS = []
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
