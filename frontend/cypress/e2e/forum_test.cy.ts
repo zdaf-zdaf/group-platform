@@ -23,6 +23,7 @@ describe('论坛模块功能测试', () => {
           win.localStorage.setItem('token', token)
         }
       })
+      cy.reload()
     })
   }
 
