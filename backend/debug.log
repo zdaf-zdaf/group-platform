@@ -1653,3 +1653,58 @@ WARNING 2025-09-02 16:45:31,250 log Unauthorized: /api/forum/questions/
 WARNING 2025-09-02 16:45:31,251 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 623
 WARNING 2025-09-02 16:45:31,289 log Unauthorized: /api/forum/questions/
 WARNING 2025-09-02 16:45:31,290 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 623
+WARNING 2025-09-02 18:22:29,827 log Unauthorized: /api/forum/questions/
+INFO 2025-09-02 18:22:29,829 basehttp "OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+WARNING 2025-09-02 18:22:29,850 log Unauthorized: /api/notices/unread_count/
+WARNING 2025-09-02 18:22:29,851 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 623
+INFO 2025-09-02 18:22:29,851 basehttp "OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+WARNING 2025-09-02 18:22:29,854 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 401 623
+WARNING 2025-09-02 18:22:29,859 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-02 18:22:29,862 log Unauthorized: /api/notices/unread_count/
+WARNING 2025-09-02 18:22:29,864 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 623
+WARNING 2025-09-02 18:22:29,865 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 401 623
+INFO 2025-09-02 18:23:34,211 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-02 18:23:36,078 basehttp "OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:23:36,078 basehttp "OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:23:36,138 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-02 18:23:36,158 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 278
+INFO 2025-09-02 18:23:38,712 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-02 18:23:38,717 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 278
+INFO 2025-09-02 18:23:41,962 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-02 18:23:41,973 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 278
+INFO 2025-09-02 18:23:45,272 basehttp "POST /api/forum/questions/ HTTP/1.1" 201 352
+INFO 2025-09-02 18:23:45,402 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-02 18:23:51,078 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-02 18:23:51,095 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-02 18:23:54,331 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-02 18:23:54,344 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-02 18:23:59,990 basehttp "OPTIONS /api/forum/questions/123/toggle-like/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:24:00,022 basehttp "PATCH /api/forum/questions/123/toggle-like/ HTTP/1.1" 200 30
+INFO 2025-09-02 18:24:00,930 basehttp "PATCH /api/forum/questions/123/toggle-like/ HTTP/1.1" 200 31
+INFO 2025-09-02 18:24:01,741 basehttp "OPTIONS /api/forum/questions/123/comments/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:24:01,769 basehttp "POST /api/forum/questions/123/comments/ HTTP/1.1" 201 165
+INFO 2025-09-02 18:24:02,701 basehttp "OPTIONS /api/forum/comments/93/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:24:02,725 basehttp "DELETE /api/forum/comments/93/ HTTP/1.1" 204 0
+INFO 2025-09-02 18:24:03,516 basehttp "OPTIONS /api/forum/questions/123/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:24:03,549 basehttp "DELETE /api/forum/questions/123/ HTTP/1.1" 204 0
+INFO 2025-09-02 18:24:06,722 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-02 18:24:07,128 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 278
+INFO 2025-09-02 18:24:10,467 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 278
+INFO 2025-09-02 18:24:13,775 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 278
+INFO 2025-09-02 18:24:17,159 basehttp "POST /api/forum/questions/ HTTP/1.1" 201 352
+INFO 2025-09-02 18:24:17,312 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-02 18:24:23,177 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-02 18:24:26,339 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-02 18:24:33,005 basehttp "OPTIONS /api/forum/questions/124/toggle-sticky/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:24:33,040 basehttp "PATCH /api/forum/questions/124/toggle-sticky/ HTTP/1.1" 200 18
+INFO 2025-09-02 18:24:33,607 basehttp "PATCH /api/forum/questions/124/toggle-sticky/ HTTP/1.1" 200 19
+INFO 2025-09-02 18:24:34,094 basehttp "OPTIONS /api/forum/questions/124/toggle-like/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:24:34,126 basehttp "PATCH /api/forum/questions/124/toggle-like/ HTTP/1.1" 200 30
+INFO 2025-09-02 18:24:34,948 basehttp "PATCH /api/forum/questions/124/toggle-like/ HTTP/1.1" 200 31
+INFO 2025-09-02 18:24:35,645 basehttp "OPTIONS /api/forum/questions/124/comments/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:24:35,666 basehttp "POST /api/forum/questions/124/comments/ HTTP/1.1" 201 165
+INFO 2025-09-02 18:24:36,539 basehttp "OPTIONS /api/forum/comments/94/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:24:36,574 basehttp "DELETE /api/forum/comments/94/ HTTP/1.1" 204 0
+INFO 2025-09-02 18:24:37,262 basehttp "OPTIONS /api/forum/questions/124/ HTTP/1.1" 200 0
+INFO 2025-09-02 18:24:37,298 basehttp "DELETE /api/forum/questions/124/ HTTP/1.1" 204 0
+INFO 2025-09-02 18:24:39,842 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 278
