@@ -53,8 +53,13 @@ describe('论坛模块功能测试', () => {
     cy.get('.publish-card textarea[placeholder="请输入问题内容"]').clear().type(postContent)
     cy.get('.publish-card button').contains('发布问题').click({ force: true })
     cy.wait('@postQuestion').then(interception => {
-      cy.log('发帖响应:', JSON.stringify(interception.response?.body))
-      cy.log('发帖状态:', interception.response?.statusCode)
+      const status = interception.response?.statusCode
+      const body = interception.response?.body
+      cy.log('发帖响应:', JSON.stringify(body))
+      cy.log('发帖状态:', status)
+      if (status !== 201) {
+        throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
+      }
     })
     cy.contains('问题发布成功', { timeout: 10000 }).should('be.visible')
     cy.get('.post-card').should('contain.text', postTitle)
@@ -100,8 +105,13 @@ describe('论坛模块功能测试', () => {
     cy.get('.publish-card textarea[placeholder="请输入问题内容"]').clear().type(postContent)
     cy.get('.publish-card button').contains('发布问题').click({ force: true })
     cy.wait('@postQuestion').then(interception => {
-      cy.log('发帖响应:', JSON.stringify(interception.response?.body))
-      cy.log('发帖状态:', interception.response?.statusCode)
+      const status = interception.response?.statusCode
+      const body = interception.response?.body
+      cy.log('发帖响应:', JSON.stringify(body))
+      cy.log('发帖状态:', status)
+      if (status !== 201) {
+        throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
+      }
     })
     cy.contains('问题发布成功', { timeout: 10000 }).should('be.visible')
     cy.get('.post-card').should('contain.text', postTitle)
