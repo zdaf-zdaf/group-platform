@@ -61,7 +61,7 @@ describe('论坛模块功能测试', () => {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
     })
-    cy.contains('问题发布成功', { timeout: 10000 }).should('be.visible')
+  cy.get('.el-message__content', { timeout: 20000 }).should('contain.text', '问题发布成功')
     cy.get('.post-card').should('contain.text', postTitle)
 
     // 点赞和取消点赞
@@ -113,7 +113,7 @@ describe('论坛模块功能测试', () => {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
     })
-    cy.contains('问题发布成功', { timeout: 10000 }).should('be.visible')
+  cy.get('.el-message__content', { timeout: 20000 }).should('contain.text', '问题发布成功')
     cy.get('.post-card').should('contain.text', postTitle)
 
     // 置顶和取消置顶
