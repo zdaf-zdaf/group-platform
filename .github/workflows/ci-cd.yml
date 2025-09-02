@@ -320,6 +320,66 @@ jobs:
       - name: 运行单元测试
         run: docker exec user-service python manage.py test --verbosity=2
         
+  # ================== 网关单元测试 ==================
+  test-gateway:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Test gateway config
+        run: |
+          docker build -t gateway-test ./gateway
+          docker run --rm gateway-test nginx -t
+
+  # ================== 前端单元测试 ==================
+  test-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+        # 修复依赖步骤
+      - name: Repair and install dependencies
+        run: |
+            # 确保使用正确的 npm 版本
+            npm install -g npm@11.5.2
+            
+            # 完全重新生成 lockfile
+            rm -rf node_modules
+            rm -f package-lock.json
+            
+            # 安装依赖并生成新的 lockfile
+            npm install --package-lock-only
+            
+            # 完整安装依赖
+            npm install
+            
+            # 验证依赖是否同步
+            npm ls --package-lock-only
+
+      - name: Run frontend unit tests
+        run: npm run test:unit  # 确保package.json中有test:unit脚本
+
+      - name: Save fixed dependencies
+        uses: actions/upload-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend/package*.json
+            retention-days: 1
+
+      - name: Run frontend unit tests
+        run: npm run test:unit
+
   # ================ 论坛镜像构建 ================
   build-forum-service:
     runs-on: ubuntu-latest
@@ -455,7 +515,60 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/user-service:latest
             ghcr.io/${{ github.repository_owner }}/user-service:${{ github.sha }}
 
-  # 并行论坛测试
+  # ================ 前端镜像构建 ================
+  build-and-push-frontend:
+    runs-on: ubuntu-latest
+    needs: [test-frontend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+
+        # 确保下载修复后的依赖文件
+      - name: Download fixed dependencies
+        uses: actions/download-artifact@v4
+        with:
+            name: frontend-dependencies
+            path: ./frontend
+      - name: Update Dockerfile
+        run: |
+          # 仅更新Node版本
+          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
+          
+          # 添加--legacy-peer-deps参数
+          sed -i 's/npm install/npm install --legacy-peer-deps/' frontend/dockerfile
+          
+          # 添加vue-cli-service安装
+          sed -i '/npm install --legacy-peer-deps/a RUN npm install -g @vue/cli-service' frontend/dockerfile
+          
+          # 添加调试命令
+          sed -i '/COPY \. \./a RUN npm ls --depth=0' frontend/dockerfile
+          
+          # 打印验证
+          cat frontend/dockerfile
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/frontend:latest
+            ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}
+
+  # 并行论坛api测试
   api-test-luntan:
     name: Parallel Forum Tests
     runs-on: ubuntu-latest
@@ -542,7 +655,7 @@ jobs:
         run: |
             pkill -f "runserver 0.0.0.0:8001" || true
 
-  # 并行实验测试
+  # 并行实验api测试
   api-test-lab:
     name: Parallel Lab Tests
     runs-on: ubuntu-latest
@@ -635,7 +748,7 @@ jobs:
         run: |
             pkill -f "runserver 0.0.0.0:8002" || true
 
-  # 并行公告测试
+  # 并行公告api测试
   api-test-gonggao:
     name: Parallel Announcement Tests
     runs-on: ubuntu-latest
@@ -722,7 +835,7 @@ jobs:
         run: |
             pkill -f "runserver 0.0.0.0:8003" || true
 
-  # 并行学习资料测试
+  # 并行资料api测试
   api-test-ziliao:
     name: Parallel Learning Materials Tests
     runs-on: ubuntu-latest
@@ -797,309 +910,55 @@ jobs:
   gui-test-cypress:
     name: Run Cypress GUI Tests
     runs-on: ubuntu-latest
-    needs: 
-      - test-frontend 
-      - build-experiments-service
-      - build-forum-service
-      - build-materials-service
-      - build-notice-service
-      - build-user-service
-      - build-and-push-frontend
+    needs: generate-deployment-script  # 依赖部署脚本生成
     
-    services:
-      mysql-gui:
-        image: mysql:8.0
-        env:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: test_db_gui
-            MYSQL_ROOT_HOST: '%'
-            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-            - 3306:3306
-        options: >-
-            --health-cmd="mysqladmin ping"
-            --health-interval=10s
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download fixed dependencies
-        uses: actions/download-artifact@v4
-        with:
-            name: frontend-dependencies
-            path: ./frontend
-
-      - name: Create log directory
-        run: mkdir -p logs
-
-      # =============== 后端服务设置 ===============
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-            python-version: '3.10'
-      
-      - name: Install backend dependencies
-        run: pip install -r requirements.txt
-        working-directory: ./backend
-      
-      - name: Configure MySQL
+      - name: Setup KinD Kubernetes Cluster
         run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-                echo "MySQL for GUI is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
-            sleep 2
-            done
-            
-            mysql -h127.0.0.1 -uroot -prootpassword -e "
-            CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
-            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-            FLUSH PRIVILEGES;"
-      
-      - name: Run migrations
-        run: |
-            python manage.py makemigrations --noinput
-            python manage.py migrate --noinput
-        working-directory: ./backend
-        env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_gui
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
-            DEBUG: False
-      
-      - name: Start Django server
-        run: |
-            python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
-            echo $! > ../logs/django.pid
-        working-directory: ./backend
-        env:
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_gui
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
-      
-      # =============== Vue前端服务设置 ===============
-      - name: Setup Node.js for Vue
-        uses: actions/setup-node@v4
-        with:
-            node-version: '22'
-            cache: 'npm'
-            cache-dependency-path: './frontend/package-lock.json'
-
-      - name: Install Vue dependencies
-        run: |
-            # 安装依赖
-            npm install
-            
-            # 创建.env文件配置Vue环境变量
-            echo "VUE_APP_API_BASE_URL=http://localhost:8000" > .env
-            echo "VUE_APP_DEBUG=true" >> .env
-        working-directory: ./frontend
-
-      - name: Debug package.json scripts
-        run: |
-          echo "package.json scripts:"
-          npm run
-        working-directory: ./frontend
-
-      - name: Start Vue server
-        run: |
-            # 启动Vue开发服务器
-            npm run dev -- --port 8080 > ../logs/vue.log 2>&1 &
-            echo $! > ../logs/vue.pid
-            
-            # 等待服务启动并检查端口
-            for i in {1..10}; do
-              if nc -z localhost 8080; then
-                echo "Vue server is running on port 8080"
-                break
-              fi
-              echo "Waiting for Vue server to start... (attempt $i/10)"
-              sleep 10
-            done
-        working-directory: ./frontend
-      
-      # =============== 测试执行 ===============
-      - name: Wait for servers with timeout
-        run: |
-            npm install -g wait-on
-            
-            # 等待Vue前端(8080)和Django后端(8000)
-            timeout 180s wait-on http://localhost:8080 http://localhost:8000 || true
-            
-            # 添加 API 健康检查
-            echo "=== API 健康检查 ==="
-            curl -I http://localhost:8000/api/healthcheck
-            
-            # 添加前端健康检查
-            echo "=== 前端健康检查 ==="
-            curl -I http://localhost:8080
-
-            # 检查服务状态
-            echo "=== 服务状态检查 ==="
-            echo "检查端口 8080:"
-            nc -z localhost 8080 && echo "前端服务运行中" || echo "前端服务未响应"
-            
-            echo "检查端口 8000:"
-            nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
-            
-            if ! nc -z localhost 8080 || ! nc -z localhost 8000; then
-            echo "❌❌ 服务启动失败，显示日志:"
-            echo "=== 后端日志 ==="
-            cat logs/django.log || echo "无后端日志"
-            echo "=== 前端日志 ==="
-            cat logs/vue.log || echo "无前端日志"
-            exit 1
-            fi
-            
-            sleep 3
-
-      - name: 初始化测试账号
-        run: |
-          curl -v -X POST http://localhost:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}' || true
-          curl -v -X POST http://localhost:8000/api/auth/register/ -H "Content-Type: application/json" -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || true
-        working-directory: ./frontend
-
-      - name: 检查账号登录
-        run: |
-          echo "登录stuTest："
-          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
-          echo "登录tchTest："
-          curl -v -X POST http://localhost:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
-        working-directory: ./frontend
-      
-      - name: Run Cypress tests
-        run: |
-          # 简化命令，移除所有可能导致冲突的参数
-          npx cypress run --headless --config baseUrl=http://localhost:8080
+          # 安装KinD（Kubernetes in Docker）
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/
           
-          # 如果失败，保存截图和视频
-          if [ $? -ne 0 ]; then
-            echo "Cypress测试失败，保存截图和视频..."
-            mkdir -p cypress-failures
-            cp -r cypress/screenshots cypress-failures/
-            cp -r cypress/videos cypress-failures/
-          fi
-        working-directory: ./frontend
-      
-      # =============== 日志收集 ===============
-      - name: Show backend logs if failed
-        if: ${{ failure() }}
-        run: cat logs/django.log
-      
-      - name: Show frontend logs if failed
-        if: ${{ failure() }}
-        run: cat logs/vue.log
+          # 创建集群
+          kind create cluster --name test-cluster
+          
+          # 验证集群
+          kubectl cluster-info --context kind-test-cluster
 
-  test-frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
-
-        # 修复依赖步骤
-      - name: Repair and install dependencies
+      - name: Deploy Microservices to KinD
         run: |
-            # 确保使用正确的 npm 版本
-            npm install -g npm@11.5.2
-            
-            # 完全重新生成 lockfile
-            rm -rf node_modules
-            rm -f package-lock.json
-            
-            # 安装依赖并生成新的 lockfile
-            npm install --package-lock-only
-            
-            # 完整安装依赖
-            npm install
-            
-            # 验证依赖是否同步
-            npm ls --package-lock-only
-
-      - name: Run frontend unit tests
-        run: npm run test:unit  # 确保package.json中有test:unit脚本
-
-      - name: Save fixed dependencies
-        uses: actions/upload-artifact@v4
-        with:
-            name: frontend-dependencies
-            path: ./frontend/package*.json
-            retention-days: 1
-
-      - name: Run frontend unit tests
-        run: npm run test:unit
-
-  build-and-push-frontend:
-    runs-on: ubuntu-latest
-    needs: [test-frontend]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
-
-        # 确保下载修复后的依赖文件
-      - name: Download fixed dependencies
-        uses: actions/download-artifact@v4
-        with:
-            name: frontend-dependencies
-            path: ./frontend
-      - name: Update Dockerfile
-        run: |
-          # 仅更新Node版本
-          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
+          # 部署所有微服务到测试集群
+          kubectl apply -f backend/forum-service/k8s/
+          kubectl apply -f backend/materials-service/k8s/
+          kubectl apply -f backend/notice-service/k8s/
+          kubectl apply -f backend/experiments-service/k8s/
+          kubectl apply -f backend/user-service/k8s/
+          kubectl apply -f frontend/k8s/
+          kubectl apply -f gateway/k8s/
           
-          # 添加--legacy-peer-deps参数
-          sed -i 's/npm install/npm install --legacy-peer-deps/' frontend/dockerfile
-          
-          # 添加vue-cli-service安装
-          sed -i '/npm install --legacy-peer-deps/a RUN npm install -g @vue/cli-service' frontend/dockerfile
-          
-          # 添加调试命令
-          sed -i '/COPY \. \./a RUN npm ls --depth=0' frontend/dockerfile
-          
-          # 打印验证
-          cat frontend/dockerfile
+          # 等待服务就绪
+          kubectl wait --for=condition=ready pod -l app=frontend --timeout=180s
+          kubectl wait --for=condition=ready pod -l app=gateway --timeout=180s
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Setup Cypress and Run Tests
+        uses: cypress-io/github-action@v6
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
+          # 连接到网关服务（端口转发）
+          start: kubectl port-forward svc/gateway-service 30080:80 &
+          wait-on: 'http://localhost:30080'
+          config: baseUrl=http://localhost:30080
+          browser: chrome
+          headless: true
+          
+      - name: Cleanup KinD Cluster
+        run: kind delete cluster --name test-cluster
+        if: always() 
 
-      - name: Build and Push Frontend Image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/frontend:latest
-            ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}
-
+  # ================== 生成部署脚本 ==================      
   generate-deployment-script:
     name: 生成部署脚本
     runs-on: ubuntu-latest
@@ -1169,18 +1028,15 @@ jobs:
             deploy-to-local.sh
           retention-days: 7
 
+  # ==================== 第七阶段：通知 ====================
   notify-deployment-ready:
     runs-on: ubuntu-latest
-    # 依赖部署脚本生成作业
-    needs: [generate-deployment-script] 
+    needs: generate-deployment-script
     steps:
-      - name: Notify Team
+      - name: 通知部署准备就绪
         run: |
-          echo "CI流程完成！"
-          echo ""
-          echo "请下载部署包并本地执行:"
-          echo "1. 从Artifacts下载 'local-deployment-package'"
-          echo "2. 解压后运行: chmod +x deploy-to-local.sh && ./deploy-to-local.sh"
-          echo "3. 访问 http://localhost:30080 验证部署"
-          echo ""
-          echo "注意: 确保本地Docker Desktop和Kubectl已正确配置"
+          echo "✅ CI/CD 流水线完成！"
+          echo "📦 镜像已构建并推送至镜像仓库"
+          echo "📋 部署脚本已生成，请在本地执行以下命令："
+          echo "   gh run download -n deployment-scripts"
+          echo "   ./deploy-local.sh"
