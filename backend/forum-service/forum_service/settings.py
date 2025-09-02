@@ -81,14 +81,11 @@ WSGI_APPLICATION = 'forum_service.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'lab_platform',
-        'USER': 'root',
-        'PASSWORD': '2023mahaoling',
-        'HOST': 'host.docker.internal',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
         'PORT': '3306',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        }
     }
 }
 
