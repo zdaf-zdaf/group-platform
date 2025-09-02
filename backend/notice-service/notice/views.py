@@ -12,7 +12,7 @@ logger = logging.getLogger('notice')
 
 class NoticeViewSet(viewsets.ModelViewSet):
     serializer_class = NoticeSerializer
-    permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
+    permission_classes = [IsTeacherOrReadOnly] 
 
     def get_queryset(self):
         queryset = Notice.objects.all()
@@ -25,8 +25,8 @@ class NoticeViewSet(viewsets.ModelViewSet):
         try:
             user = request.user
 
-            # 检查用户角色
-            if not hasattr(user, 'role') or user.role != 'STUDENT':
+            # 检查用户角色 - 改为小写 'student'
+            if not hasattr(user, 'role') or user.role != 'student':
                 return Response({"count": 0}, status=status.HTTP_200_OK)
                 
             # 计算用户未读公告数量
@@ -41,8 +41,8 @@ class NoticeViewSet(viewsets.ModelViewSet):
         try:
             user = request.user
 
-             # 验证用户角色
-            if not hasattr(user, 'role') or user.role != 'STUDENT':
+             # 验证用户角色 - 改为小写 'student'
+            if not hasattr(user, 'role') or user.role != 'student':
                 return Response({"detail": "无权限操作"}, status=status.HTTP_403_FORBIDDEN)
                 
             # 获取所有未读公告
@@ -70,8 +70,8 @@ class NoticeViewSet(viewsets.ModelViewSet):
             notice = self.get_object()
             user = request.user
 
-            # 验证用户角色
-            if not hasattr(user, 'role') or user.role != 'STUDENT':
+            # 验证用户角色 - 改为小写 'student'
+            if not hasattr(user, 'role') or user.role != 'student':
                 return Response(
                     {"detail": "只允许学生标记公告为已读"},
                     status=status.HTTP_403_FORBIDDEN
@@ -95,3 +95,8 @@ class NoticeViewSet(viewsets.ModelViewSet):
                 "detail": "标记失败，请稍后再试",
                 "error": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def create(self, request, *args, **kwargs):
+        # 手动设置作者ID
+        request.data['author_id'] = request.user.id
+        return super().create(request, *args, **kwargs)

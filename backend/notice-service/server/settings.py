@@ -60,9 +60,16 @@ WSGI_APPLICATION = 'server.wsgi.application'
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+   'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'notice_db',  # 您的MySQL数据库名
+        'USER': 'root',       # 数据库用户
+        'PASSWORD': 'root',   # 数据库密码
+        'HOST': 'host.docker.internal',  # Docker访问宿主机MySQL
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        }
     }
 }
 
