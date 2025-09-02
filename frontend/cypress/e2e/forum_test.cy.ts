@@ -90,8 +90,9 @@ describe('论坛模块功能测试', () => {
     cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
       cy.get('button').contains('删除').click({ force: true })
     })
-  cy.wait(1500)
-  cy.contains('.post-card', postTitle).should('not.exist')
+    cy.wait(1500)
+    cy.reload()
+    cy.contains('.post-card', postTitle).should('not.exist')
   })
 
   // 教师端置顶、点赞、评论、删除
@@ -152,7 +153,8 @@ describe('论坛模块功能测试', () => {
     cy.get('.post-card').first().within(() => {
       cy.get('button').contains('删除').click({ force: true })
     })
-  cy.wait(1500)
-  cy.contains('.post-card', postTitle).should('not.exist')
+    cy.wait(1500)
+    cy.reload()
+    cy.contains('.post-card', postTitle).should('not.exist')
   })
 })
