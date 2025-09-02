@@ -39,9 +39,6 @@ print(a + b)
     // 注册
     cy.visit('/register')
     cy.get('input[placeholder="请输入3-16位用户名"]').type(teacherUsername)
-    cy.get('input[placeholder="请输入邮箱地址"]').type(`${teacherUsername}@example.com`)
-    cy.get('input[placeholder="请输入6-18位密码"]').type(password)
-    cy.get('input[placeholder="请再次输入密码"]').type(password)
     cy.get('.el-select').click()
     cy.get('.el-select-dropdown__item').contains('教师').click({ force: true })
     cy.get('input[type="checkbox"]').check({ force: true })
@@ -97,9 +94,6 @@ print(a + b)
   it('教师登录并创建实验', () => {
     cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
-    cy.get('input[placeholder="请输入密码"]').type(password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
     cy.url().should('include', '/profile')
 
     cy.contains('创建实验').click({ force: true })
@@ -327,9 +321,6 @@ print(a + b)
     // 教师登录
     cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
-    cy.get('input[placeholder="请输入密码"]').type(password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
     cy.url().should('include', '/profile')
 
     // 进入“实验管理”或“批改作业”页面（假设有入口按钮/菜单）

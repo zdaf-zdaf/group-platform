@@ -1,7 +1,7 @@
 INFO 2025-08-30 15:04:11,448 autoreload Watching for file changes with StatReloader
 INFO 2025-08-30 15:06:20,466 autoreload Watching for file changes with StatReloader
 INFO 2025-09-01 09:34:00,486 autoreload Watching for file changes with StatReloader
-INFO 2025-09-01 09:35:48,128 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\server\urls.py changed, reloading.
+INFO 2025-09-01 09:35:48,128 autoreload E:\BUAA\锟斤拷锟斤拷\小学锟斤拷\github_lab\group-platform\backend\server\urls.py changed, reloading.
 INFO 2025-09-01 09:35:49,404 autoreload Watching for file changes with StatReloader
 INFO 2025-09-01 09:37:49,341 autoreload Watching for file changes with StatReloader
 INFO 2025-09-01 09:38:12,816 basehttp "GET /health/ HTTP/1.1" 200 16

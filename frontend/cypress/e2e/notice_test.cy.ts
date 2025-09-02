@@ -131,9 +131,6 @@ describe('公告模块功能测试', () => {
   it('教师端删除发布的两个公告', () => {
     cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type(teacher.username)
-    cy.get('input[placeholder="请输入密码"]').type(teacher.password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
     cy.url().should('include', '/profile')
 
     cy.contains('通知公告').click({ force: true })

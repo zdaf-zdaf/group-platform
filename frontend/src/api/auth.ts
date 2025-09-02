@@ -3,7 +3,7 @@ import type { AxiosResponse } from 'axios';
 import type { LoginForm } from '@/views/auth/Login.vue';
 
 // 配置后端基础 URL（根据你的实际后端地址修改）
-const BASE_URL = 'http://localhost:8000/api/'; // Django 后端地址
+const BASE_URL = '/api/'; // Django 后端地址
 
 // 创建 axios 实例
 export const apiClient = axios.create({
