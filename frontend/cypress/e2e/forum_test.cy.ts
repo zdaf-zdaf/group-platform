@@ -18,7 +18,7 @@ describe('论坛模块功能测试', () => {
       expect(response.status).to.eq(200);
       token = response.body.access || response.body.token || response.body.data?.token;
       expect(token, 'token should exist').to.not.be.null;
-      cy.visit('/', {
+      cy.visit('/forum', {
         onBeforeLoad(win) {
           win.localStorage.setItem('token', token);
           if (response.body.username) {
@@ -33,7 +33,6 @@ describe('论坛模块功能测试', () => {
         }
       });
       cy.wait(1000);
-      // 断言 token 已写入 localStorage
       cy.window().then(win => {
         expect(win.localStorage.getItem('token')).to.exist;
       });
