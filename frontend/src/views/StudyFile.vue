@@ -247,11 +247,13 @@ const loadMaterials = async () => {
     loading.value = true
     error.value = null
     const data = await MaterialApi.getMaterials(searchText.value, filterType.value || undefined)
+    // 获取当前页面的源（例如 http://localhost:8088）
+    const baseUrl = window.location.origin;
 
     materials.value = data.map(item => ({
       ...item,
-      // 关键修复：直接使用后端提供的URL，不做额外编码
-      previewUrl: `${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'}${item.file_url}`,
+      // 关键修复：使用动态的基础 URL，而不是硬编码
+      previewUrl: `${baseUrl}${item.file_url}`,
       formatted_date: formatDate(item.created_at)
     }))
   } catch (err: any) {

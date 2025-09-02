@@ -1,26 +1,61 @@
+# k8s/ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: course-platform-ingress
+  name: microservices-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
-  ingressClassName: nginx
   rules:
-  - host: localhost
-    http:
+  - http:
       paths:
-      - path: /
+      # 用户服务路由
+      - path: /api/user(/|$)(.*)
         pathType: Prefix
         backend:
           service:
-            name: frontend-service
-            port:
-              number: 80
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: course-backend
+            name: user-service
             port:
               number: 8000
+      # 通知服务路由
+      - path: /api/notice(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: notice-service
+            port:
+              number: 8000
+      # 学习资料服务路由
+      - path: /api/materials(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: materials-service
+            port:
+              number: 8000
+      # 论坛服务路由
+      - path: /api/forum(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: forum-service
+            port:
+              number: 8000
+      # 实验服务路由
+      - path: /api/lab(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: lab-service
+            port:
+              number: 8000
+      # 前端路由
+      - path: /()(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80

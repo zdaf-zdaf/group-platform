@@ -43,9 +43,6 @@ describe('学习资料模块功能测试', () => {
   it('学生端查看并预览四种类型资料，下载第一个', () => {
     cy.visit('/login')
     cy.get('input[placeholder="请输入用户名"]').type('stuTest')
-    cy.get('input[placeholder="请输入密码"]').type('Test1234@')
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
     cy.url().should('include', '/profile')
 
     cy.contains('学习资料').click({ force: true })

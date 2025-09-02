@@ -7,7 +7,7 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security
-SECRET_KEY = os.getenv('SECRET_KEY', 'dev-materials-secret-key-change-me')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-9ekm#x74ns6(j*h)3+jb-v*sz7bho2edo%g)uktin)ugf-5!s%')
 DEBUG = os.getenv('DEBUG', 'true').lower() == 'true'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
@@ -46,7 +46,7 @@ MIDDLEWARE = [
 # DRF & Auth
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'materials.authentication.StatelessJWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -62,8 +62,8 @@ REST_FRAMEWORK = {
 
 # 注意：为保证与签发 JWT 的用户服务一致，这里支持通过环境变量注入签名密钥
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(os.getenv('JWT_ACCESS_MINUTES', '30'))),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=int(os.getenv('JWT_REFRESH_DAYS', '1'))),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
@@ -71,8 +71,9 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
     'ALGORITHM': os.getenv('JWT_ALGORITHM', 'HS256'),
-    'SIGNING_KEY': os.getenv('JWT_SIGNING_KEY', SECRET_KEY),
-    'VERIFYING_KEY': os.getenv('JWT_VERIFYING_KEY', None),
+    # 关键修改：SIGNING_KEY 和 VERIFYING_KEY 都使用从环境变量加载的 SECRET_KEY
+    'SIGNING_KEY': os.getenv('SECRET_KEY'),
+    'VERIFYING_KEY': os.getenv('SECRET_KEY'),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
@@ -175,7 +176,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console', 'file'],
-            'level': 'INFO',
+            'level': 'DEBUG',
             'propagate': True,
         },
         'materials': {

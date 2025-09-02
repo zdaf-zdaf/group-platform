@@ -1,174 +1,105 @@
+# backend/materials_service/materials/views.py
+
 import os
 import logging
-from urllib.parse import unquote
 from urllib.parse import quote
-from django.conf import settings
-from rest_framework import viewsets, permissions, status,serializers
+from django.http import FileResponse
+from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from django.http import FileResponse, Http404
+
 from .models import LearningMaterial
 from .serializers import LearningMaterialSerializer
-from .permissions import IsTeacherOrReadOnly  # 使用自定义权限
-
+from .permissions import IsTeacher  # 导入我们自定义的 IsTeacher 权限
 
 logger = logging.getLogger(__name__)
 
 class LearningMaterialViewSet(viewsets.ModelViewSet):
     queryset = LearningMaterial.objects.all()
-    parser_classes = (MultiPartParser, FormParser)
     serializer_class = LearningMaterialSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
 
-    def get_queryset(self):
-        user = self.request.user
-        role = getattr(user, 'role', None)
-        if role == 'teacher' or getattr(user, 'is_staff', False) or getattr(user, 'is_superuser', False):
-            return LearningMaterial.objects.filter(created_by=user)
-        return LearningMaterial.objects.all()
+    # 1. 使用 DRF 标准的权限控制方法
+    def get_permissions(self):
+        """
+        根据不同的操作 (action) 返回不同的权限。
+        """
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            # 对于写操作 (创建, 更新, 删除)，要求用户必须是教师。
+            # IsTeacher 会检查 Token 中的 role 是否为 'teacher'。
+            permission_classes = [IsTeacher]
+        else:
+            # 对于读操作 (list, retrieve, download)，只要求用户已登录。
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
-    def create(self, request, *args, **kwargs):
-        # 修复中文文件名处理
-        if 'file' in request.FILES:
-            file = request.FILES['file']
-            # 正确解码中文文件名
-            file.name = unquote(file.name)
-            request.FILES['file'] = file
-
-        return super().create(request, *args, **kwargs)
-
+    # 2. 改造 perform_create 以适应微服务
     def perform_create(self, serializer):
-        file = self.request.FILES.get('file')
-        if not file:
-            logger.error("未接收到文件")
-            raise serializers.ValidationError({"file": "必须上传文件"})
-
-        # 确保文件大小被正确保存
+        """
+        在创建资料时，自动记录上传者的用户名。
+        """
+        # 从 JWT Token 中获取用户名，而不是 user 对象
+        uploader_username = self.request.user.username
         serializer.save(
-            created_by=self.request.user,
-            size=file.size
+            uploader_username=uploader_username,
+            size=self.request.FILES.get('file').size
         )
-        logger.info(f"文件保存成功 - 文件名: {file.name}, 大小: {file.size}字节")
+        logger.info(f"文件保存成功 - 上传者: {uploader_username}")
 
-    def destroy(self, request, *args, **kwargs):
+    # 3. 改造 perform_update
+    def perform_update(self, serializer):
+        # 在更新时，也保存文件大小
+        data = {'size': self.request.FILES.get('file').size} if self.request.FILES.get('file') else {}
+        serializer.save(**data)
+
+    # 4. 改造 destroy
+    def perform_destroy(self, instance):
+        # 删除关联的物理文件
         try:
-            instance = self.get_object()
-            if request.user != instance.created_by:
-                logger.warning(f"用户 {request.user.id} 尝试删除无权限的资料 {instance.id}")
-                return Response(
-                    {"error": "无权删除此资料"},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-
-            # 删除物理文件
             file_path = instance.file.path
             if os.path.exists(file_path):
                 os.remove(file_path)
-
-            return super().destroy(request, *args, **kwargs)
+                logger.info(f"物理文件已删除: {file_path}")
         except Exception as e:
-            logger.error(f"删除资料失败: {str(e)}")
-            return Response(
-                {"error": f"删除资料失败: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            logger.error(f"删除物理文件失败: {str(e)}")
+        instance.delete()
 
-    def update(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            if request.user != instance.created_by:
-                logger.warning(f"用户 {request.user.id} 尝试修改无权限的资料 {instance.id}")
-                return Response(
-                    {"error": "无权修改此资料"},
-                    status=status.HTTP_403_FORBIDDEN
+    # 5. 统一权限检查逻辑
+    def check_object_permissions(self, request, obj):
+        """
+        在获取单个对象时，检查对象级别的权限。
+        确保只有创建者本人才能修改或删除。
+        """
+        super().check_object_permissions(request, obj)
+        # 对于写操作，额外检查用户名是否匹配
+        if self.action in ['update', 'partial_update', 'destroy']:
+            if obj.uploader_username != request.user.username:
+                self.permission_denied(
+                    request, message='你无权修改或删除他人创建的资料。'
                 )
 
-            # 处理文件更新
-            file = request.FILES.get('file')
-
-            if not file:
-                # 只更新其他字段
-                serializer = self.get_serializer(
-                    instance,
-                    data=request.data,
-                    partial=True
-                )
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data)
-
-            # 处理文件更新
-            # 删除旧文件
-            old_file = instance.file.path
-            if os.path.exists(old_file):
-                os.remove(old_file)
-            # 更新文件大小
-            instance.size = file.size
-
-            return super().update(request, *args, **kwargs)
-
-        except Exception as e:
-            logger.error(f"更新资料失败: {str(e)}")
-            return Response(
-                {"error": f"更新资料失败: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
+    # 6. 下载文件的 action (保持不变，但现在受 get_permissions 控制)
     @action(detail=True, methods=['get'])
     def download(self, request, pk=None):
         try:
             material = self.get_object()
+            file_path = material.file.path
 
-            if not material.file:
-                logger.error(f"资料 {pk} 无文件关联")
-                return Response(
-                    {"error": "文件不存在"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+            if not os.path.exists(file_path):
+                return Response({"error": "文件不存在"}, status=status.HTTP_404_NOT_FOUND)
 
-            if not material.file_exists:
-                logger.error(f"资料 {pk} 文件不存在于存储系统")
-                return Response(
-                    {"error": "文件存储系统中不存在"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-
-            # 更新下载次数
             material.downloads += 1
             material.save()
 
-            # 创建文件响应
-            file_path = material.file.path
-
-            # 修复：使用安全方式打开文件
-            response = FileResponse(
-                open(file_path, 'rb'),  # 使用二进制模式打开
-                content_type='application/octet-stream'  # 通用二进制类型
-            )
-
-            # 修复文件名编码问题
+            response = FileResponse(open(file_path, 'rb'), content_type='application/octet-stream')
             filename = os.path.basename(file_path)
-            quoted_filename = quote(filename)  # 处理中文文件名
-
-            # 设置下载头
+            quoted_filename = quote(filename)
             response['Content-Disposition'] = f'attachment; filename*=UTF-8\'\'{quoted_filename}'
-
-            # 设置文件大小
             response['Content-Length'] = os.path.getsize(file_path)
-
+            
             logger.info(f"文件下载成功 - 资料ID: {pk}, 文件名: {filename}")
             return response
-
-        except FileNotFoundError:
-            logger.error(f"文件未找到 - 资料ID: {pk}")
-            return Response(
-                {"error": "文件未找到"},
-                status=status.HTTP_404_NOT_FOUND
-            )
         except Exception as e:
             logger.error(f"文件下载失败 - 资料ID: {pk}, 错误: {str(e)}")
-            return Response(
-                {"error": f"文件下载失败: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({"error": f"文件下载失败: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

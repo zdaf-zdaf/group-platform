@@ -62,3 +62,411 @@ WARNING 2025-08-30 16:43:52,018 log Unauthorized: /api/api/test/teacher/
 WARNING 2025-08-30 16:43:52,021 basehttp "GET /api/api/test/teacher/ HTTP/1.1" 401 5204
 WARNING 2025-08-30 16:43:58,639 log Unauthorized: /api/api/test/student/
 WARNING 2025-08-30 16:43:58,641 basehttp "GET /api/api/test/student/ HTTP/1.1" 401 5204
+INFO 2025-09-01 10:53:04,943 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 14:10:30,708 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 14:15:16,063 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 14:28:00,124 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 14:28:43,209 basehttp "OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+WARNING 2025-09-01 14:28:43,224 log Not Found: /api/auth/register/
+WARNING 2025-09-01 14:28:43,225 basehttp "POST /api/auth/register/ HTTP/1.1" 404 2722
+WARNING 2025-09-01 14:28:50,442 log Not Found: /api/auth/register/
+WARNING 2025-09-01 14:28:50,443 basehttp "POST /api/auth/register/ HTTP/1.1" 404 2722
+WARNING 2025-09-01 14:29:08,910 log Not Found: /api/auth/register/
+WARNING 2025-09-01 14:29:08,911 basehttp "GET /api/auth/register/ HTTP/1.1" 404 2721
+WARNING 2025-09-01 14:29:09,339 log Not Found: /favicon.ico
+WARNING 2025-09-01 14:29:09,341 basehttp "GET /favicon.ico HTTP/1.1" 404 2355
+WARNING 2025-09-01 14:31:21,178 log Method Not Allowed: /api/api/auth/register/
+WARNING 2025-09-01 14:31:21,179 basehttp "GET /api/api/auth/register/ HTTP/1.1" 405 8311
+INFO 2025-09-01 14:31:21,287 basehttp "GET /static/rest_framework/css/bootstrap.min.css HTTP/1.1" 200 121457
+INFO 2025-09-01 14:31:21,294 basehttp "GET /static/rest_framework/css/prettify.css HTTP/1.1" 200 817
+INFO 2025-09-01 14:31:21,295 basehttp "GET /static/rest_framework/css/bootstrap-tweaks.css HTTP/1.1" 200 3426
+INFO 2025-09-01 14:31:21,301 basehttp "GET /static/rest_framework/css/default.css HTTP/1.1" 200 1152
+INFO 2025-09-01 14:31:21,304 basehttp "GET /static/rest_framework/js/ajax-form.js HTTP/1.1" 200 3796
+INFO 2025-09-01 14:31:21,306 basehttp "GET /static/rest_framework/js/csrf.js HTTP/1.1" 200 1793
+INFO 2025-09-01 14:31:21,307 basehttp "GET /static/rest_framework/js/bootstrap.min.js HTTP/1.1" 200 39680
+INFO 2025-09-01 14:31:21,309 basehttp "GET /static/rest_framework/js/default.js HTTP/1.1" 200 1268
+INFO 2025-09-01 14:31:21,311 basehttp "GET /static/rest_framework/js/prettify-min.js HTTP/1.1" 200 13632
+INFO 2025-09-01 14:31:21,311 basehttp "GET /static/rest_framework/js/load-ajax-form.js HTTP/1.1" 200 59
+INFO 2025-09-01 14:31:21,312 basehttp "GET /static/rest_framework/js/jquery-3.7.1.min.js HTTP/1.1" 200 87533
+INFO 2025-09-01 14:31:21,436 basehttp "GET /static/rest_framework/img/grid.png HTTP/1.1" 200 1458
+INFO 2025-09-01 14:31:31,503 autoreload /app/user/urls.py changed, reloading.
+INFO 2025-09-01 14:31:31,791 autoreload D:\buaa\大二\大二下\软工\小学期\codes\xiaoxueqi\group-platform\backend\user_service\user\urls.py changed, reloading.
+INFO 2025-09-01 14:31:32,670 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 14:31:34,291 autoreload Watching for file changes with StatReloader
+ERROR 2025-09-01 14:32:10,052 log Internal Server Error: /api/auth/register/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/mysql/base.py", line 76, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/connections.py", line 280, in query
+    _mysql.connection.query(self, query)
+MySQLdb.ProgrammingError: (1146, "Table 'user_db_name.user' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/user/views.py", line 25, in create
+    serializer.is_valid(raise_exception=True)
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/serializers.py", line 444, in run_validation
+    value = self.to_internal_value(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/serializers.py", line 501, in to_internal_value
+    validated_value = field.run_validation(primitive_value)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/fields.py", line 757, in run_validation
+    return super().run_validation(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/fields.py", line 539, in run_validation
+    self.run_validators(value)
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/fields.py", line 551, in run_validators
+    validator(value, self)
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/validators.py", line 86, in __call__
+    if qs_exists(queryset):
+       ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/validators.py", line 23, in qs_exists
+    return queryset.exists()
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1296, in exists
+    return self.query.has_results(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 674, in has_results
+    return compiler.has_results()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/compiler.py", line 1591, in has_results
+    return bool(self.execute_sql(SINGLE))
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/usr/local/lib/python3.11/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/mysql/base.py", line 76, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/connections.py", line 280, in query
+    _mysql.connection.query(self, query)
+django.db.utils.ProgrammingError: (1146, "Table 'user_db_name.user' doesn't exist")
+ERROR 2025-09-01 14:32:10,063 basehttp "POST /api/auth/register/ HTTP/1.1" 500 216345
+WARNING 2025-09-01 14:32:31,269 log Method Not Allowed: /api/auth/register/
+WARNING 2025-09-01 14:32:31,271 basehttp "GET /api/auth/register/ HTTP/1.1" 405 8291
+ERROR 2025-09-01 14:37:35,192 log Internal Server Error: /api/auth/register/
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/mysql/base.py", line 76, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/connections.py", line 280, in query
+    _mysql.connection.query(self, query)
+MySQLdb.ProgrammingError: (1146, "Table 'user_db_name.user' doesn't exist")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/user/views.py", line 25, in create
+    serializer.is_valid(raise_exception=True)
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/serializers.py", line 444, in run_validation
+    value = self.to_internal_value(data)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/serializers.py", line 501, in to_internal_value
+    validated_value = field.run_validation(primitive_value)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/fields.py", line 757, in run_validation
+    return super().run_validation(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/fields.py", line 539, in run_validation
+    self.run_validators(value)
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/fields.py", line 551, in run_validators
+    validator(value, self)
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/validators.py", line 86, in __call__
+    if qs_exists(queryset):
+       ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rest_framework/validators.py", line 23, in qs_exists
+    return queryset.exists()
+           ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1296, in exists
+    return self.query.has_results(using=self.db)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/query.py", line 674, in has_results
+    return compiler.has_results()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/compiler.py", line 1591, in has_results
+    return bool(self.execute_sql(SINGLE))
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/usr/local/lib/python3.11/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/mysql/base.py", line 76, in execute
+    return self.cursor.execute(query, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/usr/local/lib/python3.11/site-packages/MySQLdb/connections.py", line 280, in query
+    _mysql.connection.query(self, query)
+django.db.utils.ProgrammingError: (1146, "Table 'user_db_name.user' doesn't exist")
+ERROR 2025-09-01 14:37:35,198 basehttp "POST /api/auth/register/ HTTP/1.1" 500 216345
+INFO 2025-09-01 14:41:10,174 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 14:42:43,544 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-01 14:43:03,500 basehttp "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+WARNING 2025-09-01 14:43:03,725 log Bad Request: /api/auth/login/
+WARNING 2025-09-01 14:43:03,725 basehttp "POST /api/auth/login/ HTTP/1.1" 400 84
+INFO 2025-09-01 14:46:57,437 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-01 14:46:57,647 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-01 14:47:18,835 basehttp "OPTIONS /api/auth/user/profile/ HTTP/1.1" 200 0
+INFO 2025-09-01 14:47:18,857 basehttp "PATCH /api/auth/user/profile/ HTTP/1.1" 200 120
+INFO 2025-09-01 14:50:27,721 basehttp "OPTIONS /materials/ HTTP/1.1" 200 0
+WARNING 2025-09-01 14:50:27,731 log Not Found: /materials/
+WARNING 2025-09-01 14:50:27,732 basehttp "GET /materials/ HTTP/1.1" 404 2352
+INFO 2025-09-01 14:50:34,557 basehttp "OPTIONS /api/notices/ HTTP/1.1" 200 0
+WARNING 2025-09-01 14:50:34,567 log Not Found: /api/notices/
+WARNING 2025-09-01 14:50:34,569 basehttp "GET /api/notices/ HTTP/1.1" 404 2699
+INFO 2025-09-01 14:50:36,620 basehttp "OPTIONS /api/students/ HTTP/1.1" 200 0
+WARNING 2025-09-01 14:50:36,630 log Not Found: /api/students/
+WARNING 2025-09-01 14:50:36,631 basehttp "GET /api/students/ HTTP/1.1" 404 2702
+INFO 2025-09-01 14:50:36,639 basehttp "OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+WARNING 2025-09-01 14:50:36,690 log Not Found: /api/experiments/experiments/
+WARNING 2025-09-01 14:50:36,692 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 404 2747
+WARNING 2025-09-01 14:50:39,070 log Not Found: /api/experiments/experiments/
+INFO 2025-09-01 14:50:39,072 basehttp "OPTIONS /api/experiments/submissions/ HTTP/1.1" 200 0
+WARNING 2025-09-01 14:50:39,073 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 404 2747
+WARNING 2025-09-01 14:50:39,083 log Not Found: /api/experiments/submissions/
+WARNING 2025-09-01 14:50:39,084 basehttp "GET /api/experiments/submissions/ HTTP/1.1" 404 2747
+INFO 2025-09-01 14:50:41,387 basehttp "OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+WARNING 2025-09-01 14:50:41,398 log Not Found: /api/forum/questions/
+WARNING 2025-09-01 14:50:41,400 basehttp "GET /api/forum/questions/ HTTP/1.1" 404 2723
+WARNING 2025-09-01 14:50:44,425 log Not Found: /api/students/
+WARNING 2025-09-01 14:50:44,425 basehttp "GET /api/students/ HTTP/1.1" 404 2702
+WARNING 2025-09-01 14:50:44,470 log Not Found: /api/experiments/experiments/
+WARNING 2025-09-01 14:50:44,475 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 404 2747
+WARNING 2025-09-01 14:50:57,221 log Not Found: /materials/
+WARNING 2025-09-01 14:50:57,223 basehttp "GET /materials/ HTTP/1.1" 404 2352
+WARNING 2025-09-01 14:52:04,103 log Not Found: /api/notices/
+WARNING 2025-09-01 14:52:04,104 basehttp "GET /api/notices/ HTTP/1.1" 404 2699
+WARNING 2025-09-01 14:52:05,354 log Not Found: /materials/
+WARNING 2025-09-01 14:52:05,355 basehttp "GET /materials/ HTTP/1.1" 404 2352
+WARNING 2025-09-01 14:52:35,678 log Not Found: /materials/
+WARNING 2025-09-01 14:52:35,679 basehttp "GET /materials/ HTTP/1.1" 404 2352
+INFO 2025-09-01 14:57:27,942 autoreload Watching for file changes with StatReloader
+WARNING 2025-09-01 14:57:54,508 log Not Found: /materials/
+WARNING 2025-09-01 14:57:54,509 basehttp "GET /materials/ HTTP/1.1" 404 2352
+INFO 2025-09-01 15:14:29,167 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:30:34,954 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:32:07,170 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:38:08,160 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:44:42,211 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:47:24,915 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:55:18,819 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:01:28,599 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:21:30,542 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:26:58,833 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:40:27,905 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:43:32,039 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:51:33,136 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:53:24,341 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:00:04,307 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:12:59,176 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:22:39,854 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:27:55,471 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:32:09,359 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:43:46,607 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:51:46,349 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:57:55,497 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 18:01:18,200 basehttp "POST /api/auth/register/ HTTP/1.0" 201 47
+INFO 2025-09-01 18:01:34,960 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-01 18:01:35,296 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-01 18:01:57,914 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-01 18:01:58,260 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-01 18:02:09,484 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 200 129
+INFO 2025-09-01 18:15:18,714 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:00:43,948 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:03:14,536 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:13:35,663 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:16:48,292 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:21:48,992 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:28:10,192 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:32:06,212 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:38:39,973 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:59:56,872 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:03:47,665 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:04:30,155 basehttp "POST /api/auth/register/ HTTP/1.0" 201 47
+INFO 2025-09-02 10:04:48,953 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:04:49,158 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:09:59,182 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:10:30,721 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:10:30,990 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:17:22,698 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:17:52,480 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:17:52,702 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:19:39,435 autoreload /app/server/settings.py changed, reloading.
+INFO 2025-09-02 10:19:40,785 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:20:55,494 autoreload /app/server/settings.py changed, reloading.
+INFO 2025-09-02 10:20:56,595 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:26:34,510 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:27:16,418 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:27:16,617 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:29:36,254 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:29:36,454 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:30:52,576 autoreload /app/server/settings.py changed, reloading.
+INFO 2025-09-02 10:30:53,724 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:31:22,987 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:31:23,224 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:33:51,623 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:34:28,738 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:34:28,944 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:40:04,810 autoreload Watching for file changes with StatReloader
+WARNING 2025-09-02 10:40:31,417 log Bad Request: /api/auth/login/
+WARNING 2025-09-02 10:40:31,418 basehttp "POST /api/auth/login/ HTTP/1.0" 400 84
+WARNING 2025-09-02 10:40:37,872 log Bad Request: /api/auth/login/
+WARNING 2025-09-02 10:40:37,873 basehttp "POST /api/auth/login/ HTTP/1.0" 400 84
+INFO 2025-09-02 10:40:42,704 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:40:42,961 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:54:52,417 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:56:25,479 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:56:25,701 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 11:06:41,651 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 11:07:19,052 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 11:07:19,255 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+WARNING 2025-09-02 11:09:15,030 log Bad Request: /api/auth/user/profile/
+WARNING 2025-09-02 11:09:15,031 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 400 94
+WARNING 2025-09-02 11:09:19,386 log Bad Request: /api/auth/user/profile/
+WARNING 2025-09-02 11:09:19,387 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 400 94
+INFO 2025-09-02 11:09:39,828 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 11:09:40,055 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+WARNING 2025-09-02 11:09:52,694 log Bad Request: /api/auth/user/profile/
+WARNING 2025-09-02 11:09:52,696 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 400 94
+INFO 2025-09-02 11:11:46,419 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 11:11:52,022 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 200 129
+INFO 2025-09-02 11:11:55,023 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 200 129
+INFO 2025-09-02 11:13:44,444 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:13:44,672 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:16:12,810 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 11:16:36,890 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:16:37,114 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:20:17,413 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 11:20:48,800 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:20:49,020 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:26:06,060 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 14:08:39,539 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 14:09:39,202 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 14:09:39,400 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 14:22:15,803 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 14:22:51,297 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 14:22:51,504 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 14:25:18,156 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 16:17:45,846 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 16:38:18,583 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 16:39:10,700 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 16:39:10,906 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 16:51:46,707 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 17:03:43,480 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 17:04:49,543 basehttp "POST /api/auth/register/ HTTP/1.0" 201 47
+INFO 2025-09-02 17:05:07,080 basehttp "POST /api/auth/login/ HTTP/1.0" 200 869
+INFO 2025-09-02 17:05:07,297 basehttp "POST /api/auth/login/ HTTP/1.0" 200 869
+INFO 2025-09-02 17:06:18,648 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 17:06:18,872 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
