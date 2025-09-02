@@ -294,7 +294,7 @@ jobs:
         run: |
           docker run -d --name notice-service-test \
             -p 8001:8000 \
-            -e DJANGO_SETTINGS_MODULE=notice_service.settings \
+            -e DJANGO_SETTINGS_MODULE=server.settings \
             -e DB_ENGINE=django.db.backends.mysql \
             -e DB_NAME=test_db_notice \
             -e DB_USER=root \
@@ -338,6 +338,13 @@ jobs:
       #     docker exec notice-service-test python manage.py makemigrations notice
       #     docker exec notice-service-test python manage.py migrate
         
+      - name: 验证容器内项目结构
+        run: |
+          docker run --rm notice-service:test ls -l /app
+          docker run --rm notice-service:test python -c "import server; print('server 模块导入成功')"
+          docker run --rm notice-service:test python -c "import notice; print('notice 模块导入成功')"
+
+
       - name: 运行单元测试
         run: docker exec notice-service-test python manage.py test --verbosity=2
 
