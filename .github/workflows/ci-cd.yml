@@ -574,11 +574,11 @@ jobs:
           echo "stuTest信息："
           curl -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}' > token.json
           TOKEN=$(cat token.json | python3 -c "import sys, json; print(json.load(sys.stdin).get('access', ''))")
-          curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/api/user/profile/
+          curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/api/auth/user/profile/
           echo "tchTest信息："
           curl -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}' > token.json
           TOKEN=$(cat token.json | python3 -c "import sys, json; print(json.load(sys.stdin).get('access', ''))")
-          curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/api/user/profile/
+          curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/api/auth/user/profile/
         working-directory: ./frontend
 
       - name: 检查登录接口响应
