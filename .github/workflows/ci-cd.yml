@@ -181,7 +181,7 @@ jobs:
         run: |
           docker run -d --name materials-service-test \
             -p 8001:8000 \
-            -e DJANGO_SETTINGS_MODULE=materials_service.settings \
+            -e DJANGO_SETTINGS_MODULE=materials-service.settings \
             -e DB_ENGINE=django.db.backends.mysql \
             -e DB_NAME=test_db_materials \
             -e DB_USER=root \
@@ -192,7 +192,25 @@ jobs:
             materials-service:test
             
       - name: 等待服务启动
-        run: sleep 10
+        run: |
+          # 等待容器启动
+          for i in {1..30}; do
+            if docker ps | grep -q "materials-service-test"; then
+              echo "容器已启动"; break
+            fi
+            echo "等待容器启动...($i/30)"; sleep 2
+          done
+          
+          # 等待应用就绪
+          docker exec materials-service-test bash -c '
+            for i in {1..30}; do
+              if curl -s http://localhost:8000/healthcheck; then
+                echo "应用已就绪"; exit 0
+              fi
+              echo "等待应用启动...($i/30)"; sleep 2
+            done
+            echo "应用启动超时"; exit 1
+          '
 
       - name: 检查容器状态和日志
         run: |
@@ -208,6 +226,8 @@ jobs:
           echo "=== 4. 等待5秒后再次确认状态 ==="
           sleep 5
           docker ps -a | grep "materials-service-test" || echo "容器已消失"
+
+
 
       - name: 重置迁移历史
         run: |
