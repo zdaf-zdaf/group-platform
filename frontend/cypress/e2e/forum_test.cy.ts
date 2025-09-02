@@ -47,6 +47,11 @@ describe('论坛模块功能测试', () => {
   it('学生端发帖、点赞、评论、删除', () => {
     login(student)
 
+    // 页面缓冲，确保渲染和数据加载完成
+    cy.wait(3000)
+    cy.get('.forum', { timeout: 20000 }).should('exist')
+    cy.wait(2000)
+
     cy.contains('答疑论坛').click({ force: true })
     cy.url({ timeout: 15000 }).should('include', '/forum')
     cy.get('.forum').should('exist')
