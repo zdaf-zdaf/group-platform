@@ -299,7 +299,7 @@ jobs:
             -e DB_NAME=test_db_notice \
             -e DB_USER=root \
             -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=host.docker.internal \
+            -e DB_HOST=127.0.0.1 \
             -e DB_PORT=3306 \
             -e DEBUG=True \
             notice-service:test
