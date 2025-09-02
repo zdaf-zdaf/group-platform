@@ -13,6 +13,11 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+    
+    # 添加延迟初始化
+    import django
+    django.setup()
+    
     execute_from_command_line(sys.argv)
 
 if __name__ == '__main__':

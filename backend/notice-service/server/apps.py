@@ -5,5 +5,6 @@ class ServerConfig(AppConfig):
     name = 'server'
     
     def ready(self):
-        # 在这里导入自定义认证类
+        # 延迟导入自定义认证类
         from . import authentication
+        print("Custom authentication class loaded")
