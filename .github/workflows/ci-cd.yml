@@ -274,10 +274,9 @@ jobs:
 
       - name: 等待MySQL就绪
         run: |
-          sudo apt-get update && sudo apt-get install -y mysql-client netcat
+          sudo apt-get update && sudo apt-get install -y mysql-client
           for i in {1..30}; do
-            # 使用 netcat 检查端口和 mysqladmin 检查服务
-            if nc -z 127.0.0.1 3306 && mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
               echo "MySQL已就绪"; break
             fi
             echo "等待MySQL...($i/30)"; sleep 2
@@ -287,32 +286,26 @@ jobs:
             ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
             ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
             FLUSH PRIVILEGES;"
-          
-      - name: 验证MySQL连接
-        run: |
-          mysql -h 127.0.0.1 -u root -prootpassword -e "CREATE DATABASE IF NOT EXISTS test_db_notice;"
-          mysql -h 127.0.0.1 -u root -prootpassword -e "SHOW DATABASES;"
-          echo "MySQL连接验证成功"
-          
+            
       - name: 构建论坛微服务镜像
-        run: docker build -t notice-service:test ./backend/notice_service
+        run: docker build -t notice_service:test ./backend/notice_service
         
       - name: 运行论坛微服务容器
         run: |
-          docker run -d --name notice-service-test \
+          docker run -d --name notice_service-test \
             -p 8001:8000 \
-            -e DJANGO_SETTINGS_MODULE=server.settings \
+            -e DJANGO_SETTINGS_MODULE=notice_service.settings \
             -e DB_ENGINE=django.db.backends.mysql \
             -e DB_NAME=test_db_notice \
             -e DB_USER=root \
             -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=127.0.0.1 \  # 使用 127.0.0.1 而不是容器名称
+            -e DB_HOST=127.0.0.1 \
             -e DB_PORT=3306 \
             -e DEBUG=True \
-            notice-service:test
-              
+            notice_service:test
+            
       - name: 等待服务启动
-        run: sleep 30  # 增加等待时间
+        run: sleep 10
 
       - name: 检查容器状态和日志
         run: |
@@ -320,26 +313,33 @@ jobs:
           docker ps -a
 
           echo "=== 2. 查看论坛服务容器的详细日志 ==="
-          docker logs notice-service-test || echo "无法获取日志，容器可能不存在或从未启动"
+          docker logs notice_service-test || echo "无法获取日志，容器可能不存在或从未启动"
 
           echo "=== 3. 检查容器的退出状态码 ==="
-          docker inspect notice-service-test --format='{{.State.ExitCode}}' || echo "无法检查容器状态"
+          docker inspect notice_service-test --format='{{.State.ExitCode}}' || echo "无法检查容器状态"
 
           echo "=== 4. 等待5秒后再次确认状态 ==="
           sleep 5
-          docker ps -a | grep "notice-service-test" || echo "容器已消失"
+          docker ps -a | grep "notice_service-test" || echo "容器已消失"
 
+      # - name: 重置迁移历史
+      #   run: |
+      #     # 删除所有迁移文件
+      #     docker exec notice-service-test bash -c 'rm notice/migrations/0*.py'
+          
+      #     # 创建新的初始迁移
+      #     docker exec notice-service-test python manage.py makemigrations notice
+          
+      #     # 应用迁移
+      #     docker exec notice-service-test python manage.py migrate
+        
+      # - name: 运行数据库迁移
+      #   run: |
+      #     docker exec notice-service-test python manage.py makemigrations notice
+      #     docker exec notice-service-test python manage.py migrate
+        
       - name: 运行单元测试
-        run: |
-          # 检查容器是否运行
-          if docker ps | grep -q "notice-service-test"; then
-            echo "容器正在运行，执行测试"
-            docker exec notice-service-test python manage.py migrate
-            docker exec notice-service-test python manage.py test --verbosity=2
-          else
-            echo "容器未运行，无法执行测试"
-            exit 1
-          fi
+        run: docker exec notice-service-test python manage.py test --verbosity=2
 
   # ================ 实验微服务单元测试 ================
   test-experiments-service:

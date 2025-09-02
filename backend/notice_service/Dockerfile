@@ -3,8 +3,8 @@ FROM python:3.11-slim-bullseye
 # 设置环境变量
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app:$PYTHONPATH \  
-    DJANGO_SETTINGS_MODULE=server.settings \
+    PYTHONPATH=/app:/app/notice_service:$PYTHONPATH \  
+    DJANGO_SETTINGS_MODULE=motice_server.settings \
     PORT=8000
 
 # 设置工作目录
@@ -23,8 +23,7 @@ RUN sed -i 's|http://deb.debian.org/debian|https://mirrors.aliyun.com/debian|g' 
 
 # 复制依赖文件并安装
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-#  -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 复制整个项目
 COPY . .
@@ -42,14 +41,5 @@ EXPOSE $PORT
 HEALTHCHECK --interval=30s --timeout=3s \
     CMD curl -f http://localhost:$PORT/healthcheck/ || exit 1
 
-# 创建等待数据库的脚本
-# 在 Dockerfile 中添加等待数据库的脚本
-RUN echo '#!/bin/sh\n\
-while ! nc -z $DB_HOST $DB_PORT; do\n\
-  echo "等待数据库..."\n\
-  sleep 2\n\
-done\n\
-echo "数据库已就绪"' > /wait-for-db.sh && chmod +x /wait-for-db.sh
-
-# 修改启动命令
-CMD ["sh", "-c", "/wait-for-db.sh && python manage.py migrate && gunicorn server.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
+# 启动命令
+CMD ["sh", "-c", "python manage.py migrate && gunicorn server.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
