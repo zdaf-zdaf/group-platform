@@ -2,9 +2,9 @@ name: group-pipeline
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 jobs:
   # ================ 检测变更的微服务 ================
@@ -1028,7 +1028,7 @@ jobs:
             deploy-to-local.sh
           retention-days: 7
 
-  # ==================== 第七阶段：通知 ====================
+  # ==================== 通知 ====================
   notify-deployment-ready:
     runs-on: ubuntu-latest
     needs: generate-deployment-script
