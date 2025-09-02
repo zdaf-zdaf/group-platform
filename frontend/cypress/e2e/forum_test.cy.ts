@@ -15,14 +15,12 @@ describe('论坛模块功能测试', () => {
       username: user.username,
       password: user.password
     }).then((response) => {
-      expect(response.status).to.eq(200)
-      token = response.body.access || response.body.token || response.body.data?.token
-      expect(token, 'token should exist').to.not.be.null
-
-      cy.visit('/profile', {
+      expect(response.status).to.eq(200);
+      token = response.body.access || response.body.token || response.body.data?.token;
+      expect(token, 'token should exist').to.not.be.null;
+      cy.visit('/', {
         onBeforeLoad(win) {
-          win.localStorage.setItem('token', token)
-          // 写入 userInfo，便于前端鉴权
+          win.localStorage.setItem('token', token);
           if (response.body.username) {
             win.localStorage.setItem('userInfo', JSON.stringify({
               username: response.body.username,
@@ -30,14 +28,16 @@ describe('论坛模块功能测试', () => {
               email: response.body.email,
               student_id: response.body.student_id,
               faculty: response.body.faculty
-            }))
+            }));
           }
         }
-      })
-      cy.reload()
-      cy.visit('/')
-      cy.wait(1000)
-    })
+      });
+      cy.wait(1000);
+      // 断言 token 已写入 localStorage
+      cy.window().then(win => {
+        expect(win.localStorage.getItem('token')).to.exist;
+      });
+    });
   }
 
   // 学生端发帖、点赞、评论、删除
