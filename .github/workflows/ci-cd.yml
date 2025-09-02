@@ -60,6 +60,8 @@ jobs:
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
           
     steps:
       - name: 检出代码
@@ -77,6 +79,7 @@ jobs:
           # 配置远程访问
           mysql -h"127.0.0.1" -uroot -prootpassword -e "
             ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
+            ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
             FLUSH PRIVILEGES;"
             
       - name: 构建论坛微服务镜像
@@ -85,17 +88,22 @@ jobs:
       - name: 运行论坛微服务容器
         run: |
           docker run -d --name forum-service \
+            --network host \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -e DJANGO_SETTINGS_MODULE=server.settings \
             -e DB_ENGINE=django.db.backends.mysql \
-            -e DB_NAME=test_db_forum \
+            -e DB_NAME=test_db \
             -e DB_USER=root \
             -e DB_PASSWORD=rootpassword \
             -e DB_HOST=127.0.0.1 \
             -e DB_PORT=3306 \
             -e DEBUG=False \
-            forum-service:test
+            course-backend:latest
             
       - name: 执行数据库迁移
-        run: docker exec forum-service python manage.py migrate --noinput
+        run: |
+          docker exec course-backend-container python manage.py makemigrations --noinput
+          docker exec course-backend-container python manage.py migrate --noinput
         
       - name: 运行单元测试
         run: docker exec forum-service python manage.py test --verbosity=2
