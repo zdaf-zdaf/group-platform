@@ -10,48 +10,20 @@ describe('论坛模块功能测试', () => {
 
   // 登录函数封装
   function login(user: { username: string; password: string }) {
-    cy.log('step1: visit /login')
-    cy.visit('/login')
-    cy.log('step2: type username')
-    cy.get('input[placeholder="请输入用户名"]').type(user.username)
-    cy.log('step3: type password')
-    cy.get('input[placeholder="请输入密码"]').type(user.password)
-    cy.log('step4: check rememberMe')
-    cy.get('input[type="checkbox"]').check({ force: true })
-
-    cy.log('step5: intercept login api')
-    // 拦截登录接口
-    cy.intercept('POST', '/api/auth/login/').as('loginRequest')
-    cy.log('step6: click login button')
-    cy.get('button').contains('立即登录').click()
-
-    cy.log('step7: wait loginRequest')
-    // 等待接口返回成功
-    cy.wait('@loginRequest').then(interception => {
-      cy.log('login status:', interception.response?.statusCode)
-      cy.log('login response body:', JSON.stringify(interception.response?.body))
-      expect(interception.response?.statusCode).to.eq(200)
-    })
-
-    // 检查 token 是否写入
-    cy.window().then(win => {
-      const token = win.localStorage.getItem('token')
-      cy.log('localStorage token:', token)
+    cy.request('POST', '/api/auth/login/', {
+      username: user.username,
+      password: user.password
+    }).then((response) => {
+      expect(response.status).to.eq(200)
+      const token = response.body.token || response.body.data?.token
       expect(token, 'token should exist').to.not.be.null
-    })
-    cy.window().then(win => {
-      cy.log('全部 localStorage:', JSON.stringify(win.localStorage))
-    })
-    cy.getCookies().then(cookies => {
-      cy.log('全部 cookies:', JSON.stringify(cookies))
-    })
 
-    // 宽松检查 URL，不要写死 /profile
-    cy.url({ timeout: 20000 }).then(url => {
-      cy.log('当前 URL: ' + url)
-      expect(url).to.not.include('/login')  // 只要不是停在 /login 就算成功
+      cy.visit('/profile', {
+        onBeforeLoad(win) {
+          win.localStorage.setItem('token', token)
+        }
+      })
     })
-
   }
 
   // 学生端发帖、点赞、评论、删除
