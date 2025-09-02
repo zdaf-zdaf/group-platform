@@ -18,22 +18,19 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0', // 允许从外部访问
+    port: 5173,      // 明确指定前端开发服务器的端口
+    // 关键修改：将所有 API 请求指向 Nginx 网关
     proxy: {
-      // 学习资料相关的请求，转发到 materials_service (8004端口)
-      '/api/materials': {
-        target: 'http://127.0.0.1:8004',
-        changeOrigin: true,
-      },
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:80', // 所有 /api 的请求都发往网关
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        // 不需要 rewrite，因为网关的 location 已经包含了 /api
       },
-      // 学习资料的媒体文件，也转发到 materials_service (8001端口)
-      '/media/materials': {
-        target: 'http://127.0.0.1:8004',
+      '/media': {
+        target: 'http://localhost:80', // 所有 /media 的请求也发往网关
         changeOrigin: true,
-      },
-    },
+      }
+    }
   },
 })

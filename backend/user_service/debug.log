@@ -355,3 +355,100 @@ WARNING 2025-09-01 14:52:35,679 basehttp "GET /materials/ HTTP/1.1" 404 2352
 INFO 2025-09-01 14:57:27,942 autoreload Watching for file changes with StatReloader
 WARNING 2025-09-01 14:57:54,508 log Not Found: /materials/
 WARNING 2025-09-01 14:57:54,509 basehttp "GET /materials/ HTTP/1.1" 404 2352
+INFO 2025-09-01 15:14:29,167 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:30:34,954 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:32:07,170 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:38:08,160 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:44:42,211 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:47:24,915 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 15:55:18,819 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:01:28,599 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:21:30,542 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:26:58,833 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:40:27,905 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:43:32,039 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:51:33,136 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 16:53:24,341 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:00:04,307 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:12:59,176 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:22:39,854 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:27:55,471 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:32:09,359 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:43:46,607 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:51:46,349 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 17:57:55,497 autoreload Watching for file changes with StatReloader
+INFO 2025-09-01 18:01:18,200 basehttp "POST /api/auth/register/ HTTP/1.0" 201 47
+INFO 2025-09-01 18:01:34,960 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-01 18:01:35,296 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-01 18:01:57,914 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-01 18:01:58,260 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-01 18:02:09,484 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 200 129
+INFO 2025-09-01 18:15:18,714 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:00:43,948 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:03:14,536 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:13:35,663 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:16:48,292 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:21:48,992 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:28:10,192 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:32:06,212 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:38:39,973 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 09:59:56,872 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:03:47,665 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:04:30,155 basehttp "POST /api/auth/register/ HTTP/1.0" 201 47
+INFO 2025-09-02 10:04:48,953 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:04:49,158 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:09:59,182 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:10:30,721 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:10:30,990 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:17:22,698 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:17:52,480 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:17:52,702 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:19:39,435 autoreload /app/server/settings.py changed, reloading.
+INFO 2025-09-02 10:19:40,785 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:20:55,494 autoreload /app/server/settings.py changed, reloading.
+INFO 2025-09-02 10:20:56,595 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:26:34,510 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:27:16,418 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:27:16,617 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:29:36,254 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:29:36,454 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:30:52,576 autoreload /app/server/settings.py changed, reloading.
+INFO 2025-09-02 10:30:53,724 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:31:22,987 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:31:23,224 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:33:51,623 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:34:28,738 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:34:28,944 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:40:04,810 autoreload Watching for file changes with StatReloader
+WARNING 2025-09-02 10:40:31,417 log Bad Request: /api/auth/login/
+WARNING 2025-09-02 10:40:31,418 basehttp "POST /api/auth/login/ HTTP/1.0" 400 84
+WARNING 2025-09-02 10:40:37,872 log Bad Request: /api/auth/login/
+WARNING 2025-09-02 10:40:37,873 basehttp "POST /api/auth/login/ HTTP/1.0" 400 84
+INFO 2025-09-02 10:40:42,704 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:40:42,961 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:54:52,417 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 10:56:25,479 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 10:56:25,701 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 11:06:41,651 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 11:07:19,052 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 11:07:19,255 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+WARNING 2025-09-02 11:09:15,030 log Bad Request: /api/auth/user/profile/
+WARNING 2025-09-02 11:09:15,031 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 400 94
+WARNING 2025-09-02 11:09:19,386 log Bad Request: /api/auth/user/profile/
+WARNING 2025-09-02 11:09:19,387 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 400 94
+INFO 2025-09-02 11:09:39,828 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+INFO 2025-09-02 11:09:40,055 basehttp "POST /api/auth/login/ HTTP/1.0" 200 873
+WARNING 2025-09-02 11:09:52,694 log Bad Request: /api/auth/user/profile/
+WARNING 2025-09-02 11:09:52,696 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 400 94
+INFO 2025-09-02 11:11:46,419 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 11:11:52,022 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 200 129
+INFO 2025-09-02 11:11:55,023 basehttp "PATCH /api/auth/user/profile/ HTTP/1.0" 200 129
+INFO 2025-09-02 11:13:44,444 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:13:44,672 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:16:12,810 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 11:16:36,890 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:16:37,114 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:20:17,413 autoreload Watching for file changes with StatReloader
+INFO 2025-09-02 11:20:48,800 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:20:49,020 basehttp "POST /api/auth/login/ HTTP/1.0" 200 975
+INFO 2025-09-02 11:26:06,060 autoreload Watching for file changes with StatReloader
