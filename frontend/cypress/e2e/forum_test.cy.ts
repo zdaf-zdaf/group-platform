@@ -34,6 +34,8 @@ describe('论坛模块功能测试', () => {
         }
       })
       cy.reload()
+      cy.visit('/')
+      cy.wait(1000)
     })
   }
 
