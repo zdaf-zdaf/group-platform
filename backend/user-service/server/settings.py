@@ -139,9 +139,9 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'user_service_db',
+        'NAME': 'lab_platform',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': '2023mahaoling',
         'HOST': 'host.docker.internal',
         'PORT': '3306',
         'OPTIONS': {

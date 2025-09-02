@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-x#3rw8e#yw-q4*lp!*+-4h3bj^6)&svevyc5!57-2&vp@r3wv!')
+SECRET_KEY = 'django-insecure-9ekm#x74ns6(j*h)3+jb-v*sz7bho2edo%g)uktin)ugf-5!s%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -80,8 +80,15 @@ WSGI_APPLICATION = 'forum_service.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'lab_platform',
+        'USER': 'root',
+        'PASSWORD': '2023mahaoling',
+        'HOST': 'host.docker.internal',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        }
     }
 }
 
@@ -128,8 +135,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # 用户微服务URL
-USER_SERVICE_URL = 'http://user-service:8000/api/auth'
-
+USER_SERVICE_URL = 'http://user-service:8001/api/auth'
+USER_SERVICE_TOKEN = os.getenv('USER_SERVICE_TOKEN', 'your-shared-token-here')
 # CORS设置
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True

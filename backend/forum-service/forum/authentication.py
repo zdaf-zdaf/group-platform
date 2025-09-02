@@ -4,6 +4,16 @@ from django.conf import settings
 import jwt
 from jwt import exceptions
 
+class SimpleUser:
+    def __init__(self, user_id, is_admin=False):
+        self.id = user_id
+        self.user_id = user_id  # 为了兼容性
+        self.is_authenticated = True
+        self.is_admin = is_admin
+    
+    def __str__(self):
+        return f"User {self.id}"
+
 class JWTAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         # 从请求头中获取认证令牌
@@ -35,8 +45,11 @@ class JWTAuthentication(authentication.BaseAuthentication):
         if not user_id:
             raise AuthenticationFailed('认证令牌中缺少用户ID')
             
+        # 创建用户对象
+        user = SimpleUser(user_id, is_admin=(role == 'teacher'))
+
         # 将用户信息添加到请求对象中
         request.user_id = user_id
         request.is_admin = (role == 'teacher')  # 假设教师是管理员
         
-        return (None, None)  # 返回None因为我们已经处理了认证
+        return (user, None)  # 返回None因为我们已经处理了认证
