@@ -10,17 +10,27 @@ describe('论坛模块功能测试', () => {
 
   // 登录函数封装
   function login(user: { username: string; password: string }) {
-    cy.request('POST', 'http://127.0.0.1:8000/api/auth/login/', {
+    cy.request('POST', 'http://localhost:8000/api/auth/login/', {
       username: user.username,
       password: user.password
     }).then((response) => {
       expect(response.status).to.eq(200)
-      const token = response.body.token || response.body.data?.token
+      const token = response.body.access || response.body.token || response.body.data?.token
       expect(token, 'token should exist').to.not.be.null
 
       cy.visit('/profile', {
         onBeforeLoad(win) {
           win.localStorage.setItem('token', token)
+          // 写入 userInfo，便于前端鉴权
+          if (response.body.username) {
+            win.localStorage.setItem('userInfo', JSON.stringify({
+              username: response.body.username,
+              role: response.body.role,
+              email: response.body.email,
+              student_id: response.body.student_id,
+              faculty: response.body.faculty
+            }))
+          }
         }
       })
       cy.reload()
