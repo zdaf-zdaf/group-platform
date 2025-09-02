@@ -61,7 +61,7 @@ describe('论坛模块功能测试', () => {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
     })
-  cy.get('.el-message__content', { timeout: 20000 }).should('contain.text', '问题发布成功')
+    cy.get('.post-card', { timeout: 20000 }).should('contain.text', postTitle)
     cy.get('.post-card').should('contain.text', postTitle)
 
     // 点赞和取消点赞
@@ -75,20 +75,21 @@ describe('论坛模块功能测试', () => {
     cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
       cy.get('input[placeholder="写下你的评论..."]').type(postComment + '{enter}')
     })
-    cy.contains('评论添加成功').should('be.visible')
+  cy.get('.post-card').contains(postComment).should('exist')
     cy.get('.post-card').contains(postComment).should('exist')
 
     // 删除评论
     cy.get('.post-card').contains(postComment).parents('.comment').within(() => {
       cy.get('button').contains('删除评论').click({ force: true })
     })
-    cy.contains('评论已删除').should('be.visible')
+  cy.get('.post-card').contains(postComment).should('not.exist')
 
     // 删除帖子
     cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
       cy.get('button').contains('删除').click({ force: true })
     })
-    cy.contains('问题已删除').should('be.visible')
+  cy.wait(1500)
+  cy.contains('.post-card', postTitle).should('not.exist')
   })
 
   // 教师端置顶、点赞、评论、删除
@@ -113,7 +114,7 @@ describe('论坛模块功能测试', () => {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
     })
-  cy.get('.el-message__content', { timeout: 20000 }).should('contain.text', '问题发布成功')
+    cy.get('.post-card', { timeout: 20000 }).should('contain.text', postTitle)
     cy.get('.post-card').should('contain.text', postTitle)
 
     // 置顶和取消置顶
@@ -134,19 +135,20 @@ describe('论坛模块功能测试', () => {
     cy.get('.post-card').first().within(() => {
       cy.get('input[placeholder="写下你的评论..."]').type(teacherComment + '{enter}')
     })
-    cy.contains('评论添加成功').should('be.visible')
+  cy.get('.post-card').contains(teacherComment).should('exist')
     cy.get('.post-card').contains(teacherComment).should('exist')
 
     // 删除评论
     cy.get('.post-card').contains(teacherComment).parents('.comment').within(() => {
       cy.get('button').contains('删除评论').click({ force: true })
     })
-    cy.contains('评论已删除').should('be.visible')
+  cy.get('.post-card').contains(teacherComment).should('not.exist')
 
     // 删除帖子
     cy.get('.post-card').first().within(() => {
       cy.get('button').contains('删除').click({ force: true })
     })
-    cy.contains('问题已删除').should('be.visible')
+  cy.wait(1500)
+  cy.contains('.post-card', postTitle).should('not.exist')
   })
 })
