@@ -1,0 +1,129 @@
+name: Materials Service CI/CD
+
+on:
+  push:
+    paths:
+      - 'backend/materials-service/**'  # 只监控materials-service目录的变更
+    branches: [ "master" ]
+  pull_request:
+    paths:
+      - 'backend/materials-service/**'
+    branches: [ "master" ]
+
+jobs:
+  test-materials-service:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: materials_db
+          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+        working-directory: ./materials-service
+
+      - name: Wait for MySQL
+        run: |
+          sudo apt-get update && sudo apt-get install -y mysql-client
+          for i in {1..30}; do
+            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
+              echo "MySQL is ready!"; break
+            fi
+            echo "Waiting for MySQL... (attempt $i/30)"; sleep 2
+          done
+
+      - name: Run migrations
+        run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+        working-directory: ./materials-service
+        env:
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: materials_db
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+
+      - name: Run unit tests
+        run: python manage.py test --verbosity=2
+        working-directory: ./materials-service
+        env:
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: materials_db
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+
+  build-and-push-materials-service:
+    runs-on: ubuntu-latest
+    needs: test-materials-service
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          usersname: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build and push materials service image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./materials-service
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/materials-service:latest
+            ghcr.io/${{ github.repository_owner }}/materials-service:${{ github.sha }}
+
+  deploy-materials-service:
+    runs-on: ubuntu-latest
+    needs: build-and-push-materials-service
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate deployment script for materials service
+        run: |
+          cat > deploy-materials-service.sh << 'EOF'
+          #!/bin/bash
+          echo "Deploying Materials Service..."
+          
+          # Update image version
+          sed -i "s|image:.*materials-service:.*|image: ghcr.io/${{ github.repository }}/materials-service:${{ github.sha }}|g" materials-service/k8s/deployment.yaml
+          
+          # Apply Kubernetes configuration
+          kubectl apply -f materials-service/k8s/
+          
+          echo "Materials Service deployed!"
+          EOF
+          
+          chmod +x deploy-materials-service.sh
+
+      - name: Upload deployment script
+        uses: actions/upload-artifact@v4
+        with:
+          name: materials-service-deployment
+          path: deploy-materials-service.sh

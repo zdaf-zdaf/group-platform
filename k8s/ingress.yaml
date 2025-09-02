@@ -1,26 +1,52 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: course-platform-ingress
+  name: microservices-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: nginx
   rules:
-  - host: localhost
-    http:
+  - http:
       paths:
+      - path: /api/users
+        pathType: Prefix
+        backend:
+          service:
+            name: user-service
+            port:
+              number: 8000
+      - path: /api/notices
+        pathType: Prefix
+        backend:
+          service:
+            name: notice-service
+            port:
+              number: 8000
+      - path: /api/materials
+        pathType: Prefix
+        backend:
+          service:
+            name: materials-service
+            port:
+              number: 8000
+      - path: /api/forum
+        pathType: Prefix
+        backend:
+          service:
+            name: forum-service
+            port:
+              number: 8000
+      - path: /api/lab
+        pathType: Prefix
+        backend:
+          service:
+            name: lab-service
+            port:
+              number: 8000
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: frontend-service
+            name: frontend
             port:
               number: 80
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: course-backend
-            port:
-              number: 8000
