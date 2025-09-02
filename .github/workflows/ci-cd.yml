@@ -15,27 +15,39 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整提交历史
-          
+          fetch-depth: 0
       - name: 识别变更的微服务
         id: changed
         run: |
-          # 识别backend目录下有变更的子目录（微服务）
+          # 调试：显示所有变更的文件
+          echo "=== 所有变更文件 ==="
+          git diff --name-only HEAD^ HEAD || echo "无法获取差异"
+          
+          # 检测backend目录下变更的微服务
           changed_dirs=$(git diff --name-only HEAD^ HEAD | grep -o '^backend/[^/]*' | sort | uniq)
-          # 如果没有变更，默认构建所有服务
+          
+          # 调试：显示检测到的服务
+          echo "=== 检测到的服务变更 ==="
+          echo "$changed_dirs"
+          
+          # 如果没有变更，默认构建所有服务（用于测试）
           if [ -z "$changed_dirs" ]; then
-            changed_dirs="backend/experiments-service backend/forum-service backend/materials-service backend/notice-service backend/user-service"
+            changed_dirs="backend/forum backend/materials backend/notice backend/experiments backend/user"
+            echo "=== 无变更，构建所有服务 ==="
           fi
-          # 转换为JSON数组格式
-          json_list=$(echo $changed_dirs | jq -R -s -c 'split("\n") | map(select(. != ""))')
-          echo "changed_services=$json_list" >> $GITHUB_OUTPUT
+          
+          # 转换为简单格式（去掉backend/前缀）
+          simple_dirs=$(echo "$changed_dirs" | sed 's|backend/||g')
+          echo "changed_services=$simple_dirs" >> $GITHUB_OUTPUT
+          echo "=== 最终输出 ==="
+          echo "$simple_dirs"
   
   # ================ 论坛微服务单元测试 ================
   test-forum-service:
     runs-on: ubuntu-latest
     needs: detect-changed-services
     # 仅当forum-service有变更时运行
-    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/forum-service') }}
+    if: ${{ always() }}
     services:
       mysql:
         image: mysql:8.0
@@ -93,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changed-services
     # 仅当materials-service有变更时运行
-    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/materials-service') }}
+    if: ${{ contains(needs.detect-changed-services.outputs.changed-services, 'materials') }}
     services:
       mysql:
         image: mysql:8.0
@@ -151,7 +163,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changed-services
     # 仅当notice-service有变更时运行
-    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/notice-service') }}
+    if: ${{ contains(needs.detect-changed-services.outputs.changed-services, 'notice') }}
     services:
       mysql:
         image: mysql:8.0
@@ -209,7 +221,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changed-services
     # 仅当experiments-service有变更时运行
-    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/experiments-service') }}
+    if: ${{ contains(needs.detect-changed-services.outputs.changed-services, 'experiments') }}
     services:
       mysql:
         image: mysql:8.0
@@ -267,7 +279,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changed-services
     # 仅当user-service有变更时运行
-    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/user-service') }}
+    if: ${{ contains(needs.detect-changed-services.outputs.changed-services, 'user') }}
     services:
       mysql:
         image: mysql:8.0
