@@ -179,7 +179,16 @@ const isLoading = ref(true)
 const newComment = ref<{ [key: number]: string }>({})
 // 初始化加载问题
 onMounted(() => {
-  loadQuestions()
+  // 优化：如果 token 不存在，延迟重试，确保 Cypress 写入 token 后再请求接口
+  const tryLoad = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setTimeout(tryLoad, 500); // 500ms后重试
+    } else {
+      loadQuestions();
+    }
+  };
+  tryLoad();
 })
 // 加载问题
 const loadQuestions = async () => {
