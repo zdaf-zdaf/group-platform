@@ -59,17 +59,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'server.wsgi.application'
 
 # Database
+# 关键修改：从环境变量读取数据库配置
 DATABASES = {
-   'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'notice_db',  # 您的MySQL数据库名
-        'USER': 'root',       # 数据库用户
-        'PASSWORD': 'root',   # 数据库密码
-        'HOST': 'host.docker.internal',  # Docker访问宿主机MySQL
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
-        }
+        },
     }
 }
 
