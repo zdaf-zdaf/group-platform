@@ -287,9 +287,6 @@ jobs:
             ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
             FLUSH PRIVILEGES;"
             
-      - name: 构建论坛微服务镜像
-        run: docker build -t notice_service:test ./backend/notice_service
-        
       - name: 运行公告微服务容器
         run: |
           docker run -d --name notice_service_test \
@@ -299,12 +296,10 @@ jobs:
             -e DB_NAME=test_db_notice \
             -e DB_USER=root \
             -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=mysql \  
+            -e DB_HOST=mysql \
             -e DB_PORT=3306 \
             -e DEBUG=True \
             notice_service:test
-
-
             
       - name: 等待服务启动
         run: sleep 10
