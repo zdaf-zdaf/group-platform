@@ -8,14 +8,15 @@ describe('论坛模块功能测试', () => {
   const postComment = '自动化测试评论内容'
   const teacherComment = '教师自动化评论内容'
 
-  // 登录函数封装
+  // 登录函数封装，token提升为全局变量
+  let token = ''
   function login(user: { username: string; password: string }) {
     cy.request('POST', 'http://localhost:8000/api/auth/login/', {
       username: user.username,
       password: user.password
     }).then((response) => {
       expect(response.status).to.eq(200)
-      const token = response.body.access || response.body.token || response.body.data?.token
+      token = response.body.access || response.body.token || response.body.data?.token
       expect(token, 'token should exist').to.not.be.null
 
       cy.visit('/profile', {
@@ -60,10 +61,14 @@ describe('论坛模块功能测试', () => {
       if (status !== 201) {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
-        // 新增：发帖后请求帖子列表并输出日志，便于CI调试
-        cy.request('GET', 'http://localhost:8000/api/forum/questions/').then(res => {
-          cy.log('帖子列表:', JSON.stringify(res.body))
-        })
+      // 新增：发帖后请求帖子列表并输出日志，便于CI调试
+      cy.request({
+        method: 'GET',
+        url: 'http://localhost:8000/api/forum/questions/',
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => {
+        cy.log('帖子列表:', JSON.stringify(res.body))
+      })
     })
     cy.reload()
     cy.wait(2000)
@@ -120,10 +125,14 @@ describe('论坛模块功能测试', () => {
       if (status !== 201) {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
-        // 新增：发帖后请求帖子列表并输出日志，便于CI调试
-        cy.request('GET', 'http://localhost:8000/api/forum/questions/').then(res => {
-          cy.log('帖子列表:', JSON.stringify(res.body))
-        })
+      // 新增：发帖后请求帖子列表并输出日志，便于CI调试
+      cy.request({
+        method: 'GET',
+        url: 'http://localhost:8000/api/forum/questions/',
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => {
+        cy.log('帖子列表:', JSON.stringify(res.body))
+      })
     })
     cy.reload()
     cy.wait(2000)
