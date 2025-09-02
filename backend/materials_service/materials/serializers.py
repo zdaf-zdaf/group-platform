@@ -51,6 +51,10 @@ class LearningMaterialSerializer(serializers.ModelSerializer):
         if not uploaded_file:
             raise serializers.ValidationError({'file': 'No file was submitted.'})
 
+        # 关键修复：安全地从 validated_data 中移除 uploader_username 和 size，以防止冲突
+        validated_data.pop('uploader_username', None)
+        validated_data.pop('size', None)
+
         # 'file' 不在 validated_data 中，我们手动处理它
         material = LearningMaterial.objects.create(
             uploader_username=user.username, 
