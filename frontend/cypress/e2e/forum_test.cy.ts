@@ -10,7 +10,7 @@ describe('论坛模块功能测试', () => {
 
   // 登录函数封装
   function login(user: { username: string; password: string }) {
-    cy.request('POST', '/api/auth/login/', {
+    cy.request('POST', 'http://127.0.0.1:8000/api/auth/login/', {
       username: user.username,
       password: user.password
     }).then((response) => {
