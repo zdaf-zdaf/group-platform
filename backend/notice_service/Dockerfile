@@ -4,7 +4,7 @@ FROM python:3.11-slim-bullseye
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app:/app/notice_service:$PYTHONPATH \  
-    DJANGO_SETTINGS_MODULE=motice_service.settings \
+    DJANGO_SETTINGS_MODULE=notice_service.settings \
     PORT=8000
 
 # 设置工作目录
