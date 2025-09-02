@@ -141,7 +141,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'user_service_db',
         'USER': 'root',
-        'PASSWORD': 'Zgq0412@',
+        'PASSWORD': 'root',
         'HOST': 'host.docker.internal',
         'PORT': '3306',
         'OPTIONS': {

@@ -25,10 +25,10 @@ class NoticeViewSet(viewsets.ModelViewSet):
         try:
             user = request.user
 
-            # 只有学生能看到未读数量
+            # 检查用户角色
             if not hasattr(user, 'role') or user.role != 'STUDENT':
                 return Response({"count": 0}, status=status.HTTP_200_OK)
-
+                
             # 计算用户未读公告数量
             unread_count = Notice.objects.exclude(readers__contains=[user.id]).count()
             return Response({"count": unread_count})
@@ -41,10 +41,10 @@ class NoticeViewSet(viewsets.ModelViewSet):
         try:
             user = request.user
 
-            # 只有学生能标记公告
+             # 验证用户角色
             if not hasattr(user, 'role') or user.role != 'STUDENT':
                 return Response({"detail": "无权限操作"}, status=status.HTTP_403_FORBIDDEN)
-
+                
             # 获取所有未读公告
             unread_notices = Notice.objects.exclude(readers__contains=[user.id])
             marked_count = 0

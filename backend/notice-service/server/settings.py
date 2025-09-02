@@ -2,6 +2,9 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
+# 从 authentication.py 导入自定义认证类
+from server.authentication import CustomJWTAuthentication
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-公告服务安全密钥'
@@ -12,6 +15,7 @@ TIME_ZONE = 'Asia/Shanghai'
 
 # Application definition
 INSTALLED_APPS = [
+    'server.apps.ServerConfig',  # 添加应用配置
     'notice.apps.NoticeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -90,7 +94,7 @@ if any([DB_ENGINE, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT]):
 # REST Framework 配置
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'server.authentication.CustomJWTAuthentication',  # 使用字符串引用
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -130,12 +134,12 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
+    'SIGNING_KEY': 'django-insecure-9ekm#x74ns6(j*h)3+jb-v*sz7bho2edo%g)uktin)ugf-5!s%',  # 使用用户服务的 SECRET_KEY
     'VERIFYING_KEY': None,
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
-AUTH_USER_MODEL = 'auth.User'  # 使用内置用户模型
+AUTH_USER_MODEL = None
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {

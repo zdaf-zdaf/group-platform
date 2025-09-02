@@ -40,5 +40,7 @@ class NoticeSerializer(serializers.ModelSerializer):
         return len(obj.readers)
 
     def create(self, validated_data):
-        validated_data['author_id'] = self.context['request'].user.id
+        """创建公告时自动设置作者ID"""
+        user = self.context['request'].user
+        validated_data['author_id'] = user.id
         return super().create(validated_data)
