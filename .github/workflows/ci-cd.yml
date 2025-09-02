@@ -299,7 +299,7 @@ jobs:
             -e DB_NAME=test_db_notice \
             -e DB_USER=root \
             -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=127.0.0.1 \
+            -e DB_HOST=host.docker.internal \
             -e DB_PORT=3306 \
             -e DEBUG=True \
             notice-service:test
@@ -316,6 +316,29 @@ jobs:
             docker logs notice-service-test
             exit 1
           fi
+
+      - name: 验证数据库连接
+        run: |
+          # 在容器内测试数据库连接
+          docker run --rm --network host mysql:8.0 mysql -h127.0.0.1 -uroot -prootpassword -e "SELECT 1;" test_db_notice || echo "数据库连接失败"
+          
+          # 检查端口监听
+          docker run --rm --network host appropriate/curl curl -s http://127.0.0.1:3306 || echo "MySQL 端口未监听"
+
+      - name: 诊断数据库连接问题
+        run: |
+          # 检查 MySQL 容器状态
+          docker ps -a | grep mysql
+          
+          # 查看 MySQL 容器日志
+          docker logs mysql-service || true
+          
+          # 在应用程序容器内测试数据库连接
+          docker run --rm --network container:mysql-service notice-service:test \
+            bash -c "apt-get update && apt-get install -y netcat && nc -z mysql 3306 && echo '端口可访问' || echo '端口不可访问'"
+          
+          # 检查应用程序容器内的环境变量
+          docker run --rm notice-service:test env | grep DB_
 
       - name: 等待数据库就绪
         run: |

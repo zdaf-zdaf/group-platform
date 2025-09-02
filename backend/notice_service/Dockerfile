@@ -42,5 +42,14 @@ EXPOSE $PORT
 HEALTHCHECK --interval=30s --timeout=3s \
     CMD curl -f http://localhost:$PORT/healthcheck/ || exit 1
 
-# 启动命令
-CMD ["sh", "-c", "python manage.py migrate || true && gunicorn server.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
+# 创建等待数据库的脚本
+RUN echo '#!/bin/bash\n\
+until nc -z $DB_HOST $DB_PORT; do\n\
+  echo "等待数据库..."\n\
+  sleep 2\n\
+done\n\
+echo "数据库已就绪"\n\
+exec "$@"' > /app/wait-for-db.sh && chmod +x /app/wait-for-db.sh
+
+# 修改启动命令
+CMD ["sh", "-c", "/app/wait-for-db.sh python manage.py migrate && gunicorn server.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
