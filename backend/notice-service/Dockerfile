@@ -3,7 +3,8 @@ FROM python:3.11-slim-bullseye
 # 设置环境变量
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    DJANGO_SETTINGS_MODULE=server.settings \
+    PYTHONPATH=/app:/app/notice_service:$PYTHONPATH \  
+    DJANGO_SETTINGS_MODULE=motice_server.settings \
     PORT=8000
 
 # 设置工作目录
