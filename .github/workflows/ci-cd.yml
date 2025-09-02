@@ -115,6 +115,17 @@ jobs:
           echo "=== 4. 等待5秒后再次确认状态 ==="
           sleep 5
           docker ps -a | grep "forum-service-test" || echo "容器已消失"
+
+      - name: 重置迁移历史
+        run: |
+          # 删除所有迁移文件
+          docker exec forum-service-test bash -c 'rm forum/migrations/0*.py'
+          
+          # 创建新的初始迁移
+          docker exec forum-service-test python manage.py makemigrations forum
+          
+          # 应用迁移
+          docker exec forum-service-test python manage.py migrate
         
       - name: 运行数据库迁移
         run: |
