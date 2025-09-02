@@ -83,17 +83,6 @@ jobs:
             
       - name: 构建论坛微服务镜像
         run: docker build -t forum-service:test ./backend/forum-service
-
-      # - name: 检查容器状态和日志
-      #   run: |
-      #     echo "=== 列出所有容器 ==="
-      #     docker ps -a # 查看所有容器（包括已退出的）
-
-      #     echo "=== 查看论坛服务容器日志 ==="
-      #     docker logs forum-service-test || echo "无法获取日志，容器可能不存在"
-
-      #     echo "=== 检查容器退出代码 ==="
-      #     docker inspect forum-service-test --format='{{.State.ExitCode}}' || echo "容器检查失败"
         
       - name: 运行论坛微服务容器
         run: |
@@ -111,11 +100,26 @@ jobs:
             
       - name: 等待服务启动
         run: sleep 10
+
+      - name: 检查容器状态和日志
+        run: |
+          echo "=== 1. 列出所有容器（包括已退出的）==="
+          docker ps -a
+
+          echo "=== 2. 查看论坛服务容器的详细日志 ==="
+          docker logs forum-service-test || echo "无法获取日志，容器可能不存在或从未启动"
+
+          echo "=== 3. 检查容器的退出状态码 ==="
+          docker inspect forum-service-test --format='{{.State.ExitCode}}' || echo "无法检查容器状态"
+
+          echo "=== 4. 等待5秒后再次确认状态 ==="
+          sleep 5
+          docker ps -a | grep "forum-service-test" || echo "容器已消失"
         
-      # - name: 执行数据库迁移
-      #   run: |
-      #     docker exec forum-service-test python manage.py makemigrations --noinput
-      #     docker exec forum-service-test python manage.py migrate --noinput
+      - name: 执行数据库迁移
+        run: |
+          docker exec forum-service-test python manage.py makemigrations --noinput
+          docker exec forum-service-test python manage.py migrate --noinput
         
       - name: 运行单元测试
         run: docker exec forum-service-test python manage.py test --verbosity=2
