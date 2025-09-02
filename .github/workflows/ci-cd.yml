@@ -116,10 +116,10 @@ jobs:
           sleep 5
           docker ps -a | grep "forum-service-test" || echo "容器已消失"
         
-      # - name: 执行数据库迁移
-      #   run: |
-      #     docker exec forum-service-test python manage.py makemigrations --noinput
-      #     docker exec forum-service-test python manage.py migrate --noinput
+      - name: 运行数据库迁移
+        run: |
+          docker exec forum-service-test python manage.py makemigrations forum
+          docker exec forum-service-test python manage.py migrate
         
       - name: 运行单元测试
         run: docker exec forum-service-test python manage.py test --verbosity=2
