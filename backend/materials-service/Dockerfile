@@ -15,16 +15,16 @@ WORKDIR /app
 ENV PYTHONPATH=/app:$PYTHONPATH
 
 # System deps for mysqlclient
-# RUN apt-get update \
-#  && apt-get install -y --no-install-recommends \
-#     build-essential \
-#     default-libmysqlclient-dev \
-#     pkg-config \
-#  && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    build-essential \
+    default-libmysqlclient-dev \
+    pkg-config \
+ && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && apt-get install -y \
+#     gcc \
+#     libpq-dev \
+#     && rm -rf /var/lib/apt/lists/*
 
 # Install Python deps first for better cache
 COPY requirements.txt ./requirements.txt
