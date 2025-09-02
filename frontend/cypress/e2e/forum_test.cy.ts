@@ -33,6 +33,7 @@ describe('论坛模块功能测试', () => {
     // 打印localStorage内容
     cy.window().then(win => {
       cy.log('localStorage token:', win.localStorage.getItem('token'))
+      console.log('DEBUG: localStorage token:', win.localStorage.getItem('token'))
     })
 
     cy.log('step9: hook console.error')
