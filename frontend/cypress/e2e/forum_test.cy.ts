@@ -61,6 +61,8 @@ describe('论坛模块功能测试', () => {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
     })
+    cy.reload()
+    cy.wait(2000)
     cy.get('.post-card', { timeout: 20000 }).should('contain.text', postTitle)
     cy.get('.post-card').should('contain.text', postTitle)
 
@@ -114,6 +116,8 @@ describe('论坛模块功能测试', () => {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
     })
+    cy.reload()
+    cy.wait(2000)
     cy.get('.post-card', { timeout: 20000 }).should('contain.text', postTitle)
     cy.get('.post-card').should('contain.text', postTitle)
 
