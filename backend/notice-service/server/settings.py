@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+import django
+django.setup()
 
 # 从 authentication.py 导入自定义认证类
 from server.authentication import CustomJWTAuthentication
