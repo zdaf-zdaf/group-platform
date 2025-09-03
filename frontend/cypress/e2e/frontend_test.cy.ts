@@ -53,8 +53,15 @@ print(a + b)
     cy.get('.el-select').click()
     cy.get('.el-select-dropdown__item').contains('教师').click({ force: true })
     cy.get('input[type="checkbox"]').check({ force: true })
+    cy.intercept('POST', '/api/auth/register/').as('registerApi')
     cy.get('button').contains('注册账号').click()
-    cy.contains('注册成功！').should('be.visible')
+    cy.wait('@registerApi', { timeout: 10000 }).then(({ response }) => {
+      cy.log('注册接口响应:', JSON.stringify(response))
+      expect(response.statusCode).to.be.oneOf([200, 201])
+    })
+    // 注册成功后直接点击“立即登录”跳转
+    cy.get('.auth-footer .auth-link').click({ force: true })
+    cy.url({ timeout: 8000 }).should('include', '/login')
 
     // 登录
     cy.visit('/login')
