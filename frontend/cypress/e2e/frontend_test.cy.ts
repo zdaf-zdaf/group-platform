@@ -143,8 +143,8 @@ print(a + b)
     cy.contains('创建实验').click({ force: true })
     cy.get('.publish-set .set-card', { timeout: 10000 }).should('be.visible')
 
-    // 拦截学生列表接口
-    cy.intercept('GET', /\/api\/user\/(list|students)\//).as('getStudentListApi')
+    // 拦截学生列表接口（与实际 axios 路径一致）
+    cy.intercept('GET', '/api/students/').as('getStudentListApi')
 
     // 填写实验信息
     cy.get('.publish-set .set-card').within(() => {
@@ -271,8 +271,8 @@ print(a + b)
     login({ username: studentUsername, password })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
-    // 拦截学生端实验列表接口
-    cy.intercept('GET', /\/api\/experiments\/(list|experiment)\//).as('getExperimentListApi')
+    // 拦截学生端实验列表接口（与实际 axios 路径一致）
+    cy.intercept('GET', '/api/experiments/experiments/').as('getExperimentListApi')
     cy.contains('实验中心').click({ force: true })
     cy.wait('@getExperimentListApi', { timeout: 10000 }).then(({ response }) => {
       cy.log('学生端实验列表接口状态:', response?.statusCode)
