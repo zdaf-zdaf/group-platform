@@ -528,11 +528,11 @@ jobs:
       - name: 构建并推送镜像
         uses: docker/build-push-action@v5
         with:
-          context: ./backend/forum-service  # 关键：指向微服务目录
+          context: ./backend/forum_service  # 关键：指向微服务目录
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/forum-service:latest
-            ghcr.io/${{ github.repository_owner }}/forum-service:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/forum_service:latest
+            ghcr.io/${{ github.repository_owner }}/forum_service:${{ github.sha }}
 
   # ================ 资料镜像构建 ================
   build-materials-service:
@@ -555,11 +555,11 @@ jobs:
       - name: 构建并推送镜像
         uses: docker/build-push-action@v5
         with:
-          context: ./backend/materials-service  # 关键：指向微服务目录
+          context: ./backend/materials_service  # 关键：指向微服务目录
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/materials-service:latest
-            ghcr.io/${{ github.repository_owner }}/materials-service:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/materials_service:latest
+            ghcr.io/${{ github.repository_owner }}/materials_service:${{ github.sha }}
 
   # ================ 公告镜像构建 ================
   build-notice-service:
@@ -582,11 +582,11 @@ jobs:
       - name: 构建并推送镜像
         uses: docker/build-push-action@v5
         with:
-          context: ./backend/notice-service  # 关键：指向微服务目录
+          context: ./backend/notice_service  # 关键：指向微服务目录
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/notice-service:latest
-            ghcr.io/${{ github.repository_owner }}/notice-service:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/notice_service:latest
+            ghcr.io/${{ github.repository_owner }}/notice_service:${{ github.sha }}
 
   # # ================ 实验镜像构建 ================
   # build-experiments-service:
@@ -636,11 +636,11 @@ jobs:
       - name: 构建并推送镜像
         uses: docker/build-push-action@v5
         with:
-          context: ./backend/user-service  # 关键：指向微服务目录
+          context: ./backend/user_service  # 关键：指向微服务目录
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/user-service:latest
-            ghcr.io/${{ github.repository_owner }}/user-service:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/user_service:latest
+            ghcr.io/${{ github.repository_owner }}/user_service:${{ github.sha }}
 
   # ================ 前端镜像构建 ================
   build-and-push-frontend:
