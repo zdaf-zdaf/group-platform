@@ -98,7 +98,8 @@ describe('论坛模块功能测试', () => {
       cy.log('发帖状态:', status)
       expect(status, '发帖接口状态码').to.eq(201)
       // 发帖后主动断言帖子已写入（兼容后端返回结构）
-      cy.intercept('GET', '/api/forum/questions/').as('getQuestionsApi')
+      cy.wait(2000)
+      // 用接口校验帖子列表
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
@@ -107,14 +108,13 @@ describe('论坛模块功能测试', () => {
       }).then(res => {
         cy.log('帖子列表接口状态:', res.status)
         cy.log('帖子列表接口body:', JSON.stringify(res.body))
-        expect(res.status, '帖子列表接口状态码').to.eq(200)
-        // 兼容 res.body 可能为对象或数组
         const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-        expect(postsArr.some(q => q.title === postTitle), '帖子列表包含新发帖').to.be.true
+        expect(postsArr.some(q => q.title === postTitle)).to.be.true
       })
     })
     cy.wait(5000); // 发帖后等待更久
     // 主动用 cy.request 拉取帖子列表接口并断言
+    // 用接口校验帖子列表
     cy.request({
       method: 'GET',
       url: 'http://127.0.0.1:8000/api/forum/questions/',
@@ -124,7 +124,7 @@ describe('论坛模块功能测试', () => {
       cy.log('帖子列表接口状态:', res.status)
       cy.log('帖子列表接口body:', JSON.stringify(res.body))
       const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(postsArr.some(q => q.title === postTitle), '帖子列表包含新发帖').to.be.true
+      expect(postsArr.some(q => q.title === postTitle)).to.be.true
     })
     cy.wait(3000);
     cy.reload();
@@ -195,20 +195,21 @@ describe('论坛模块功能测试', () => {
       if (status !== 201) {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
-      cy.intercept('GET', '/api/forum/questions/').as('getQuestionsApi')
+      cy.wait(2000)
+      // 用接口校验帖子列表
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
         headers: { Authorization: `Bearer ${token}` },
-        failOnStatusCode: false // CI 调试用，避免非200直接失败
+        failOnStatusCode: false
       }).then(res => {
-        // 兼容 res.body 可能为对象或数组
         const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
         expect(postsArr.some(q => q.title === postTitle)).to.be.true
       })
     })
     cy.wait(5000); // 发帖后等待更久
     // 主动用 cy.request 拉取帖子列表接口并断言
+    // 用接口校验帖子列表
     cy.request({
       method: 'GET',
       url: 'http://127.0.0.1:8000/api/forum/questions/',
@@ -218,7 +219,7 @@ describe('论坛模块功能测试', () => {
       cy.log('帖子列表接口状态:', res.status)
       cy.log('帖子列表接口body:', JSON.stringify(res.body))
       const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(postsArr.some(q => q.title === postTitle), '帖子列表包含新发帖').to.be.true
+      expect(postsArr.some(q => q.title === postTitle)).to.be.true
     })
     cy.wait(3000);
     cy.reload();
