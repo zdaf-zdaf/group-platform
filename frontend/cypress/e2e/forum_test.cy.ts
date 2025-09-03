@@ -8,7 +8,17 @@ describe('论坛模块功能测试', () => {
   const postComment = '自动化测试评论内容'
   const teacherComment = '教师自动化评论内容'
 
-  // 登录函数封装，token提升为全局变量
+  // 输出环境变量和 axios baseURL，便于调试
+  before(() => {
+    cy.log('process.env.VUE_APP_API_BASE_URL:', Cypress.env('VUE_APP_API_BASE_URL'))
+    cy.window().then(win => {
+      cy.log('window.VUE_APP_API_BASE_URL:', win.VUE_APP_API_BASE_URL)
+    })
+    cy.readFile('src/api/auth.ts').then((content) => {
+      const match = content.match(/baseURL:\s*([\'\"])(.*?)\1/)
+      if (match) cy.log('axios baseURL:', match[2])
+    })
+  })
   let token = ''
   function login(user: { username: string; password: string }) {
     cy.request('POST', 'http://127.0.0.1:8000/api/auth/login/', {

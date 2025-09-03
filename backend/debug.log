@@ -1718,3 +1718,7 @@ INFO 2025-09-02 23:37:51,364 autoreload E:\BUAA\大三\小学期\github_lab\group-pla
 INFO 2025-09-02 23:37:52,244 autoreload Watching for file changes with StatReloader
 INFO 2025-09-02 23:38:13,330 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\server\settings.py changed, reloading.
 INFO 2025-09-02 23:38:14,283 autoreload Watching for file changes with StatReloader
+WARNING 2025-09-03 09:06:50,159 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 09:06:50,161 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 96
+INFO 2025-09-03 09:06:59,143 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 09:07:21,250 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 278
