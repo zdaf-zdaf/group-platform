@@ -10,10 +10,11 @@ describe('公告模块功能测试', () => {
   const noticeEditTitle = '自动化测试公告1-已编辑'
   const noticeEditContent = '这是编辑后的公告内容1'
 
+  const API_BASE_URL = 'http://127.0.0.1:8000'
   // 登录函数封装，token提升为全局变量
   let token = ''
   function login(user: { username: string; password: string }) {
-    cy.request('POST', 'http://localhost:8000/api/auth/login/', {
+    cy.request('POST', `${API_BASE_URL}/api/auth/login/`, {
       username: user.username,
       password: user.password
     }).then((response) => {

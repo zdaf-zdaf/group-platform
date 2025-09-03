@@ -2230,3 +2230,9 @@ INFO 2025-09-03 12:03:01,419 basehttp "DELETE /api/forum/comments/99/ HTTP/1.1" 
 INFO 2025-09-03 12:03:01,645 basehttp "OPTIONS /api/forum/questions/130/ HTTP/1.1" 200 0
 INFO 2025-09-03 12:03:01,699 basehttp "DELETE /api/forum/questions/130/ HTTP/1.1" 204 0
 INFO 2025-09-03 12:03:04,208 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 16:45:06,165 basehttp "OPTIONS /api/students/ HTTP/1.1" 200 0
+WARNING 2025-09-03 16:45:06,236 log Unauthorized: /api/students/
+WARNING 2025-09-03 16:45:06,236 basehttp "GET /api/students/ HTTP/1.1" 401 623
+INFO 2025-09-03 16:45:06,267 basehttp "OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+WARNING 2025-09-03 16:45:06,269 log Unauthorized: /api/experiments/experiments/
+WARNING 2025-09-03 16:45:06,269 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 401 623
