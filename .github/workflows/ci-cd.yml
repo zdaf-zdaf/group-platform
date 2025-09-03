@@ -963,10 +963,14 @@ jobs:
             pkill -f "runserver 0.0.0.0:8003" || true
 
   # 并行资料api测试
-  api-test-ziliao:
+  api-test-materials:
     name: Parallel Learning Materials Tests
     runs-on: ubuntu-latest
     needs: [build-materials-service] # 依赖后端单元测试
+    if: ${{ always() }}   
+    steps:
+      - name: Debug build status
+        run: echo "Status of build-materials-service = ${{ needs.build-materials-service.result }}"
     
     services:
       mysql-ziliao:  # 服务名称唯一
