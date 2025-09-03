@@ -30,7 +30,14 @@ print(a + b)
     cy.get('.el-select-dropdown__item').contains('学生').click({ force: true })
     cy.get('input[type="checkbox"]').check({ force: true })
     cy.get('button').contains('注册账号').click()
-    cy.contains('注册成功！').should('be.visible')
+    // 兼容弹窗和页面提示
+    cy.get('body').then($body => {
+      if ($body.find('.success-message').length) {
+        cy.get('.success-message').should('contain.text', '注册成功')
+      } else {
+        cy.contains('注册成功').should('exist')
+      }
+    })
   })
 
   // ========================
@@ -281,13 +288,14 @@ print(a + b)
         cy.get('.editor-panel', { timeout: 30000 }).should('exist').and('be.visible')
 
         // Monaco Editor 输入代码 - 使用更可靠的选择器
-        cy.get('.editor-panel textarea', { timeout: 15000 })
+        cy.get('.editor-panel .monaco-editor', { timeout: 15000 })
           .should('be.visible')
-          .type(codeSample, {
-            parseSpecialCharSequences: false,
-            delay: 5,
-            force: true
-          })
+          .click('center')
+        cy.focused().type(codeSample, {
+          parseSpecialCharSequences: false,
+          delay: 5,
+          force: true
+        })
 
           // 上传文件
         const filePath = 'cypress/fixtures/test.py' // 确保文件存在于这个路径
