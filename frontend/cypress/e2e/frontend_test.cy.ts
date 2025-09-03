@@ -1,6 +1,36 @@
 /// <reference types="cypress" />
 
 describe('灵狐智验前端完整流程集成测试', () => {
+  // 通用登录函数，直接请求后端并注入 token 和 userInfo
+  const API_BASE_URL = 'http://127.0.0.1:8000'
+  let token = ''
+  function login(user) {
+    cy.request('POST', `${API_BASE_URL}/api/auth/login/`, {
+      username: user.username,
+      password: user.password
+    }).then((response) => {
+      expect(response.status).to.eq(200)
+      token = response.body.access || response.body.token || response.body.data?.token
+      expect(token, 'token should exist').to.not.be.null
+      cy.visit('/profile', {
+        onBeforeLoad(win) {
+          win.localStorage.setItem('token', token)
+          if (response.body.username) {
+            win.localStorage.setItem('userInfo', JSON.stringify({
+              username: response.body.username,
+              role: response.body.role,
+              email: response.body.email,
+              student_id: response.body.student_id,
+              faculty: response.body.faculty
+            }))
+          }
+        }
+      })
+      cy.reload()
+      cy.visit('/')
+      cy.wait(1000)
+    })
+  }
 
   const studentUsername = `stu${Date.now() % 10000}`
   const teacherUsername = `tch${Date.now() % 10000}`
@@ -63,23 +93,8 @@ print(a + b)
     cy.get('.auth-footer .auth-link').click({ force: true })
     cy.url({ timeout: 8000 }).should('include', '/login')
 
-    // 登录
-    cy.visit('/login')
-    cy.intercept('POST', '/api/auth/login/').as('loginApi')
-    cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
-    cy.get('input[placeholder="请输入密码"]').type(password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-    cy.wait('@loginApi', { timeout: 10000 }).then(({ response }) => {
-      cy.log('登录接口响应:', JSON.stringify(response))
-      expect(response && response.statusCode).to.be.oneOf([200, 201])
-    })
-    cy.wait(1000)
-    cy.url().then(url => {
-      if (!url.includes('/profile')) {
-        cy.visit('/profile')
-      }
-    })
+    // 登录（统一用 cy.request 注入 token）
+    login({ username: teacherUsername, password })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
     // 进入个人信息页
@@ -121,22 +136,8 @@ print(a + b)
   // 教师登录并创建实验
   // ========================
   it('教师登录并创建实验', () => {
-    cy.visit('/login')
-    cy.intercept('POST', '/api/auth/login/').as('loginApi')
-    cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
-    cy.get('input[placeholder="请输入密码"]').type(password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-    cy.wait('@loginApi', { timeout: 10000 }).then(({ response }) => {
-      cy.log('登录接口响应:', JSON.stringify(response))
-      expect(response && response.statusCode).to.be.oneOf([200, 201])
-    })
-    cy.wait(1000)
-    cy.url().then(url => {
-      if (!url.includes('/profile')) {
-        cy.visit('/profile')
-      }
-    })
+    // 登录（统一用 cy.request 注入 token）
+    login({ username: teacherUsername, password })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
     cy.contains('创建实验').click({ force: true })
@@ -269,22 +270,8 @@ print(a + b)
   // 学生登录完成实验
   // ========================
   it('学生登录完成实验', () => {
-    cy.visit('/login')
-    cy.intercept('POST', '/api/auth/login/').as('loginApi')
-    cy.get('input[placeholder="请输入用户名"]').type(studentUsername)
-    cy.get('input[placeholder="请输入密码"]').type(password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-    cy.wait('@loginApi', { timeout: 10000 }).then(({ response }) => {
-      cy.log('登录接口响应:', JSON.stringify(response))
-      expect(response && response.statusCode).to.be.oneOf([200, 201])
-    })
-    cy.wait(1000)
-    cy.url().then(url => {
-      if (!url.includes('/profile')) {
-        cy.visit('/profile')
-      }
-    })
+  // 登录（统一用 cy.request 注入 token）
+    login({ username: studentUsername, password })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
     cy.contains('实验中心').click({ force: true })
@@ -373,23 +360,8 @@ print(a + b)
   // 教师查看学生提交记录与详情
   // ========================
   it('教师查看学生提交记录与详情', () => {
-    // 教师登录
-    cy.visit('/login')
-    cy.intercept('POST', '/api/auth/login/').as('loginApi')
-    cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
-    cy.get('input[placeholder="请输入密码"]').type(password)
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('立即登录').click()
-    cy.wait('@loginApi', { timeout: 10000 }).then(({ response }) => {
-      cy.log('登录接口响应:', JSON.stringify(response))
-      expect(response && response.statusCode).to.be.oneOf([200, 201])
-    })
-    cy.wait(1000)
-    cy.url().then(url => {
-      if (!url.includes('/profile')) {
-        cy.visit('/profile')
-      }
-    })
+    // 教师登录（统一用 cy.request 注入 token）
+    login({ username: teacherUsername, password })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
     // 进入“实验管理”或“批改作业”页面（假设有入口按钮/菜单）

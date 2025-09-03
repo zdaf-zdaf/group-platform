@@ -6,8 +6,8 @@ describe('学习资料模块功能测试', () => {
   const API_BASE_URL = 'http://127.0.0.1:8000'
   // 登录函数封装，token提升为全局变量
   let token = ''
-  function login(user: { username: string; password: string }) {
-    cy.intercept('POST', '/api/auth/login/').as('loginApi')
+  // 通用登录函数，直接请求后端并注入 token 和 userInfo
+  function login(user) {
     cy.request('POST', `${API_BASE_URL}/api/auth/login/`, {
       username: user.username,
       password: user.password
@@ -15,11 +15,9 @@ describe('学习资料模块功能测试', () => {
       expect(response.status).to.eq(200)
       token = response.body.access || response.body.token || response.body.data?.token
       expect(token, 'token should exist').to.not.be.null
-
       cy.visit('/profile', {
         onBeforeLoad(win) {
           win.localStorage.setItem('token', token)
-          // 写入 userInfo，便于前端鉴权
           if (response.body.username) {
             win.localStorage.setItem('userInfo', JSON.stringify({
               username: response.body.username,
