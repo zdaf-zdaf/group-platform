@@ -20,7 +20,7 @@ print(a + b)
   // 学生注册
   // ========================
   it('学生注册流程', () => {
-    cy.intercept('POST', '/api/auth/register').as('registerApi')
+  cy.intercept('POST', '/api/auth/register/').as('registerApi')
     cy.get('button').contains('注册账号').click()
     cy.wait('@registerApi', { timeout: 10000 }).then(({ response }) => {
       cy.log('注册接口响应:', JSON.stringify(response))

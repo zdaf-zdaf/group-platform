@@ -118,7 +118,7 @@ export const authService = {
    */
   async getUserInfo(token: string): Promise<{ username: string; role: 'student' | 'teacher' }> {
     try {
-      const response = await apiClient.get('/api/auth/user', {
+      const response = await apiClient.get('/api/auth/user/', {
         headers: {
           Authorization: `Bearer ${token}`
         }
