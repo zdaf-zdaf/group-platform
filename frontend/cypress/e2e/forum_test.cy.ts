@@ -26,8 +26,9 @@ describe('论坛模块功能测试', () => {
       password: user.password
     }).then((response) => {
       expect(response.status).to.eq(200);
-      token = response.body.access || response.body.token || response.body.data?.token;
+      token = response.body.access;
       expect(token, 'token should exist').to.not.be.null;
+      token = `Bearer ${token}`;
       cy.visit('/forum', {
         onBeforeLoad(win) {
           win.localStorage.setItem('token', token);
@@ -83,7 +84,8 @@ describe('论坛模块功能测试', () => {
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: token },
+        failOnStatusCode: false // CI 调试用，避免非200直接失败
       }).then(res => {
         cy.log('帖子列表:', JSON.stringify(res.body))
         expect(res.body.some(q => q.title === postTitle)).to.be.true
@@ -109,7 +111,6 @@ describe('论坛模块功能测试', () => {
     cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
       cy.get('input[placeholder="写下你的评论..."]').type(postComment + '{enter}')
     })
-  cy.get('.post-card').contains(postComment).should('exist')
     cy.get('.post-card').contains(postComment).should('exist')
 
     // 删除评论
@@ -152,7 +153,8 @@ describe('论坛模块功能测试', () => {
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: token },
+        failOnStatusCode: false // CI 调试用，避免非200直接失败
       }).then(res => {
         cy.log('帖子列表:', JSON.stringify(res.body))
         expect(res.body.some(q => q.title === postTitle)).to.be.true

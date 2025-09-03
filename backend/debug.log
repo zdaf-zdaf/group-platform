@@ -2236,3 +2236,5 @@ WARNING 2025-09-03 16:45:06,236 basehttp "GET /api/students/ HTTP/1.1" 401 623
 INFO 2025-09-03 16:45:06,267 basehttp "OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
 WARNING 2025-09-03 16:45:06,269 log Unauthorized: /api/experiments/experiments/
 WARNING 2025-09-03 16:45:06,269 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 401 623
+WARNING 2025-09-03 17:21:50,799 log Unauthorized: /api/auth/user/profile/
+WARNING 2025-09-03 17:21:50,799 basehttp "GET /api/auth/user/profile/ HTTP/1.1" 401 96

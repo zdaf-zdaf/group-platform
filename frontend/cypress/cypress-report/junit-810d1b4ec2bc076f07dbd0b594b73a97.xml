@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="29.568" tests="3" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-09-03T09:32:02" tests="0" file="cypress\e2e\material_test.cy.ts" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="学习资料模块功能测试" timestamp="2025-09-03T09:32:02" tests="3" time="29.359" failures="0">
+    <testcase name="学习资料模块功能测试 教师端依次发布四种类型学习资料" time="13.690" classname="教师端依次发布四种类型学习资料">
+    </testcase>
+    <testcase name="学习资料模块功能测试 学生端查看并预览四种类型资料，下载第一个" time="8.847" classname="学生端查看并预览四种类型资料，下载第一个">
+    </testcase>
+    <testcase name="学习资料模块功能测试 教师端删除学习资料" time="6.509" classname="教师端删除学习资料">
+    </testcase>
+  </testsuite>
+</testsuites>
