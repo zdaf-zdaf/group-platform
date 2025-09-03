@@ -747,7 +747,6 @@ jobs:
             name: frontend-dependencies
             path: |
               ./frontend/package*.json
-              ./frontend/node_modules/
             retention-days: 1
 
   build-and-push-backend:
@@ -796,13 +795,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
-
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
-
         # 确保下载修复后的依赖文件
       - name: Download fixed dependencies
         uses: actions/download-artifact@v4
@@ -810,25 +802,18 @@ jobs:
             name: frontend-dependencies
             path: ./frontend
 
-      - name: Restore npm dependencies
-        run: npm install || true
-        working-directory: ./frontend
-      
-      - name: Fix esbuild binary permissions
-        run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
         working-directory: ./frontend
 
-      - name: Restore npm dependencies
-        run: npm install
+      - name: Fix esbuild binary permissions
+        run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
         working-directory: ./frontend
 
       - name: Check Node.js version
         run: node -v && npm -v
         working-directory: ./frontend
 
-      - name: Fix esbuild binary permissions
-        run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
-        working-directory: ./frontend
 
       - name: Update Dockerfile
         run: |
