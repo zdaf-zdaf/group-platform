@@ -732,6 +732,15 @@ jobs:
       - name: Debug artifact upload before
         run: ls -lh ./frontend && ls -lh ./frontend/node_modules || true
 
+      - name: Debug artifact upload before
+        run: ls -lh ./frontend && ls -lh ./frontend/node_modules || true
+
+      - name: Run frontend unit tests
+        run: npm run test:unit
+
+      - name: Debug artifact upload after
+        run: echo "Artifact upload step已执行" && ls -lh ./frontend && ls -lh ./frontend/node_modules || true
+
       - name: Save fixed dependencies
         uses: actions/upload-artifact@v4
         with:
@@ -740,12 +749,6 @@ jobs:
               ./frontend/package*.json
               ./frontend/node_modules/
             retention-days: 1
-
-      - name: Debug artifact upload after
-        run: echo "Artifact upload step已执行" && ls -lh ./frontend && ls -lh ./frontend/node_modules || true
-
-      - name: Run frontend unit tests
-        run: npm run test:unit
 
   build-and-push-backend:
     runs-on: ubuntu-latest
