@@ -543,6 +543,26 @@ jobs:
         working-directory: ./frontend
          
 
+      # ================== 检查前后端服务互联 ==================
+      - name: 检查前后端服务互联
+        run: |
+          echo "检查后端 API 可访问..."
+          for i in {1..10}; do
+            if curl -s http://127.0.0.1:8000/api/auth/user/profile/ | grep -q 'username'; then
+              echo "后端 API 正常"; break
+            fi
+            echo "后端 API 未就绪，重试...($i/10)"; sleep 2
+          done
+          echo "检查前端页面可访问..."
+          for i in {1..10}; do
+            if curl -s http://127.0.0.1:8080 | grep -q '<div'; then
+              echo "前端页面正常"; break
+            fi
+            echo "前端页面未就绪，重试...($i/10)"; sleep 2
+          done
+          echo "前后端服务均已可访问，准备运行 Cypress 测试。"
+        working-directory: ./frontend
+
       # ================== 运行 Cypress ==================
       - name: Run Cypress GUI tests
         run: |
