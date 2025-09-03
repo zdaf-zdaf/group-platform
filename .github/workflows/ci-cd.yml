@@ -493,23 +493,73 @@ jobs:
         working-directory: ./frontend
 
       # ================== 初始化测试账号 ==================
-      - run: |
-          python3 ./scripts/setup_test_accounts.py
+      - name: 初始化测试账号
+        run: |
+          # 注册 stuTest
+          echo "注册 stuTest："
+          curl -s -X POST http://127.0.0.1:8000/api/auth/register/ \
+            -H "Content-Type: application/json" \
+            -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}' || echo "stuTest 已存在"
+
+          # 注册 tchTest
+          echo "注册 tchTest："
+          curl -s -X POST http://127.0.0.1:8000/api/auth/register/ \
+            -H "Content-Type: application/json" \
+            -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || echo "tchTest 已存在"
+
+          # stuTest 登录获取 token
+          echo "stuTest 登录并获取 token："
+          curl -s -X POST http://127.0.0.1:8000/api/auth/login/ \
+            -H "Content-Type: application/json" \
+            -d '{"username":"stuTest","password":"Test1234@"}' > logs/stuToken.json
+
+          STU_TOKEN=$(cat logs/stuToken.json | python3 -c "import sys, json; print(json.load(sys.stdin).get('access',''))")
+          echo "stuTest TOKEN: $STU_TOKEN"
+
+          # tchTest 登录获取 token
+          echo "tchTest 登录并获取 token："
+          curl -s -X POST http://127.0.0.1:8000/api/auth/login/ \
+            -H "Content-Type: application/json" \
+            -d '{"username":"tchTest","password":"Test1234@"}' > logs/tchToken.json
+
+          TCH_TOKEN=$(cat logs/tchToken.json | python3 -c "import sys, json; print(json.load(sys.stdin).get('access',''))")
+          echo "tchTest TOKEN: $TCH_TOKEN"
+
+          # 测试 API 是否可访问
+          echo "检查 stuTest 用户信息："
+          curl -s -H "Authorization: Bearer $STU_TOKEN" http://127.0.0.1:8000/api/auth/user/profile/
+
+          echo "检查 tchTest 用户信息："
+          curl -s -H "Authorization: Bearer $TCH_TOKEN" http://127.0.0.1:8000/api/auth/user/profile/
         working-directory: ./frontend
+         
 
       # ================== 运行 Cypress ==================
-      - run: |
+      - name: Run Cypress GUI tests
+        run: |
           set -o pipefail
-          npx cypress run --headless --config baseUrl=http://127.0.0.1:8080 2>&1 | tee logs/cypress.log || \
-          (echo "❌ Cypress 测试失败，打印 token 与 API 响应日志" && \
-          cat logs/cypress.log && \
-          echo "=== stuTest Token ===" && \
-          cat logs/stuToken.log || echo "stuToken.log 不存在" && \
-          echo "=== tchTest Token ===" && \
-          cat logs/tchToken.log || echo "tchToken.log 不存在" && \
-          echo "=== API 响应日志示例 ===" && \
-          curl -s -H "Authorization: Bearer $(cat logs/stuToken.log)" http://127.0.0.1:8000/api/auth/user/profile/ || echo "API 响应失败"; \
-          exit 1)
+          npx cypress run --headless --config baseUrl=http://127.0.0.1:8080 2>&1 | tee logs/cypress.log || (
+            echo "❌ Cypress 测试失败，输出日志："
+            cat logs/cypress.log
+
+            echo "=== stuTest Token ==="
+            [ -f logs/stuToken.json ] && cat logs/stuToken.json || echo "stuToken.json 不存在"
+
+            echo "=== tchTest Token ==="
+            [ -f logs/tchToken.json ] && cat logs/tchToken.json || echo "tchToken.json 不存在"
+
+            echo "=== API 响应示例（stuTest） ==="
+            [ -f logs/stuToken.json ] && \
+              curl -s -H "Authorization: Bearer $(cat logs/stuToken.json | python3 -c 'import sys,json;print(json.load(sys.stdin).get(\"access\",\"\"))')" \
+              http://127.0.0.1:8000/api/auth/user/profile/ || echo "无法调用 API：stuTest Token 不存在"
+
+            echo "=== API 响应示例（tchTest） ==="
+            [ -f logs/tchToken.json ] && \
+              curl -s -H "Authorization: Bearer $(cat logs/tchToken.json | python3 -c 'import sys,json;print(json.load(sys.stdin).get(\"access\",\"\"))')" \
+              http://127.0.0.1:8000/api/auth/user/profile/ || echo "无法调用 API：tchTest Token 不存在"
+
+            exit 1
+          )
         working-directory: ./frontend
 
       # ================== 上传 logs 和 Cypress artifact ==================
