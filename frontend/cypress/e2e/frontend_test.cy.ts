@@ -143,6 +143,9 @@ print(a + b)
     cy.contains('创建实验').click({ force: true })
     cy.get('.publish-set .set-card', { timeout: 10000 }).should('be.visible')
 
+    // 拦截学生列表接口
+    cy.intercept('GET', /\/api\/user\/(list|students)\//).as('getStudentListApi')
+
     // 填写实验信息
     cy.get('.publish-set .set-card').within(() => {
       cy.get('input[placeholder^="如：数组与字符串题组"]').type(experimentTitle)
@@ -150,42 +153,28 @@ print(a + b)
 
       // 修改开始时间选择方式 - 使用原生Date对象
       const now = new Date()
-      const startTime = new Date(now.getTime() + 60 * 60 * 1000) // 当前时间+1小时
+      const startTime = new Date(now.getTime() + 60 * 60 * 1000)
       const startTimeStr = startTime.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
+        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
       }).replace(/\//g, '-')
-
-      // 修改截止时间选择方式 - 使用原生Date对象
-      const deadlineTime = new Date(now.getTime() + 25 * 60 * 60 * 1000) // 当前时间+25小时
+      const deadlineTime = new Date(now.getTime() + 25 * 60 * 60 * 1000)
       const deadlineTimeStr = deadlineTime.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
+        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
       }).replace(/\//g, '-')
-
       cy.get('input[placeholder="选择开始时间"]').clear({ force: true }).type(startTimeStr, { force: true })
       cy.get('input[placeholder="选择截止时间"]').clear({ force: true }).type(deadlineTimeStr, { force: true })
 
+      // 等待学生数据加载完成并断言接口
+      cy.wait('@getStudentListApi', { timeout: 10000 }).then(({ response }) => {
+        cy.log('学生列表接口状态:', response?.statusCode)
+        cy.log('学生列表接口body:', JSON.stringify(response?.body))
+        expect(response?.statusCode, '学生列表接口状态码').to.be.oneOf([200, 201])
+        expect(response?.body && response.body.length > 0, '学生列表有数据').to.be.true
+      })
 
-      // 等待学生数据加载完成
       cy.get('.el-transfer-panel__list').should('be.visible')
       cy.get('.el-transfer-panel__item').should('have.length.gt', 0)
-
-      // 根据图片修改学生选择逻辑
-      // 1. 先点击"未选学生"左侧的全选复选框
       cy.get('.el-transfer-panel__header input[type="checkbox"]').first().check({ force: true })
-
-      // 2. 然后点击向右箭头按钮（第二个按钮）
       cy.get('.el-transfer__buttons button').eq(1).click({ force: true })
     })
 
@@ -262,7 +251,15 @@ print(a + b)
     })
 
 
+    // 拦截实验创建接口
+    cy.intercept('POST', /\/api\/experiments\/experiment\//).as('createExperimentApi')
     cy.get('.publish-set .set-card').contains('发布实验').click({ force: true })
+    cy.wait('@createExperimentApi', { timeout: 10000 }).then(({ response }) => {
+      cy.log('实验创建接口状态:', response?.statusCode)
+      cy.log('实验创建接口body:', JSON.stringify(response?.body))
+      expect(response?.statusCode, '实验创建接口状态码').to.eq(201)
+      expect(response?.body && response.body.title === experimentTitle, '实验创建接口返回title').to.be.true
+    })
     cy.contains(experimentTitle).should('be.visible')
   })
 
@@ -274,7 +271,15 @@ print(a + b)
     login({ username: studentUsername, password })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
+    // 拦截学生端实验列表接口
+    cy.intercept('GET', /\/api\/experiments\/(list|experiment)\//).as('getExperimentListApi')
     cy.contains('实验中心').click({ force: true })
+    cy.wait('@getExperimentListApi', { timeout: 10000 }).then(({ response }) => {
+      cy.log('学生端实验列表接口状态:', response?.statusCode)
+      cy.log('学生端实验列表接口body:', JSON.stringify(response?.body))
+      expect(response?.statusCode, '学生端实验列表接口状态码').to.be.oneOf([200, 201])
+      expect(response?.body && response.body.some && response.body.some(e => e.title === experimentTitle), '实验列表包含新建实验').to.be.true
+    })
     cy.contains(experimentTitle).click({ force: true })
 
      // ========================
