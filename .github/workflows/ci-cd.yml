@@ -466,6 +466,8 @@ jobs:
           DB_PORT: 3306
           DEBUG: False
 
+      - name: Install wait-on
+        run: npm install -g wait-on
       # ================== 启动 Django 和 Vue ==================
       # 先在 backend 目录启动 Django
       - name: Start Django Server
