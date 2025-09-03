@@ -11,7 +11,7 @@ class QuestionListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         # 从请求中获取用户ID（假设已通过认证中间件添加）
-        serializer.save(author_id=self.request.user_id)
+        serializer.save(author=self.request.user_id)
 
 class QuestionDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Question.objects.all()
@@ -21,7 +21,7 @@ class QuestionDetailView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         # 检查用户是否有权限删除（作者或管理员）
-        if instance.author_id != request.user_id and not request.is_admin:
+        if instance.author != request.user_id and not getattr(request, 'is_admin', False):
             return Response({"error": "您没有权限删除此问题"}, status=status.HTTP_403_FORBIDDEN)
         return super().delete(request, *args, **kwargs)
 
@@ -33,7 +33,7 @@ class CommentCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         question_id = self.kwargs['question_id']
         question = generics.get_object_or_404(Question, pk=question_id)
-        serializer.save(author_id=self.request.user_id, question=question)
+        serializer.save(author=self.request.user_id, question=question)
 
 class CommentDeleteView(generics.DestroyAPIView):
     queryset = Comment.objects.all()
@@ -41,8 +41,8 @@ class CommentDeleteView(generics.DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
-        # 检查用户是否有权限删除（作者或管理员）
-        if instance.author_id != request.user_id and not request.is_admin:
+        # 检查用户是否有权限删除（作者或管理员）author
+        if instance.author != request.user_id and not getattr(request, 'is_admin', False):
             return Response({"error": "您没有权限删除此评论"}, status=status.HTTP_403_FORBIDDEN)
         return super().delete(request, *args, **kwargs)
 
