@@ -16,6 +16,8 @@ class Question(models.Model):
     def __str__(self):
         return self.title
 
+
+
 class Comment(models.Model):
     question = models.ForeignKey(Question, related_name='comments', on_delete=models.CASCADE)
     content = models.TextField()
@@ -26,4 +28,4 @@ class Comment(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return f"Comment by user {self.author_id} on {self.question.title}"
+        return f"Comment by user {self.author} on {self.question.title}"

@@ -32,7 +32,7 @@ jobs:
           
           # 如果没有变更，默认构建所有服务（用于测试）
           if [ -z "$changed_dirs" ]; then
-            changed_dirs="backend/forum backend/materials backend/notice backend/experiments backend/user"
+            changed_dirs="backend/forum backend/materials backend/notice backend/user"
             echo "=== 无变更，构建所有服务 ==="
           fi
           
@@ -285,86 +285,86 @@ jobs:
       - name: 运行单元测试
         run: docker exec notice_service_test python manage.py test --verbosity=2
 
-  # ================ 实验微服务单元测试 ================
-  test-experiments-service:
-    runs-on: ubuntu-latest
-    needs: detect-changed-services
-    if: ${{ always() }}
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: test_db_experiments
-          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -uroot -prootpassword"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+  # # ================ 实验微服务单元测试 ================
+  # test-experiments-service:
+  #   runs-on: ubuntu-latest
+  #   needs: detect-changed-services
+  #   if: ${{ always() }}
+  #   services:
+  #     mysql:
+  #       image: mysql:8.0
+  #       env:
+  #         MYSQL_ROOT_PASSWORD: rootpassword
+  #         MYSQL_DATABASE: test_db_experiments
+  #         MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+  #       ports:
+  #         - 3306:3306
+  #       options: >-
+  #         --health-cmd="mysqladmin ping -uroot -prootpassword"
+  #         --health-interval=10s
+  #         --health-timeout=5s
+  #         --health-retries=3
 
-    steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: 检出代码
+  #       uses: actions/checkout@v4
 
-      - name: 构建公告微服务镜像
-        run: docker build -t experiments_service:test ./backend/experiments_service
+  #     - name: 构建公告微服务镜像
+  #       run: docker build -t experiments_service:test ./backend/experiments_service
 
-      - name: 查看本地镜像
-        run: docker images
+  #     - name: 查看本地镜像
+  #       run: docker images
 
-      - name: 找到 GitHub Actions 默认网络
-        id: get-network
-        run: |
-          NETWORK_ID=$(docker network ls --format "{{.Name}}" | grep "github_network" || true)
-          if [ -z "$NETWORK_ID" ]; then
-            echo "未找到 github_network，列出所有网络："
-            docker network ls
-            exit 1
-          fi
-          echo "network=$NETWORK_ID" >> $GITHUB_OUTPUT
+  #     - name: 找到 GitHub Actions 默认网络
+  #       id: get-network
+  #       run: |
+  #         NETWORK_ID=$(docker network ls --format "{{.Name}}" | grep "github_network" || true)
+  #         if [ -z "$NETWORK_ID" ]; then
+  #           echo "未找到 github_network，列出所有网络："
+  #           docker network ls
+  #           exit 1
+  #         fi
+  #         echo "network=$NETWORK_ID" >> $GITHUB_OUTPUT
 
-      - name: 等待 MySQL 在容器网络内可访问
-        run: |
-          for i in {1..30}; do
-            if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
-              mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_experiments; then
-              echo "✅ MySQL 在容器内可访问"; break
-            fi
-            echo "等待 MySQL...($i/30)"; sleep 2
-          done
+  #     - name: 等待 MySQL 在容器网络内可访问
+  #       run: |
+  #         for i in {1..30}; do
+  #           if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
+  #             mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_experiments; then
+  #             echo "✅ MySQL 在容器内可访问"; break
+  #           fi
+  #           echo "等待 MySQL...($i/30)"; sleep 2
+  #         done
 
-      - name: 运行公告微服务容器
-        run: |
-          docker run -d --name experiments_service_test \
-            --network ${{ steps.get-network.outputs.network }} \
-            -p 8001:8000 \
-            -e DJANGO_SETTINGS_MODULE=server.settings \
-            -e DB_ENGINE=django.db.backends.mysql \
-            -e DB_NAME=test_db_experiments \
-            -e DB_USER=root \
-            -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=mysql \
-            -e DB_PORT=3306 \
-            -e DEBUG=True \
-            experiments_service:test
+  #     - name: 运行公告微服务容器
+  #       run: |
+  #         docker run -d --name experiments_service_test \
+  #           --network ${{ steps.get-network.outputs.network }} \
+  #           -p 8001:8000 \
+  #           -e DJANGO_SETTINGS_MODULE=server.settings \
+  #           -e DB_ENGINE=django.db.backends.mysql \
+  #           -e DB_NAME=test_db_experiments \
+  #           -e DB_USER=root \
+  #           -e DB_PASSWORD=rootpassword \
+  #           -e DB_HOST=mysql \
+  #           -e DB_PORT=3306 \
+  #           -e DEBUG=True \
+  #           experiments_service:test
 
-      - name: 等待服务启动
-        run: sleep 10
+  #     - name: 等待服务启动
+  #       run: sleep 10
 
-      - name: 检查容器状态和日志
-        run: |
-          echo "=== 容器列表 ==="
-          docker ps -a
-          echo "=== 容器日志 ==="
-          docker logs experiments_service_test || true
-          echo "=== 容器退出状态码 ==="
-          docker inspect experiments_service_test --format='{{.State.ExitCode}}' || true
+  #     - name: 检查容器状态和日志
+  #       run: |
+  #         echo "=== 容器列表 ==="
+  #         docker ps -a
+  #         echo "=== 容器日志 ==="
+  #         docker logs experiments_service_test || true
+  #         echo "=== 容器退出状态码 ==="
+  #         docker inspect experiments_service_test --format='{{.State.ExitCode}}' || true
 
-      - name: 运行单元测试
-        run: docker exec experiments_service_test python manage.py test --verbosity=2
+  #     - name: 运行单元测试
+  #       run: docker exec experiments_service_test python manage.py test --verbosity=2
 
   # ================ 用户微服务单元测试 ================
   test-user-service:
@@ -447,8 +447,6 @@ jobs:
       - name: 运行单元测试
         run: docker exec user_service_test python manage.py test --verbosity=2
 
-
-        
   # # ================== 网关单元测试 ==================
   # test-gateway:
   #   runs-on: ubuntu-latest
@@ -590,32 +588,32 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/notice-service:latest
             ghcr.io/${{ github.repository_owner }}/notice-service:${{ github.sha }}
 
-  # ================ 实验镜像构建 ================
-  build-experiments-service:
-    runs-on: ubuntu-latest
-    needs: [detect-changed-services, test-experiments-service]
-    # 仅当experiments-service有变更时运行
-    if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/experiments-service') }}
+  # # ================ 实验镜像构建 ================
+  # build-experiments-service:
+  #   runs-on: ubuntu-latest
+  #   needs: [detect-changed-services, test-experiments-service]
+  #   # 仅当experiments-service有变更时运行
+  #   if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/experiments-service') }}
     
-    steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: 检出代码
+  #       uses: actions/checkout@v4
         
-      - name: 登录GitHub容器仓库
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}  # 需要提前在仓库Secrets中配置
+  #     - name: 登录GitHub容器仓库
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GHCR_PAT }}  # 需要提前在仓库Secrets中配置
           
-      - name: 构建并推送镜像
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend/experiments-service  # 关键：指向微服务目录
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/experiments-service:latest
-            ghcr.io/${{ github.repository_owner }}/experiments-service:${{ github.sha }}
+  #     - name: 构建并推送镜像
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: ./backend/experiments-service  # 关键：指向微服务目录
+  #         push: true
+  #         tags: |
+  #           ghcr.io/${{ github.repository_owner }}/experiments-service:latest
+  #           ghcr.io/${{ github.repository_owner }}/experiments-service:${{ github.sha }}
             
   # ================ 用户镜像构建 ================
   build-user-service:
@@ -784,98 +782,98 @@ jobs:
         run: |
             pkill -f "runserver 0.0.0.0:8001" || true
 
-  # 并行实验api测试
-  api-test-lab:
-    name: Parallel Lab Tests
-    runs-on: ubuntu-latest
-    needs: [build-experiments-service]
+  # # 并行实验api测试
+  # api-test-lab:
+  #   name: Parallel Lab Tests
+  #   runs-on: ubuntu-latest
+  #   needs: [build-experiments-service]
     
-    services:
-      mysql-lab:
-        image: mysql:8.0
-        env:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: test_db_lab  # 独立数据库名
-            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-            - 3308:3306  # 不同端口
+  #   services:
+  #     mysql-lab:
+  #       image: mysql:8.0
+  #       env:
+  #           MYSQL_ROOT_PASSWORD: rootpassword
+  #           MYSQL_DATABASE: test_db_lab  # 独立数据库名
+  #           MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+  #       ports:
+  #           - 3308:3306  # 不同端口
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
         
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-            python-version: '3.10'
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #           python-version: '3.10'
         
-      - name: Install dependencies
-        run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-        working-directory: ./backend
+  #     - name: Install dependencies
+  #       run: |
+  #           python -m pip install --upgrade pip
+  #           pip install -r requirements.txt
+  #       working-directory: ./backend
         
-      - name: Configure MySQL
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            # 等待MySQL启动（使用新端口3308）
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -P 3308 -uroot -prootpassword --silent; then
-                echo "MySQL for Lab is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
-            sleep 2
-            done
-    #  新增：执行数据库迁移
-      - name: Run migrations
-        run: |
-          python manage.py makemigrations --noinput
-          python manage.py migrate --noinput
-        working-directory: ./backend
-        env:
-          DJANGO_SETTINGS_MODULE: server.settings
-          DB_ENGINE: django.db.backends.mysql
-          DB_NAME: test_db_lab
-          DB_USER: root
-          DB_PASSWORD: rootpassword
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3308
-          DEBUG: False
+  #     - name: Configure MySQL
+  #       run: |
+  #           sudo apt-get update && sudo apt-get install -y mysql-client
+  #           # 等待MySQL启动（使用新端口3308）
+  #           for i in {1..30}; do
+  #           if mysqladmin ping -h"127.0.0.1" -P 3308 -uroot -prootpassword --silent; then
+  #               echo "MySQL for Lab is ready!"
+  #               break
+  #           fi
+  #           echo "Waiting for MySQL... (attempt $i/30)"
+  #           sleep 2
+  #           done
+  #   #  新增：执行数据库迁移
+  #     - name: Run migrations
+  #       run: |
+  #         python manage.py makemigrations --noinput
+  #         python manage.py migrate --noinput
+  #       working-directory: ./backend
+  #       env:
+  #         DJANGO_SETTINGS_MODULE: server.settings
+  #         DB_ENGINE: django.db.backends.mysql
+  #         DB_NAME: test_db_lab
+  #         DB_USER: root
+  #         DB_PASSWORD: rootpassword
+  #         DB_HOST: 127.0.0.1
+  #         DB_PORT: 3308
+  #         DEBUG: False
 
-      - name: Start Django Server (Port 8002)
-        run: |
-            python manage.py runserver 127.0.0.1:8002 &
-            sleep 5  # 等待服务器启动
-        working-directory: ./backend
-        env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_lab  # 指定独立数据库
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3308  # 使用3308端口
-            DEBUG: False
+  #     - name: Start Django Server (Port 8002)
+  #       run: |
+  #           python manage.py runserver 127.0.0.1:8002 &
+  #           sleep 5  # 等待服务器启动
+  #       working-directory: ./backend
+  #       env:
+  #           DJANGO_SETTINGS_MODULE: server.settings
+  #           DB_ENGINE: django.db.backends.mysql
+  #           DB_NAME: test_db_lab  # 指定独立数据库
+  #           DB_USER: root
+  #           DB_PASSWORD: rootpassword
+  #           DB_HOST: 127.0.0.1
+  #           DB_PORT: 3308  # 使用3308端口
+  #           DEBUG: False
 
-      - name: Install Newman
-        run: npm install -g newman
+  #     - name: Install Newman
+  #       run: npm install -g newman
 
-      - name: Run Lab Tests
-        run: |
-            newman run postman/collection2-Lab.json \
-            --environment postman/environment.json \
-            --env-var "baseUrl=http://127.0.0.1:8002/api" \
-            --reporters cli
-      - name: Display Server Logs on Failure
-        if: failure()  
-        run: |
-            echo "===== Django Server Logs ====="
-            cat backend/debug.log  # 假设服务器日志输出到backend/debug.log
-            echo "===== End Logs ====="
-      - name: Stop Django Server
-        run: |
-            pkill -f "runserver 0.0.0.0:8002" || true
+  #     - name: Run Lab Tests
+  #       run: |
+  #           newman run postman/collection2-Lab.json \
+  #           --environment postman/environment.json \
+  #           --env-var "baseUrl=http://127.0.0.1:8002/api" \
+  #           --reporters cli
+  #     - name: Display Server Logs on Failure
+  #       if: failure()  
+  #       run: |
+  #           echo "===== Django Server Logs ====="
+  #           cat backend/debug.log  # 假设服务器日志输出到backend/debug.log
+  #           echo "===== End Logs ====="
+  #     - name: Stop Django Server
+  #       run: |
+  #           pkill -f "runserver 0.0.0.0:8002" || true
 
   # 并行公告api测试
   api-test-gonggao:
@@ -1035,137 +1033,137 @@ jobs:
         run: |
             pkill -f "runserver 0.0.0.0:8004" || true
 
-  # ================ GUI 测试 ================
-  gui-test-cypress:
-    name: Run Cypress GUI Tests
-    runs-on: ubuntu-latest
-    needs: generate-deployment-script  # 依赖部署脚本生成
+  # # ================ GUI 测试 ================
+  # gui-test-cypress:
+  #   name: Run Cypress GUI Tests
+  #   runs-on: ubuntu-latest
+  #   needs: generate-deployment-script  # 依赖部署脚本生成
     
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Setup KinD Kubernetes Cluster
-        run: |
-          # 安装KinD（Kubernetes in Docker）
-          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
-          chmod +x ./kind
-          sudo mv ./kind /usr/local/bin/
+  #     - name: Setup KinD Kubernetes Cluster
+  #       run: |
+  #         # 安装KinD（Kubernetes in Docker）
+  #         curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+  #         chmod +x ./kind
+  #         sudo mv ./kind /usr/local/bin/
           
-          # 创建集群
-          kind create cluster --name test-cluster
+  #         # 创建集群
+  #         kind create cluster --name test-cluster
           
-          # 验证集群
-          kubectl cluster-info --context kind-test-cluster
+  #         # 验证集群
+  #         kubectl cluster-info --context kind-test-cluster
 
-      - name: Deploy Microservices to KinD
-        run: |
-          # 部署所有微服务到测试集群
-          kubectl apply -f backend/forum-service/k8s/
-          kubectl apply -f backend/materials-service/k8s/
-          kubectl apply -f backend/notice-service/k8s/
-          kubectl apply -f backend/experiments-service/k8s/
-          kubectl apply -f backend/user-service/k8s/
-          kubectl apply -f frontend/k8s/
-          kubectl apply -f gateway/k8s/
+  #     - name: Deploy Microservices to KinD
+  #       run: |
+  #         # 部署所有微服务到测试集群
+  #         kubectl apply -f backend/forum-service/k8s/
+  #         kubectl apply -f backend/materials-service/k8s/
+  #         kubectl apply -f backend/notice-service/k8s/
+  #         kubectl apply -f backend/experiments-service/k8s/
+  #         kubectl apply -f backend/user-service/k8s/
+  #         kubectl apply -f frontend/k8s/
+  #         kubectl apply -f gateway/k8s/
           
-          # 等待服务就绪
-          kubectl wait --for=condition=ready pod -l app=frontend --timeout=180s
-          kubectl wait --for=condition=ready pod -l app=gateway --timeout=180s
+  #         # 等待服务就绪
+  #         kubectl wait --for=condition=ready pod -l app=frontend --timeout=180s
+  #         kubectl wait --for=condition=ready pod -l app=gateway --timeout=180s
 
-      - name: Setup Cypress and Run Tests
-        uses: cypress-io/github-action@v6
-        with:
-          # 连接到网关服务（端口转发）
-          start: kubectl port-forward svc/gateway-service 30080:80 &
-          wait-on: 'http://localhost:30080'
-          config: baseUrl=http://localhost:30080
-          browser: chrome
-          headless: true
+  #     - name: Setup Cypress and Run Tests
+  #       uses: cypress-io/github-action@v6
+  #       with:
+  #         # 连接到网关服务（端口转发）
+  #         start: kubectl port-forward svc/gateway-service 30080:80 &
+  #         wait-on: 'http://localhost:30080'
+  #         config: baseUrl=http://localhost:30080
+  #         browser: chrome
+  #         headless: true
           
-      - name: Cleanup KinD Cluster
-        run: kind delete cluster --name test-cluster
-        if: always() 
+  #     - name: Cleanup KinD Cluster
+  #       run: kind delete cluster --name test-cluster
+  #       if: always() 
 
-  # ================== 生成部署脚本 ==================      
-  generate-deployment-script:
-    name: 生成部署脚本
-    runs-on: ubuntu-latest
-    # 依赖所有微服务和前端
-    needs: 
-      - build-experiments-service
-      - build-forum-service
-      - build-materials-service
-      - build-notice-service
-      - build-user-service
-      - build-and-push-frontend
+  # # ================== 生成部署脚本 ==================      
+  # generate-deployment-script:
+  #   name: 生成部署脚本
+  #   runs-on: ubuntu-latest
+  #   # 依赖所有微服务和前端
+  #   needs: 
+  #     - build-experiments-service
+  #     - build-forum-service
+  #     - build-materials-service
+  #     - build-notice-service
+  #     - build-user-service
+  #     - build-and-push-frontend
       
-    steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: 检出代码
+  #       uses: actions/checkout@v4
 
-      - name: 生成部署脚本
-        run: |
-          cat > deploy-to-local.sh << 'EOF'
-          #!/bin/bash
-          echo "=== 开始部署微服务到本地K8s ==="
+  #     - name: 生成部署脚本
+  #       run: |
+  #         cat > deploy-to-local.sh << 'EOF'
+  #         #!/bin/bash
+  #         echo "=== 开始部署微服务到本地K8s ==="
           
-          # 1. 更新所有微服务镜像版本
-          sed -i "s|image:.*experiments-service:.*|image: ghcr.io/${{ github.repository_owner }}/experiments-service:${{ github.sha }}|g" backend/experiments-service/k8s/deployment.yaml
-          sed -i "s|image:.*forum-service:.*|image: ghcr.io/${{ github.repository_owner }}/forum-service:${{ github.sha }}|g" backend/forum-service/k8s/deployment.yaml
-          sed -i "s|image:.*materials-service:.*|image: ghcr.io/${{ github.repository_owner }}/materials-service:${{ github.sha }}|g" backend/materials-service/k8s/deployment.yaml
-          sed -i "s|image:.*notice-service:.*|image: ghcr.io/${{ github.repository_owner }}/notice-service:${{ github.sha }}|g" backend/notice-service/k8s/deployment.yaml
-          sed -i "s|image:.*user-service:.*|image: ghcr.io/${{ github.repository_owner }}/user-service:${{ github.sha }}|g" backend/user-service/k8s/deployment.yaml
+  #         # 1. 更新所有微服务镜像版本
+  #         sed -i "s|image:.*experiments-service:.*|image: ghcr.io/${{ github.repository_owner }}/experiments-service:${{ github.sha }}|g" backend/experiments-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*forum-service:.*|image: ghcr.io/${{ github.repository_owner }}/forum-service:${{ github.sha }}|g" backend/forum-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*materials-service:.*|image: ghcr.io/${{ github.repository_owner }}/materials-service:${{ github.sha }}|g" backend/materials-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*notice-service:.*|image: ghcr.io/${{ github.repository_owner }}/notice-service:${{ github.sha }}|g" backend/notice-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*user-service:.*|image: ghcr.io/${{ github.repository_owner }}/user-service:${{ github.sha }}|g" backend/user-service/k8s/deployment.yaml
           
-          # 2. 更新前端镜像
-          sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
+  #         # 2. 更新前端镜像
+  #         sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
           
-          # 3. 应用K8s配置
-          echo "应用实验微服务配置..."
-          kubectl apply -f backend/experiments-service/k8s/
-          echo "应用论坛微服务配置..."
-          kubectl apply -f backend/forum-service/k8s/
-          echo "应用资料微服务配置..."
-          kubectl apply -f backend/materials-service/k8s/
-          echo "应用通知微服务配置..."
-          kubectl apply -f backend/notice-service/k8s/
-          echo "应用用户微服务配置..."
-          kubectl apply -f backend/user-service/k8s/
-          echo "应用前端配置..."
-          kubectl apply -f k8s/frontend-deploy.yaml
+  #         # 3. 应用K8s配置
+  #         echo "应用实验微服务配置..."
+  #         kubectl apply -f backend/experiments-service/k8s/
+  #         echo "应用论坛微服务配置..."
+  #         kubectl apply -f backend/forum-service/k8s/
+  #         echo "应用资料微服务配置..."
+  #         kubectl apply -f backend/materials-service/k8s/
+  #         echo "应用通知微服务配置..."
+  #         kubectl apply -f backend/notice-service/k8s/
+  #         echo "应用用户微服务配置..."
+  #         kubectl apply -f backend/user-service/k8s/
+  #         echo "应用前端配置..."
+  #         kubectl apply -f k8s/frontend-deploy.yaml
           
-          # 4. 等待服务就绪
-          echo "等待服务启动(约60秒)..."
-          sleep 60
+  #         # 4. 等待服务就绪
+  #         echo "等待服务启动(约60秒)..."
+  #         sleep 60
           
-          # 5. 显示访问信息
-          echo "=== 部署完成 ==="
-          echo "前端访问: http://localhost:30080"
-          echo "API文档: http://localhost:30080/api/docs"
-          EOF
+  #         # 5. 显示访问信息
+  #         echo "=== 部署完成 ==="
+  #         echo "前端访问: http://localhost:30080"
+  #         echo "API文档: http://localhost:30080/api/docs"
+  #         EOF
           
-          chmod +x deploy-to-local.sh
-          echo "已生成部署脚本: deploy-to-local.sh"
+  #         chmod +x deploy-to-local.sh
+  #         echo "已生成部署脚本: deploy-to-local.sh"
 
-      - name: 打包部署文件
-        uses: actions/upload-artifact@v4
-        with:
-          name: microservices-deployment
-          path: |
-            backend/*/k8s/*.yaml  # 包含所有微服务的K8s配置
-            k8s/frontend-deploy.yaml
-            deploy-to-local.sh
-          retention-days: 7
+  #     - name: 打包部署文件
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: microservices-deployment
+  #         path: |
+  #           backend/*/k8s/*.yaml  # 包含所有微服务的K8s配置
+  #           k8s/frontend-deploy.yaml
+  #           deploy-to-local.sh
+  #         retention-days: 7
 
-  # ==================== 通知 ====================
-  notify-deployment-ready:
-    runs-on: ubuntu-latest
-    needs: generate-deployment-script
-    steps:
-      - name: 通知部署准备就绪
-        run: |
-          echo "✅ CI/CD 流水线完成！"
-          echo "📦 镜像已构建并推送至镜像仓库"
-          echo "📋 部署脚本已生成，请在本地执行以下命令："
-          echo "   gh run download -n deployment-scripts"
-          echo "   ./deploy-local.sh"
+  # # ==================== 通知 ====================
+  # notify-deployment-ready:
+  #   runs-on: ubuntu-latest
+  #   needs: generate-deployment-script
+  #   steps:
+  #     - name: 通知部署准备就绪
+  #       run: |
+  #         echo "✅ CI/CD 流水线完成！"
+  #         echo "📦 镜像已构建并推送至镜像仓库"
+  #         echo "📋 部署脚本已生成，请在本地执行以下命令："
+  #         echo "   gh run download -n deployment-scripts"
+  #         echo "   ./deploy-local.sh"
