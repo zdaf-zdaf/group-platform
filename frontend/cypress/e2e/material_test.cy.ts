@@ -72,7 +72,7 @@ describe('学习资料模块功能测试', () => {
       // 检查文件是否存在
       cy.readFile(item.file, 'binary', { timeout: 10000 }).should('exist')
       cy.get('.el-upload input[type="file"]').selectFile(item.file, { force: true })
-      cy.intercept('POST', '/api/materials/material/').as('publishMaterialApi')
+      cy.intercept('POST', '/materials/').as('publishMaterialApi')
       cy.contains('发布资料').click({ force: true })
       cy.wait('@publishMaterialApi', { timeout: 10000 }).then(({ response }) => {
         cy.log('资料上传接口状态:', response?.statusCode)
@@ -81,7 +81,7 @@ describe('学习资料模块功能测试', () => {
         expect(response?.body && response.body.title === title, '资料上传接口返回title').to.be.true
       })
       // 检查资料列表接口
-      cy.intercept('GET', '/api/materials/material/').as('getMaterialListApi')
+      cy.intercept('GET', '/materials/').as('getMaterialListApi')
       cy.reload()
       cy.wait('@getMaterialListApi', { timeout: 10000 }).then(({ response }) => {
         cy.log('资料列表接口状态:', response?.statusCode)
@@ -108,7 +108,7 @@ describe('学习资料模块功能测试', () => {
     const previewTypes = ['PDF文档', '文档资料', '图表素材', '视频教程']
     previewTypes.forEach(label => {
       cy.get('.material-list .material-item').contains(label).parents('.material-item').then($item => {
-        cy.intercept('GET', '/api/materials/material/*').as('previewMaterialApi')
+        cy.intercept('GET', '/materials/*/').as('previewMaterialApi')
         cy.wrap($item).contains('在线预览').click({ force: true })
         cy.wait('@previewMaterialApi')
         cy.wait(1000) // 等待新窗口弹出
@@ -116,7 +116,7 @@ describe('学习资料模块功能测试', () => {
     })
     // 下载第一个资料
     cy.get('.material-list .material-item').first().within(() => {
-      cy.intercept('GET', '/api/materials/material/*/download/').as('downloadMaterialApi')
+      cy.intercept('GET', '/materials/*/download/').as('downloadMaterialApi')
       cy.contains('下载文件').click({ force: true })
       cy.wait('@downloadMaterialApi')
     })
@@ -141,7 +141,7 @@ describe('学习资料模块功能测试', () => {
     ]
     titles.forEach(title => {
       cy.get('.material-list .material-item').contains(title).parents('.material-item').within(() => {
-        cy.intercept('DELETE', '/api/materials/material/*/').as('deleteMaterialApi')
+        cy.intercept('DELETE', '/materials/*/').as('deleteMaterialApi')
         cy.contains('删除').click({ force: true })
       })
       cy.get('.el-message-box').should('be.visible')
