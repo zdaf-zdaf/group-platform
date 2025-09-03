@@ -403,272 +403,106 @@ jobs:
     name: Run Cypress GUI Tests
     runs-on: ubuntu-latest
     needs: [test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao]
-    
+
     services:
       mysql-gui:
         image: mysql:8.0
         env:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: test_db_gui
-            MYSQL_ROOT_HOST: '%'
-            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db_gui
+          MYSQL_ROOT_HOST: '%'
+          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
-            - 3306:3306
+          - 3306:3306
         options: >-
-            --health-cmd="mysqladmin ping"
-            --health-interval=10s
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Download fixed dependencies
-        uses: actions/download-artifact@v4
+      - uses: actions/setup-node@v4
         with:
-            name: frontend-dependencies
-            path: ./frontend
-      - name: Restore npm dependencies
-        run: npm install
-        working-directory: ./frontend
-       
-      - name: Check Node.js version
-        run: node -v && npm -v
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - run: npm install
         working-directory: ./frontend
 
-      - name: Fix esbuild binary permissions
-        run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
-        working-directory: ./frontend
-
-      - name: Create log directory
-        run: mkdir -p logs
-
-      # =============== 后端服务设置 ===============
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-            python-version: '3.10'
-      
-      - name: Install backend dependencies
-        run: pip install -r requirements.txt
+          python-version: '3.10'
+
+      - run: pip install -r requirements.txt
         working-directory: ./backend
-      
-      - name: Configure MySQL
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-                echo "MySQL for GUI is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
+
+      - run: |
+          sudo apt-get update && sudo apt-get install -y mysql-client
+          for i in {1..30}; do
+            if mysqladmin ping -h127.0.0.1 -uroot -prootpassword --silent; then break; fi
             sleep 2
-            done
-            
-            mysql -h127.0.0.1 -uroot -prootpassword -e "
-            CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
-            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-            FLUSH PRIVILEGES;"
-      
-      - name: Run migrations
-        run: |
-            python manage.py makemigrations --noinput
-            python manage.py migrate --noinput
+          done
+          mysql -h127.0.0.1 -uroot -prootpassword -e "
+          CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
+          GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+          FLUSH PRIVILEGES;"
+        
+      - run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
         working-directory: ./backend
         env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_gui
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
-            DEBUG: False
-      
-      - name: Start Django server
-        run: |
-            python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
-            echo $! > ../logs/django.pid
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_gui
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DEBUG: False
+
+      - run: |
+          mkdir -p logs
+          python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
+          echo $! > ../logs/django.pid
         working-directory: ./backend
-        env:
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_gui
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
-      
-      # =============== Vue前端服务设置 ===============
-      - name: Setup Node.js for Vue
-        uses: actions/setup-node@v4
-        with:
-            node-version: '22'
-            cache: 'npm'
-            cache-dependency-path: 'frontend/package-lock.json'
 
-      - name: Install Vue dependencies
-        run: |
-            # 安装依赖
-            npm install
-            
-            # 创建.env文件配置Vue环境变量
-            echo "VUE_APP_API_BASE_URL=http://127.0.0.1:8000" > .env
-            echo "VUE_APP_DEBUG=true" >> .env
+      - run: |
+          echo "VUE_APP_API_BASE_URL=http://127.0.0.1:8000" > .env
+          echo "VUE_APP_DEBUG=true" >> .env
+          npm run dev -- --host 0.0.0.0 --port 8080 > ../logs/vue.log 2>&1 &
+          echo $! > ../logs/vue.pid
         working-directory: ./frontend
 
-      - name: Debug package.json scripts
-        run: |
-          echo "package.json scripts:"
-          npm run
+      - run: |
+          npm install -g wait-on
+          wait-on http://127.0.0.1:8080 http://localhost:8080 http://127.0.0.1:8000
+
+      - run: |
+          # 注册并登录账号，统一获取 token
+          python3 ./scripts/setup_test_accounts.py
         working-directory: ./frontend
 
-      - name: Start Vue server
-        run: |
-            # 启动Vue开发服务器，监听所有地址，保证 127.0.0.1/localhost 都可访问
-            npm run dev -- --host 0.0.0.0 --port 8080 > ../logs/vue.log 2>&1 &
-            echo $! > ../logs/vue.pid
-            
-            # 等待服务启动并检查端口
-            for i in {1..10}; do
-              if nc -z 127.0.0.1 8080 && nc -z localhost 8080; then
-                echo "Vue server is running on 127.0.0.1:8080 and localhost:8080"
-                break
-              fi
-              echo "Waiting for Vue server to start... (attempt $i/10)"
-              sleep 10
-            done
-            if ! nc -z 127.0.0.1 8080 || ! nc -z localhost 8080; then
-              echo '❌❌ Vue server failed to start, printing logs:'
-              cat ../logs/vue.log || echo 'No vue log'
-              exit 1
-            fi
-        working-directory: ./frontend
-      
-      # =============== 测试执行 ===============
-      - name: Wait for servers with timeout
-        run: |
-            npm install -g wait-on
-            # 等待Vue前端(8080)和Django后端(8000)，同时监听 127.0.0.1 和 localhost
-            timeout 180s wait-on http://127.0.0.1:8080 http://localhost:8080 http://localhost:8000 || true
-            # 添加 API 健康检查
-            echo "=== API 健康检查 ==="
-            curl -I http://localhost:8000/api/healthcheck
-            # 添加前端健康检查
-            echo "=== 前端健康检查 ==="
-            curl -I http://localhost:8080
-            # 检查服务状态
-            echo "=== 服务状态检查 ==="
-            echo "检查端口 8080:"
-            nc -z 127.0.0.1 8080 && echo "127.0.0.1:8080 运行中" || echo "127.0.0.1:8080 未响应"
-            nc -z localhost 8080 && echo "localhost:8080 运行中" || echo "localhost:8080 未响应"
-            echo "检查端口 8000:"
-            nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
-            if ! nc -z 127.0.0.1 8080 || ! nc -z localhost 8080 || ! nc -z localhost 8000; then
-              echo "❌❌ 服务启动失败，显示日志:"
-              echo "=== 后端日志 ==="
-              cat logs/django.log || echo "无后端日志"
-              echo "=== 前端日志 ==="
-              cat logs/vue.log || echo "无前端日志"
-              exit 1
-            fi
-            sleep 3
-
-      - name: 初始化测试账号
-        run: |
-          echo "注册stuTest："
-          curl -v -X POST http://127.0.0.1:8000/api/auth/register/ \
-            -H "Content-Type: application/json" \
-            -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}' || exit 1
-          echo "注册tchTest："
-          curl -v -X POST http://127.0.0.1:8000/api/auth/register/ \
-            -H "Content-Type: application/json" \
-            -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || exit 1
-
-          echo "stuTest登录并获取token："
-          curl -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}' > token.json
-          echo "stuTest token内容："
-          cat token.json
-          TOKEN=$(cat token.json | python3 -c "import sys, json; print(json.load(sys.stdin).get('access', ''))")
-          echo "stuTest TOKEN: $TOKEN"
-          echo "stuTest用户信息："
-          curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/api/auth/user/profile/
-
-          echo "tchTest登录并获取token："
-          curl -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}' > token.json
-          echo "tchTest token内容："
-          cat token.json
-          TOKEN=$(cat token.json | python3 -c "import sys, json; print(json.load(sys.stdin).get('access', ''))")
-          echo "tchTest TOKEN: $TOKEN"
-          echo "tchTest用户信息："
-          curl -H "Authorization: Bearer $TOKEN" http://127.0.0.1:8000/api/auth/user/profile/
+      - run: npx cypress run --headless --config baseUrl=http://127.0.0.1:8080
         working-directory: ./frontend
 
-      - name: 检查登录接口响应
-        run: |
-          echo "登录stuTest："
-          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}'
-          echo "登录tchTest："
-          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}'
-        working-directory: ./frontend
-
-      - name: 检查账号登录
-        run: |
-          echo "登录stuTest："
-          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"stuTest","password":"Test1234@"}' || exit 1
-          echo "登录tchTest："
-          curl -v -X POST http://127.0.0.1:8000/api/auth/login/ -H "Content-Type: application/json" -d '{"username":"tchTest","password":"Test1234@"}' || exit 1
-        working-directory: ./frontend
-      
-      - name: Run Cypress tests
-        run: |
-            npx wait-on http://127.0.0.1:8080
-            npx wait-on http://127.0.0.1:8000
-            npx cypress run --headless --config baseUrl=http://127.0.0.1:8080
-        working-directory: ./frontend
-      
-      # =============== 日志收集 ===============
-      - name: Show Cypress token
-        run: cat frontend/cypress/logs/token.txt || echo 'token file not found'
-      - name: Show backend logs if failed
-        if: ${{ failure() }}
-        run: cat logs/django.log
-      
-      - name: List logs directory if failed
-        if: ${{ failure() }}
-        run: ls -lh logs || echo 'logs dir not found'
-
-      - name: Show frontend logs if failed
-        if: ${{ failure() }}
-        run: cat logs/vue.log
-
-      # =============== 日志强制收集 ===============
-      # 无论成功或失败都输出日志，方便排查
-      - name: Always show backend logs
+      - uses: actions/upload-artifact@v4
         if: always()
-        run: cat logs/django.log || true
-      - name: Always show frontend logs
-        if: always()
-        run: cat logs/vue.log || true
-
-      # =============== 上传 logs 文件夹为 artifact ===============
-      - name: Upload logs folder as artifact
-        if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: ci-logs
           path: logs/
           retention-days: 7
 
-      # =============== 上传 Cypress 截图和视频为 artifact ===============
-      - name: Upload Cypress screenshots as artifact
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots
           path: frontend/cypress/screenshots/
           retention-days: 7
 
-      - name: Upload Cypress videos as artifact
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: cypress-videos
           path: frontend/cypress/videos/
