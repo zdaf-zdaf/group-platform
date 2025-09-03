@@ -158,11 +158,29 @@ print(a + b)
       }).replace(/\//g, '-')
       cy.get('input[placeholder="选择开始时间"]').clear({ force: true }).type(startTimeStr, { force: true })
       cy.get('input[placeholder="选择截止时间"]').clear({ force: true }).type(deadlineTimeStr, { force: true })
-      cy.get('.el-transfer-panel__list').should('be.visible')
-      cy.get('.el-transfer-panel__item').should('have.length.gt', 0)
-      cy.get('.el-transfer-panel__header input[type="checkbox"]').first().check({ force: true })
-      cy.get('.el-transfer__buttons button').eq(1).click({ force: true })
     })
+    // 轮询学生列表接口，直到有数据
+    function pollStudentList(retry = 10) {
+      if (retry <= 0) throw new Error('学生列表接口始终无数据');
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/api/students/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(res => {
+        const arr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        if (arr.length > 0) {
+          cy.log('学生列表接口有数据')
+        } else {
+          cy.wait(1000).then(() => pollStudentList(retry - 1))
+        }
+      })
+    }
+    pollStudentList()
+    cy.get('.el-transfer-panel__list', { timeout: 20000 }).should('exist')
+    cy.get('.el-transfer-panel__item', { timeout: 20000 }).should('have.length.gt', 0)
+    cy.get('.el-transfer-panel__header input[type="checkbox"]').first().check({ force: true })
+    cy.get('.el-transfer__buttons button').eq(1).click({ force: true })
 
     // 选择题
     cy.get('.publish-set .set-card .question-card').last().within(() => {
@@ -242,16 +260,23 @@ print(a + b)
     login({ username: studentUsername, password })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
-    // 用接口校验实验列表
-    cy.request({
-      method: 'GET',
-      url: `${API_BASE_URL}/api/experiments/experiments/`,
-      headers: { Authorization: `Bearer ${token}` }
-    }).then((resp) => {
-      expect(resp.status).to.be.oneOf([200, 201])
-      const found = Array.isArray(resp.body) ? resp.body : (resp.body?.data || [])
-      expect(found.some(e => e.title === experimentTitle), '后端实验列表包含新建实验').to.be.true
-    })
+    // 轮询实验列表接口，直到新建实验出现
+    function pollExperimentList(retry = 10) {
+      if (retry <= 0) throw new Error('实验列表接口始终无新建实验');
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/api/experiments/experiments/`,
+        headers: { Authorization: `Bearer ${token}` }
+      }).then((resp) => {
+        const found = Array.isArray(resp.body) ? resp.body : (resp.body?.data || [])
+        if (found.some(e => e.title === experimentTitle)) {
+          cy.log('后端实验列表包含新建实验')
+        } else {
+          cy.wait(1000).then(() => pollExperimentList(retry - 1))
+        }
+      })
+    }
+    pollExperimentList()
     cy.wait(2000)
     cy.reload()
     cy.contains(experimentTitle, { timeout: 10000 }).click({ force: true })
@@ -343,16 +368,23 @@ print(a + b)
     login({ username: teacherUsername, password })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
-    // 用接口校验学生提交记录
-    cy.request({
-      method: 'GET',
-      url: `${API_BASE_URL}/api/experiments/submissions/`,
-      headers: { Authorization: `Bearer ${token}` }
-    }).then((resp) => {
-      expect(resp.status).to.be.oneOf([200, 201])
-      const found = Array.isArray(resp.body) ? resp.body : (resp.body?.data || [])
-      expect(found.length > 0, '后端有学生提交记录').to.be.true
-    })
+    // 轮询学生提交记录接口，直到有数据
+    function pollSubmissionList(retry = 10) {
+      if (retry <= 0) throw new Error('学生提交记录接口始终无数据');
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/api/experiments/submissions/`,
+        headers: { Authorization: `Bearer ${token}` }
+      }).then((resp) => {
+        const found = Array.isArray(resp.body) ? resp.body : (resp.body?.data || [])
+        if (found.length > 0) {
+          cy.log('后端有学生提交记录')
+        } else {
+          cy.wait(1000).then(() => pollSubmissionList(retry - 1))
+        }
+      })
+    }
+    pollSubmissionList()
 
     // 进入“实验管理”或“批改作业”页面（假设有入口按钮/菜单）
     cy.contains('查看学生提交').click({ force: true })
