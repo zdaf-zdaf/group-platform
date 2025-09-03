@@ -87,7 +87,7 @@ describe('论坛模块功能测试', () => {
     cy.get('.forum').should('exist')
 
     // 发布帖子
-  cy.intercept('POST', '/api/forum/questions/').as('postQuestion')
+    cy.intercept('POST', '/api/forum/questions/').as('postQuestion')
     cy.get('.publish-card input[placeholder="请输入问题标题"]').clear().type(postTitle)
     cy.get('.publish-card textarea[placeholder="请输入问题内容"]').clear().type(postContent)
     cy.get('.publish-card button').contains('发布问题').click({ force: true })
@@ -96,25 +96,42 @@ describe('论坛模块功能测试', () => {
       const body = interception.response?.body
       cy.log('发帖响应:', JSON.stringify(body))
       cy.log('发帖状态:', status)
-      if (status !== 201) {
-        throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
-      }
+      expect(status, '发帖接口状态码').to.eq(201)
+      expect(body && body.title, '发帖接口返回title').to.eq(postTitle)
+      // 发帖后主动断言帖子已写入
       cy.intercept('GET', '/api/forum/questions/').as('getQuestionsApi')
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
         headers: { Authorization: `Bearer ${token}` },
-        failOnStatusCode: false // CI 调试用，避免非200直接失败
+        failOnStatusCode: false
       }).then(res => {
-        expect(res.body.some(q => q.title === postTitle)).to.be.true
+        cy.log('帖子列表接口状态:', res.status)
+        cy.log('帖子列表接口body:', JSON.stringify(res.body))
+        expect(res.status, '帖子列表接口状态码').to.eq(200)
+        expect(res.body.some(q => q.title === postTitle), '帖子列表包含新发帖').to.be.true
       })
     })
     cy.wait(5000); // 发帖后等待更久
+    // reload 后拦截帖子列表接口并断言
+    cy.intercept('GET', '/api/forum/questions/').as('getQuestionsApiReload')
     cy.reload();
+    cy.wait('@getQuestionsApiReload').then(interception => {
+      const res = interception.response
+      cy.log('reload后帖子列表接口状态:', res.statusCode)
+      cy.log('reload后帖子列表接口body:', JSON.stringify(res.body))
+      expect(res.statusCode, 'reload后帖子列表状态码').to.eq(200)
+      expect(res.body.some(q => q.title === postTitle), 'reload后帖子列表包含新发帖').to.be.true
+    })
     cy.wait(3000);
     cy.reload();
     cy.wait(2000);
-
+    // 输出 localStorage token
+    cy.window().then(win => {
+      const savedToken = win.localStorage.getItem('token');
+      cy.log('localStorage token:', savedToken);
+      expect(savedToken, 'localStorage token存在').to.match(/^.+$/);
+    });
     cy.get('.post-card', { timeout: 30000 }).should('exist');
     cy.get('.post-card').should('contain.text', postTitle);
 
