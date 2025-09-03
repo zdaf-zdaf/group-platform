@@ -181,5 +181,5 @@ class SubmissionSerializer(serializers.ModelSerializer):
         ]
 
     def get_student_name(self, obj):
-        # 不再调用user-service API，而是返回基于ID的简单名称
+        # 返回基于ID的简单名称，不需要用户模型
         return f"学生-{obj.user_id}"
