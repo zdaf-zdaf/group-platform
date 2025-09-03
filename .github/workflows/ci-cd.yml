@@ -811,6 +811,14 @@ jobs:
             path: ./frontend
 
       - name: Restore npm dependencies
+        run: npm install || true
+        working-directory: ./frontend
+      
+      - name: Fix esbuild binary permissions
+        run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
+        working-directory: ./frontend
+
+      - name: Restore npm dependencies
         run: npm install
         working-directory: ./frontend
 
