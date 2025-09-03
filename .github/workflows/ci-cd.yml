@@ -429,7 +429,15 @@ jobs:
       - name: Restore npm dependencies
         run: npm install
         working-directory: ./frontend
-        
+       
+      - name: Check Node.js version
+        run: node -v && npm -v
+        working-directory: ./frontend
+
+      - name: Fix esbuild binary permissions
+        run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
+        working-directory: ./frontend
+
       - name: Create log directory
         run: mkdir -p logs
 
@@ -707,6 +715,14 @@ jobs:
             
             # 验证依赖是否同步
             npm ls --package-lock-only
+      
+      - name: Check Node.js version
+        run: node -v && npm -v
+        working-directory: ./frontend
+
+      - name: Fix esbuild binary permissions
+        run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
+        working-directory: ./frontend
 
       - name: Run frontend unit tests
         run: npm run test:unit  # 确保package.json中有test:unit脚本
@@ -779,6 +795,14 @@ jobs:
         run: npm install
         working-directory: ./frontend
 
+      - name: Check Node.js version
+        run: node -v && npm -v
+        working-directory: ./frontend
+
+      - name: Fix esbuild binary permissions
+        run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
+        working-directory: ./frontend
+        
       - name: Update Dockerfile
         run: |
           # 仅更新Node版本
