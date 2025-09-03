@@ -65,10 +65,15 @@ print(a + b)
 
     // 登录
     cy.visit('/login')
+    cy.intercept('POST', '/api/auth/login/').as('loginApi')
     cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
     cy.get('input[placeholder="请输入密码"]').type(password)
     cy.get('input[type="checkbox"]').check({ force: true })
     cy.get('button').contains('立即登录').click()
+    cy.wait('@loginApi', { timeout: 10000 }).then(({ response }) => {
+      cy.log('登录接口响应:', JSON.stringify(response))
+      expect(response.statusCode).to.be.oneOf([200, 201])
+    })
     cy.url().should('include', '/profile')
 
     // 进入个人信息页
@@ -111,10 +116,15 @@ print(a + b)
   // ========================
   it('教师登录并创建实验', () => {
     cy.visit('/login')
+    cy.intercept('POST', '/api/auth/login/').as('loginApi')
     cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
     cy.get('input[placeholder="请输入密码"]').type(password)
     cy.get('input[type="checkbox"]').check({ force: true })
     cy.get('button').contains('立即登录').click()
+    cy.wait('@loginApi', { timeout: 10000 }).then(({ response }) => {
+      cy.log('登录接口响应:', JSON.stringify(response))
+      expect(response.statusCode).to.be.oneOf([200, 201])
+    })
     cy.url().should('include', '/profile')
 
     cy.contains('创建实验').click({ force: true })
@@ -248,10 +258,15 @@ print(a + b)
   // ========================
   it('学生登录完成实验', () => {
     cy.visit('/login')
+    cy.intercept('POST', '/api/auth/login/').as('loginApi')
     cy.get('input[placeholder="请输入用户名"]').type(studentUsername)
     cy.get('input[placeholder="请输入密码"]').type(password)
     cy.get('input[type="checkbox"]').check({ force: true })
     cy.get('button').contains('立即登录').click()
+    cy.wait('@loginApi', { timeout: 10000 }).then(({ response }) => {
+      cy.log('登录接口响应:', JSON.stringify(response))
+      expect(response.statusCode).to.be.oneOf([200, 201])
+    })
     cy.url().should('include', '/profile')
 
     cy.contains('实验中心').click({ force: true })
@@ -342,10 +357,15 @@ print(a + b)
   it('教师查看学生提交记录与详情', () => {
     // 教师登录
     cy.visit('/login')
+    cy.intercept('POST', '/api/auth/login/').as('loginApi')
     cy.get('input[placeholder="请输入用户名"]').type(teacherUsername)
     cy.get('input[placeholder="请输入密码"]').type(password)
     cy.get('input[type="checkbox"]').check({ force: true })
     cy.get('button').contains('立即登录').click()
+    cy.wait('@loginApi', { timeout: 10000 }).then(({ response }) => {
+      cy.log('登录接口响应:', JSON.stringify(response))
+      expect(response.statusCode).to.be.oneOf([200, 201])
+    })
     cy.url().should('include', '/profile')
 
     // 进入“实验管理”或“批改作业”页面（假设有入口按钮/菜单）
