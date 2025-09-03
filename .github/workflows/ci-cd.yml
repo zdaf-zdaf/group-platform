@@ -13,201 +13,6 @@ jobs:
     services:
       mysql:
         image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: test_db
-          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Wait for MySQL ready and configure root
-        run: |
-          sudo apt-get update && sudo apt-get install -y mysql-client
-          for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-              echo "MySQL is ready!"; break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"; sleep 2
-          done
-          mysql -h"127.0.0.1" -uroot -prootpassword -e "
-            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            FLUSH PRIVILEGES;"
-      - name: Build backend image
-        run: docker build -t course-backend:latest ./backend
-
-      - name: Run backend container with docker.sock
-        run: |
-          docker run -d --name course-backend-container \
-            --network host \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -e DJANGO_SETTINGS_MODULE=server.settings \
-            -e DB_ENGINE=django.db.backends.mysql \
-            -e DB_NAME=test_db \
-            -e DB_USER=root \
-            -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=127.0.0.1 \
-            -e DB_PORT=3306 \
-            -e DEBUG=False \
-            course-backend:latest
-      - name: Run migrations in backend container
-        run: |
-          docker exec course-backend-container python manage.py makemigrations --noinput
-          docker exec course-backend-container python manage.py migrate --noinput
-      - name: Run Django tests in backend container
-        run: docker exec course-backend-container python manage.py test --verbosity=2
-
-  # 并行论坛测试
-  api-test-luntan:
-    name: Parallel Forum Tests
-    runs-on: ubuntu-latest
-    needs: [test-backend]
-    
-    services:
-      mysql-luntan:  # 服务名称唯一
-        image: mysql:8.0
-        env:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: test_db_luntan  # 独立的数据库名
-            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-            - 3307:3306  # 使用不同端口映射
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-            python-version: '3.10'
-        
-      - name: Install dependencies
-        run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-        working-directory: ./backend
-        
-      - name: Configure MySQL
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            # 等待MySQL启动（使用新端口3307）
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -P 3307 -uroot -prootpassword --silent; then
-                echo "MySQL for Luntan is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
-            sleep 2
-            done
-    #  新增：执行数据库迁移
-      - name: Run migrations
-        run: |
-          python manage.py makemigrations --noinput
-          python manage.py migrate --noinput
-        working-directory: ./backend
-        env:
-          DJANGO_SETTINGS_MODULE: server.settings
-          DB_ENGINE: django.db.backends.mysql
-          DB_NAME: test_db_luntan
-          DB_USER: root
-          DB_PASSWORD: rootpassword
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3307
-          DEBUG: False
-
-      - name: Start Django Server (Port 8001)
-        run: |
-            python manage.py runserver 127.0.0.1:8001 &
-            sleep 5  # 等待服务器启动
-        working-directory: ./backend
-        env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_luntan  # 指定独立数据库
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3307  # 使用3307端口
-            DEBUG: False
-
-      - name: Install Newman
-        run: npm install -g newman
-
-      - name: Run Forum Tests
-        run: |
-            newman run postman/collection1-LunTan.json \
-            --environment postman/environment.json \
-            --env-var "baseUrl=http://127.0.0.1:8001/api" \
-            --reporters cli
-      - name: Stop Django Server
-        run: |
-            pkill -f "runserver 0.0.0.0:8001" || true
-  # 并行实验测试（配置类似，但使用不同端口和数据库名）
-  api-test-lab:
-    name: Parallel Lab Tests
-    runs-on: ubuntu-latest
-    needs: [test-backend]
-    
-    services:
-      mysql-lab:
-        image: mysql:8.0
-        env:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: test_db_lab  # 独立数据库名
-            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
-        ports:
-            - 3308:3306  # 不同端口
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-            python-version: '3.10'
-        
-      - name: Install dependencies
-        run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-        working-directory: ./backend
-        
-      - name: Configure MySQL
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            # 等待MySQL启动（使用新端口3308）
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -P 3308 -uroot -prootpassword --silent; then
-                echo "MySQL for Lab is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
-            sleep 2
-            done
-    #  新增：执行数据库迁移
-      - name: Run migrations
-        run: |
-          python manage.py makemigrations --noinput
-          python manage.py migrate --noinput
-        working-directory: ./backend
-        env:
-          DJANGO_SETTINGS_MODULE: server.settings
-          DB_ENGINE: django.db.backends.mysql
-          DB_NAME: test_db_lab
-          DB_USER: root
-          DB_PASSWORD: rootpassword
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3308
           DEBUG: False
 
       - name: Start Django Server (Port 8002)
@@ -452,7 +257,8 @@ jobs:
           FLUSH PRIVILEGES;"
 
       # ================== Django 数据库迁移 ==================
-      - run: |
+      - name: 运行数据库迁移
+        run: |
           python manage.py makemigrations --noinput
           python manage.py migrate --noinput
         working-directory: ./backend
@@ -491,6 +297,9 @@ jobs:
             echo "❌ Vue 服务启动失败"
             exit 1
           fi
+        env:
+          VUE_APP_API_BASE_URL: http://127.0.0.1:8000
+          VUE_APP_DEBUG: true
         working-directory: ./frontend
 
       # ================== 初始化测试账号 ==================
@@ -753,69 +562,55 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/frontend:latest
             ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}
 
-  generate-deployment-script:
-    name: Generate Deployment Script
+
+  deploy-to-k8s:
+    name: Deploy to K8S in CI
     runs-on: ubuntu-latest
-    # 依赖所有测试和构建作业
     needs: [test-backend, test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao, gui-test-cypress, build-and-push-backend, build-and-push-frontend]
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 生成部署脚本
-      - name: Generate Local Deployment Package
+      - name: 安装 kind
         run: |
-          # 创建一键部署脚本
-          cat > deploy-to-local.sh << 'EOF'
-          #!/bin/bash
-          echo "开始部署到本地K8s环境..."
-          
-          # 1. 更新镜像版本
-          sed -i "s|image:.*backend:.*|image: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}|g" k8s/backend-deployment.yaml
-          sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
-          
-          # 2. 部署到K8s
-          kubectl apply -f k8s/
-          
-          # 3. 等待服务就绪
-          echo "等待服务启动..."
-          sleep 30
-          
-          # 4. 显示访问信息
-          echo "部署完成！"
-          echo "前端访问: http://127.0.0.1:30080"
-          echo "后端API: http://127.0.0.1:30080/api"
-          echo ""
-          echo "运行集成测试:"
-          echo "cd postman && newman run collection1-LunTan.json -e environment.json"
-          EOF
-          
-          chmod +x deploy-to-local.sh
-          echo "生成了一键部署脚本: deploy-to-local.sh"
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.22.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
 
-      # 上传部署包
-      - name: Upload Deployment Package
-        uses: actions/upload-artifact@v4
-        with:
-          name: local-deployment-package
-          path: |
-            k8s/
-            deploy-to-local.sh
-          retention-days: 7
+      - name: 创建K8S集群
+        run: kind create cluster --name ci-cluster
 
-  notify-deployment-ready:
-    runs-on: ubuntu-latest
-    # 依赖部署脚本生成作业
-    needs: [generate-deployment-script] 
-    steps:
-      - name: Notify Team
+      - name: 配置kubectl
         run: |
-          echo "CI流程完成！"
-          echo ""
-          echo "请下载部署包并本地执行:"
-          echo "1. 从Artifacts下载 'local-deployment-package'"
-          echo "2. 解压后运行: chmod +x deploy-to-local.sh && ./deploy-to-local.sh"
-          echo "3. 访问 http://127.0.0.1:30080 验证部署"
-          echo ""
-          echo "注意: 确保本地Docker Desktop和Kubectl已正确配置"
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: 替换K8S镜像标签
+        run: |
+          sed -i "s|image:.*backend:.*|image: ghcr.io/${{ github.repository_owner }}/backend:${{ github.sha }}|g" k8s/backend-deployment.yaml
+          sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
+
+      - name: 加载后端镜像到kind
+        run: kind load docker-image ghcr.io/${{ github.repository_owner }}/backend:${{ github.sha }} --name ci-cluster
+
+      - name: 加载前端镜像到kind
+        run: kind load docker-image ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }} --name ci-cluster
+
+      - name: 部署到K8S
+        run: kubectl apply -f k8s/
+
+      - name: 等待服务启动
+        run: sleep 30
+
+      - name: 运行后端API集成测试
+        run: |
+          newman run postman/collection1-LunTan.json -e postman/environment.json --env-var "baseUrl=http://localhost:30080/api"
+
+      - name: 运行前端GUI集成测试
+        run: |
+          npx cypress run --headless --config baseUrl=http://localhost:30080
+
+      - name: 删除K8S集群
+        if: always()
+        run: kind delete cluster --name ci-cluster
+
