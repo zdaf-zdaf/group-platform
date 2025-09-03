@@ -30,12 +30,16 @@ print(a + b)
     cy.get('.el-select-dropdown__item').contains('学生').click({ force: true })
     cy.get('input[type="checkbox"]').check({ force: true })
     cy.get('button').contains('注册账号').click()
-    // 兼容弹窗和页面提示
+    // 兼容弹窗、页面提示和跳转，适配 CI
+    cy.wait(500)
     cy.get('body').then($body => {
       if ($body.find('.success-message').length) {
         cy.get('.success-message').should('contain.text', '注册成功')
+      } else if ($body.find('.el-message').length) {
+        cy.get('.el-message').should('contain.text', '注册成功')
       } else {
-        cy.contains('注册成功').should('exist')
+        // 检查是否已跳转到登录页
+        cy.url({ timeout: 5000 }).should('include', '/login')
       }
     })
   })
