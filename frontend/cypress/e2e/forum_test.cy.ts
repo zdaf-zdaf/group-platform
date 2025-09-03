@@ -26,12 +26,27 @@ describe('论坛模块功能测试', () => {
       password: user.password
     }).then((response) => {
       expect(response.status).to.eq(200);
-      token = response.body.access;
-      expect(token, 'token should exist').to.not.be.null;
-      token = `Bearer ${token}`;
-      cy.visit('/forum', {
+      const accessToken = response.body.access;
+      expect(accessToken, 'token should exist').to.not.be.null;
+
+      token = accessToken; // 只存 accessToken，不加 Bearer
+      cy.log(`最终 token: ${token}`);
+
+      // 测试 token 是否可用
+      cy.request({
+        method: 'GET',
+        url: 'http://127.0.0.1:8000/api/forum/questions/',
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(res => {
+        cy.log('登录后立即测试 token 结果:', JSON.stringify(res.body));
+        cy.log('测试请求状态码:', res.status);
+      });
+
+      // 先设置 localStorage，再访问页面，避免 token 丢失
+      cy.visit('/', {
         onBeforeLoad(win) {
-          win.localStorage.setItem('token', token);
+          win.localStorage.setItem('token', token); // 只存 accessToken
           if (response.body.username) {
             win.localStorage.setItem('userInfo', JSON.stringify({
               username: response.body.username,
@@ -43,13 +58,15 @@ describe('论坛模块功能测试', () => {
           }
         }
       });
-      cy.wait(3000); // 登录后等待更久，确保 token 被前端识别
-      cy.reload(); // 强制刷新，确保 token 生效
-      cy.wait(3000);
-      cy.reload(); // 再次刷新，最大化保证 SPA 识别 token
+      cy.wait(1000);
+      cy.visit('/forum');
       cy.wait(2000);
+      cy.reload();
+      cy.wait(1000);
       cy.window().then(win => {
-        expect(win.localStorage.getItem('token')).to.exist;
+        const savedToken = win.localStorage.getItem('token');
+        cy.log('localStorage token:', savedToken);
+        expect(savedToken).to.match(/^.+$/); // 只要有内容即可
       });
     });
   }
@@ -84,10 +101,10 @@ describe('论坛模块功能测试', () => {
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` },
         failOnStatusCode: false // CI 调试用，避免非200直接失败
       }).then(res => {
-        cy.log('帖子列表:', JSON.stringify(res.body))
+  // ...日志已移除...
         expect(res.body.some(q => q.title === postTitle)).to.be.true
       })
     })
@@ -153,10 +170,9 @@ describe('论坛模块功能测试', () => {
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` },
         failOnStatusCode: false // CI 调试用，避免非200直接失败
       }).then(res => {
-        cy.log('帖子列表:', JSON.stringify(res.body))
         expect(res.body.some(q => q.title === postTitle)).to.be.true
       })
     })
