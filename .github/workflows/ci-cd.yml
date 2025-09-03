@@ -494,6 +494,10 @@ jobs:
         working-directory: ./frontend
 
       # ================== 初始化测试账号 ==================
+      - name: 新建日志文件夹
+        run: mkdir -p logs
+        working-directory: ./frontend
+        
       - name: 初始化测试账号
         run: |
           # 注册 stuTest
