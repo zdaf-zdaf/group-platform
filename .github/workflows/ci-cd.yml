@@ -421,6 +421,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ================== Node.js 前端 ==================
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -430,6 +431,7 @@ jobs:
       - run: npm install
         working-directory: ./frontend
 
+      # ================== Python 后端 ==================
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -437,6 +439,7 @@ jobs:
       - run: pip install -r requirements.txt
         working-directory: ./backend
 
+      # ================== MySQL 配置 ==================
       - run: |
           sudo apt-get update && sudo apt-get install -y mysql-client
           for i in {1..30}; do
@@ -447,7 +450,8 @@ jobs:
           CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
           GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
           FLUSH PRIVILEGES;"
-        
+
+      # ================== Django 数据库迁移 ==================
       - run: |
           python manage.py makemigrations --noinput
           python manage.py migrate --noinput
@@ -462,31 +466,53 @@ jobs:
           DB_PORT: 3306
           DEBUG: False
 
+      # ================== 启动 Django 和 Vue ==================
       - run: |
           mkdir -p logs
-          python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
-          echo $! > ../logs/django.pid
-        working-directory: ./backend
 
-      - run: |
+          # 启动 Django
+          python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > logs/django.log 2>&1 &
+          echo $! > logs/django.pid
+
+          # 启动 Vue
           echo "VUE_APP_API_BASE_URL=http://127.0.0.1:8000" > .env
           echo "VUE_APP_DEBUG=true" >> .env
-          npm run dev -- --host 0.0.0.0 --port 8080 > ../logs/vue.log 2>&1 &
-          echo $! > ../logs/vue.pid
+          npm run dev -- --host 0.0.0.0 --port 8080 > logs/vue.log 2>&1 &
+          echo $! > logs/vue.pid
+
+          # 等待端口启动
+          npm install -g wait-on
+          if ! wait-on --timeout 180000 http://127.0.0.1:8080 http://127.0.0.1:8000; then
+            echo "❌ 服务启动失败，输出日志："
+            echo "=== Django 日志 ==="
+            cat logs/django.log || echo "无 Django 日志"
+            echo "=== Vue 日志 ==="
+            cat logs/vue.log || echo "无 Vue 日志"
+            exit 1
+          fi
         working-directory: ./frontend
 
+      # ================== 初始化测试账号 ==================
       - run: |
-          npm install -g wait-on
-          wait-on http://127.0.0.1:8080 http://localhost:8080 http://127.0.0.1:8000
-
-      - run: |
-          # 注册并登录账号，统一获取 token
           python3 ./scripts/setup_test_accounts.py
         working-directory: ./frontend
 
-      - run: npx cypress run --headless --config baseUrl=http://127.0.0.1:8080
+      # ================== 运行 Cypress ==================
+      - run: |
+          set -o pipefail
+          npx cypress run --headless --config baseUrl=http://127.0.0.1:8080 2>&1 | tee logs/cypress.log || \
+          (echo "❌ Cypress 测试失败，打印 token 与 API 响应日志" && \
+          cat logs/cypress.log && \
+          echo "=== stuTest Token ===" && \
+          cat logs/stuToken.log || echo "stuToken.log 不存在" && \
+          echo "=== tchTest Token ===" && \
+          cat logs/tchToken.log || echo "tchToken.log 不存在" && \
+          echo "=== API 响应日志示例 ===" && \
+          curl -s -H "Authorization: Bearer $(cat logs/stuToken.log)" http://127.0.0.1:8000/api/auth/user/profile/ || echo "API 响应失败"; \
+          exit 1)
         working-directory: ./frontend
 
+      # ================== 上传 logs 和 Cypress artifact ==================
       - uses: actions/upload-artifact@v4
         if: always()
         with:
