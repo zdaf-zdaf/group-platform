@@ -571,7 +571,7 @@ jobs:
 
       - name: test
         run: |
-          curl -v -X POST http://localhost:8000/api/auth/register \
+          curl -v -X POST http://localhost:8000/api/auth/register/ \
             -H "Content-Type: application/json" \
             -d '{"username":"ciuser","password":"Test1234@","email":"ciuser@ci.com","role":"student"}'
 
