@@ -14,6 +14,7 @@ describe('公告模块功能测试', () => {
   // 登录函数封装，token提升为全局变量
   let token = ''
   function login(user: { username: string; password: string }) {
+    cy.intercept('POST', '/api/auth/login/').as('loginApi')
     cy.request('POST', `${API_BASE_URL}/api/auth/login/`, {
       username: user.username,
       password: user.password
@@ -58,9 +59,11 @@ describe('公告模块功能测试', () => {
     cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeContent1)
     cy.get('.set-card .el-select').click({ force: true })
     cy.get('.el-select-dropdown__item').contains('课程通知').click({ force: true })
+    cy.intercept('POST', '/api/notice/notice/').as('publishNoticeApi')
     cy.get('.set-card').within(() => {
       cy.get('button').contains('发布公告').click({ force: true })
     })
+    cy.wait('@publishNoticeApi')
     cy.contains('公告发布成功').should('be.visible')
     cy.get('.notice-list').should('contain.text', noticeTitle1)
 
@@ -71,9 +74,11 @@ describe('公告模块功能测试', () => {
     cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeContent2)
     cy.get('.set-card .el-select').click({ force: true })
     cy.get('.el-select-dropdown__item').contains('安全公告').click({ force: true })
+    cy.intercept('POST', '/api/notice/notice/').as('publishNoticeApi')
     cy.get('.set-card').within(() => {
       cy.get('button').contains('发布公告').click({ force: true })
     })
+    cy.wait('@publishNoticeApi')
     cy.contains('公告发布成功').should('be.visible')
     cy.get('.notice-list').should('contain.text', noticeTitle2)
 
@@ -86,9 +91,11 @@ describe('公告模块功能测试', () => {
     cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeEditContent)
     cy.get('.set-card .el-select').click({ force: true })
     cy.get('.el-select-dropdown__item').contains('设备维护').click({ force: true })
+    cy.intercept('PATCH', /\/api\/notice\/notice\/\d+\//).as('editNoticeApi')
     cy.get('.set-card').within(() => {
       cy.get('button').contains('更新公告').click({ force: true })
     })
+    cy.wait('@editNoticeApi')
     cy.contains('公告更新成功').should('be.visible')
     cy.get('.notice-list').should('contain.text', noticeEditTitle)
 
@@ -160,15 +167,19 @@ describe('公告模块功能测试', () => {
 
     // 删除已编辑的公告
     cy.get('.notice-list .notice-item').contains(noticeEditTitle).parents('.notice-item').within(() => {
+      cy.intercept('DELETE', /\/api\/notice\/notice\/\d+\//).as('deleteNoticeApi')
       cy.contains('删除').click({ force: true })
     })
+    cy.wait('@deleteNoticeApi')
     cy.contains('公告删除成功').should('be.visible')
     cy.get('.notice-list').should('not.contain.text', noticeEditTitle)
 
     // 删除第二个公告
     cy.get('.notice-list .notice-item').contains(noticeTitle2).parents('.notice-item').within(() => {
+      cy.intercept('DELETE', /\/api\/notice\/notice\/\d+\//).as('deleteNoticeApi')
       cy.contains('删除').click({ force: true })
     })
+    cy.wait('@deleteNoticeApi')
     cy.contains('公告删除成功').should('be.visible')
     cy.get('.notice-list').should('not.contain.text', noticeTitle2)
 

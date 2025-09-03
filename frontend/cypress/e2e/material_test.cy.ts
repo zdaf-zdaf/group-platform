@@ -7,6 +7,7 @@ describe('学习资料模块功能测试', () => {
   // 登录函数封装，token提升为全局变量
   let token = ''
   function login(user: { username: string; password: string }) {
+    cy.intercept('POST', '/api/auth/login/').as('loginApi')
     cy.request('POST', `${API_BASE_URL}/api/auth/login/`, {
       username: user.username,
       password: user.password
@@ -62,7 +63,9 @@ describe('学习资料模块功能测试', () => {
       cy.get('.set-card .el-select').click({ force: true })
       cy.get('.el-select-dropdown__item').contains(item.label).click({ force: true })
       cy.get('.el-upload input[type="file"]').selectFile(item.file, { force: true })
+      cy.intercept('POST', '/api/materials/material/').as('publishMaterialApi')
       cy.contains('发布资料').click({ force: true })
+      cy.wait('@publishMaterialApi')
       cy.contains('资料发布成功').should('be.visible')
       cy.get('.material-list').should('contain.text', title)
     })
@@ -82,13 +85,17 @@ describe('学习资料模块功能测试', () => {
     const previewTypes = ['PDF文档', '文档资料', '图表素材', '视频教程']
     previewTypes.forEach(label => {
       cy.get('.material-list .material-item').contains(label).parents('.material-item').then($item => {
+        cy.intercept('GET', '/api/materials/material/*').as('previewMaterialApi')
         cy.wrap($item).contains('在线预览').click({ force: true })
+        cy.wait('@previewMaterialApi')
         cy.wait(1000) // 等待新窗口弹出
       })
     })
     // 下载第一个资料
     cy.get('.material-list .material-item').first().within(() => {
+      cy.intercept('GET', '/api/materials/material/*/download/').as('downloadMaterialApi')
       cy.contains('下载文件').click({ force: true })
+      cy.wait('@downloadMaterialApi')
     })
   })
 
@@ -111,10 +118,12 @@ describe('学习资料模块功能测试', () => {
     ]
     titles.forEach(title => {
       cy.get('.material-list .material-item').contains(title).parents('.material-item').within(() => {
+        cy.intercept('DELETE', '/api/materials/material/*/').as('deleteMaterialApi')
         cy.contains('删除').click({ force: true })
       })
       cy.get('.el-message-box').should('be.visible')
       cy.get('.el-message-box__btns button').contains('确定删除').click({ force: true })
+      cy.wait('@deleteMaterialApi')
       cy.contains('删除成功').should('be.visible')
     })
   })
