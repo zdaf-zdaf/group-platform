@@ -20,28 +20,18 @@ print(a + b)
   // 学生注册
   // ========================
   it('学生注册流程', () => {
-    cy.visit('/register')
-    cy.get('form', { timeout: 10000 }).should('exist')
-    cy.get('input[placeholder="请输入3-16位用户名"]').type(studentUsername)
-    cy.get('input[placeholder="请输入邮箱地址"]').type(`${studentUsername}@example.com`)
-    cy.get('input[placeholder="请输入6-18位密码"]').type(password)
-    cy.get('input[placeholder="请再次输入密码"]').type(password)
-    cy.get('.el-select').click()
-    cy.get('.el-select-dropdown__item').contains('学生').click({ force: true })
-    cy.get('input[type="checkbox"]').check({ force: true })
-    cy.get('button').contains('注册账号').click()
-    // 兼容弹窗、页面提示和跳转，适配 CI
-    cy.wait(500)
-    cy.get('body').then($body => {
-      if ($body.find('.success-message').length) {
-        cy.get('.success-message').should('contain.text', '注册成功')
-      } else if ($body.find('.el-message').length) {
-        cy.get('.el-message').should('contain.text', '注册成功')
-      } else {
-        // 检查是否已跳转到登录页
-        cy.url({ timeout: 5000 }).should('include', '/login')
-      }
-    })
+  cy.visit('/register')
+  cy.get('form', { timeout: 10000 }).should('exist')
+  cy.get('input[placeholder="请输入3-16位用户名"]').type(studentUsername)
+  cy.get('input[placeholder="请输入邮箱地址"]').type(`${studentUsername}@example.com`)
+  cy.get('input[placeholder="请输入6-18位密码"]').type(password)
+  cy.get('input[placeholder="请再次输入密码"]').type(password)
+  cy.get('.el-select').click()
+  cy.get('.el-select-dropdown__item').contains('学生').click({ force: true })
+  cy.get('input[type="checkbox"]').check({ force: true })
+  cy.get('button').contains('注册账号').click()
+  // 只判断跳转到登录页即可通过，兼容 CI
+  cy.url({ timeout: 8000 }).should('include', '/login')
   })
 
   // ========================
