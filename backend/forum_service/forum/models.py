@@ -14,7 +14,8 @@ class Question(models.Model):
         ordering = ['-is_sticky', '-created_at']
     
     def __str__(self):
-        return self.title
+        return f"Comment by user {self.author} on {self.question.title}"
+
 
 class Comment(models.Model):
     question = models.ForeignKey(Question, related_name='comments', on_delete=models.CASCADE)
