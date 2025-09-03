@@ -21,6 +21,7 @@ print(a + b)
   // ========================
   it('学生注册流程', () => {
     cy.visit('/register')
+    cy.get('form', { timeout: 10000 }).should('exist')
     cy.get('input[placeholder="请输入3-16位用户名"]').type(studentUsername)
     cy.get('input[placeholder="请输入邮箱地址"]').type(`${studentUsername}@example.com`)
     cy.get('input[placeholder="请输入6-18位密码"]').type(password)
@@ -359,5 +360,15 @@ print(a + b)
 
     // 检查保存批改结果按钮
     cy.contains('保存批改结果').should('exist')
+
+    // 教师删除实验
+    cy.contains('创建实验').click({ force: true })
+    cy.get('.set-item', { timeout: 10000 }).should('exist')
+    cy.get('.set-item').contains(experimentTitle).parents('.set-item').within(() => {
+      cy.contains('删除').click({ force: true })
+    })
+    cy.get('.el-message-box__btns', { timeout: 10000 }).should('be.visible')
+    cy.get('.el-message-box__btns').contains('确定').click({ force: true })
+    cy.get('.set-item').contains(experimentTitle).should('not.exist')
   })
 })

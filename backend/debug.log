@@ -1722,3 +1722,7 @@ WARNING 2025-09-03 09:06:50,159 log Unauthorized: /api/forum/questions/
 WARNING 2025-09-03 09:06:50,161 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 96
 INFO 2025-09-03 09:06:59,143 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
 INFO 2025-09-03 09:07:21,250 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 278
+INFO 2025-09-03 11:24:20,025 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\server\urls.py changed, reloading.
+INFO 2025-09-03 11:24:21,845 autoreload Watching for file changes with StatReloader
+INFO 2025-09-03 11:25:46,478 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\server\urls.py changed, reloading.
+INFO 2025-09-03 11:25:47,865 autoreload Watching for file changes with StatReloader

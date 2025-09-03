@@ -8,6 +8,15 @@ const api = axios.create({
   }
 });
 
+// 请求拦截器 - 自动注入 token
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export interface QuestionSet {
   id?: number
   title: string

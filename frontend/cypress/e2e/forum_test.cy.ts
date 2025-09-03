@@ -94,10 +94,7 @@ describe('论坛模块功能测试', () => {
     cy.wait(3000);
     cy.reload();
     cy.wait(2000);
-    cy.document().then(doc => {
-      cy.log('页面HTML:', doc.documentElement.outerHTML);
-    });
-    cy.screenshot('forum-after-post'); // 自动截图页面
+
     cy.get('.post-card', { timeout: 30000 }).should('exist');
     cy.get('.post-card').should('contain.text', postTitle);
 
@@ -166,10 +163,7 @@ describe('论坛模块功能测试', () => {
     cy.wait(3000);
     cy.reload();
     cy.wait(2000);
-    cy.document().then(doc => {
-      cy.log('页面HTML:', doc.documentElement.outerHTML);
-    });
-    cy.screenshot('forum-after-post-teacher'); // 自动截图页面
+
     cy.get('.post-card', { timeout: 30000 }).should('exist');
     cy.get('.post-card').should('contain.text', postTitle);
 

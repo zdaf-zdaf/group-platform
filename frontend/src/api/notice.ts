@@ -11,22 +11,12 @@ const api = axios.create({
   }
 });
 
-// 请求拦截器 - 添加 Token
-api.interceptors.request.use((config) => {
-  const authStore = useAuthStore();
-
-  // 优先从authStore获取token，而不是localStorage
-  if (authStore.token) {
-    config.headers.Authorization = `Bearer ${authStore.token}`;
+// 请求拦截器 - 自动注入 token
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-
-  // 打印请求调试信息
-  console.log(`发送请求: ${config.method?.toUpperCase()} ${config.url}`, {
-    params: config.params,
-    data: config.data,
-    headers: config.headers
-  });
-
   return config;
 }, (error) => {
   console.error('请求拦截器错误:', error);

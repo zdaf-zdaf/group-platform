@@ -726,12 +726,6 @@ jobs:
         run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
         working-directory: ./frontend
 
-      - name: Run frontend unit tests
-        run: npm run test:unit  # 确保package.json中有test:unit脚本
-
-      - name: Debug artifact upload before
-        run: ls -lh ./frontend && ls -lh ./frontend/node_modules || true
-
       - name: Debug artifact upload before
         run: ls -lh ./frontend && ls -lh ./frontend/node_modules || true
 
