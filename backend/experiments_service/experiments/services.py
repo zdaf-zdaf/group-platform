@@ -25,7 +25,7 @@ class UserServiceClient:
             response = requests.get(
                 f'{self.base_url}/api/users/{user_id}/',
                 headers={'Authorization': f'Bearer {self.token}'},
-                timeout=3
+                timeout=3  # 添加超时设置
             )
             
             if response.status_code == 200:
@@ -35,6 +35,9 @@ class UserServiceClient:
             else:
                 logger.error(f"获取用户信息失败: {response.status_code}")
                 return None
+        except requests.exceptions.Timeout:
+            logger.error("用户服务请求超时")
+            return None
         except requests.RequestException as e:
             logger.exception(f"调用用户服务失败: {str(e)}")
             return None

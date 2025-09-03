@@ -18,11 +18,11 @@ class CustomJWTAuthentication(authentication.BaseAuthentication):
         token = parts[1]
 
         try:
-            # 验证令牌 - 使用与user-service相同的密钥
+            # 使用JWT配置中的签名密钥
             payload = jwt.decode(
                 token,
-                settings.SECRET_KEY,
-                algorithms=['HS256']
+                settings.SIMPLE_JWT['SIGNING_KEY'],
+                algorithms=[settings.SIMPLE_JWT['ALGORITHM']]
             )
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('Token has expired')
@@ -33,7 +33,7 @@ class CustomJWTAuthentication(authentication.BaseAuthentication):
 
         # 创建用户对象 - 从JWT令牌中提取用户信息
         user = type('User', (object,), {
-            'id': payload.get('user_id'),
+            'id': payload.get(settings.SIMPLE_JWT['USER_ID_CLAIM']),
             'role': payload.get('role', 'student'),
             'is_authenticated': True,
         })

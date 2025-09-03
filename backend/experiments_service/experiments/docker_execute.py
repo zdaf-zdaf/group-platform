@@ -14,32 +14,44 @@ class DockerJudge:
     def run_code(self, problem_config, code):
         """执行代码并返回结果"""
         try:
-            # 创建临时容器
-            container = self.client.containers.run(
+            # 创建临时容器 - 使用安全的方式执行代码
+            container = self.client.containers.create(
                 image=settings.DOCKER_JUDGE_IMAGE,
-                command=f"python -c '{code}'",
+                command=["python", "-c", "import sys; exec(sys.stdin.read())"],
                 environment={
                     'INPUT': problem_config.get('test_cases', '')
                 },
                 mem_limit=f"{problem_config.get('mem_limit', 256)}m",
                 network_mode='none',
-                detach=True
+                stdin_open=True,  # 开启标准输入
             )
+            
+            # 启动容器
+            container.start()
+            
+            # 通过标准输入发送代码
+            socket = container.attach_socket(params={'stdin': 1, 'stream': 1})
+            socket._sock.sendall(code.encode('utf-8'))
+            socket._sock.sendall(b'\n')  # 确保代码被执行
+            socket.close()
             
             # 等待容器执行完成
             try:
-                container.wait(timeout=problem_config.get('timeout', 10))
+                result = container.wait(timeout=problem_config.get('timeout', 10))
+                exit_code = result['StatusCode']
             except docker.errors.ContainerError as e:
                 logger.error(f"容器执行错误: {str(e)}")
+                exit_code = 1
             
             # 获取日志输出
-            logs = container.logs().decode('utf-8')
+            logs = container.logs(stdout=True, stderr=True).decode('utf-8')
             
             # 清理容器
-            container.remove()
+            container.remove(force=True)
             
             return {
                 'status': 'success',
+                'exit_code': exit_code,
                 'output': logs
             }
         except Exception as e:
