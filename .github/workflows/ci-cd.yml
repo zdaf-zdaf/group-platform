@@ -502,7 +502,7 @@ jobs:
         with:
             node-version: '22'
             cache: 'npm'
-            cache-dependency-path: '../frontend/package-lock.json'
+            cache-dependency-path: 'frontend/package-lock.json'
 
       - name: Install Vue dependencies
         run: |
@@ -692,7 +692,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: '../frontend/package-lock.json'
+          cache-dependency-path: 'package-lock.json'
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -786,7 +786,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: '../frontend/package-lock.json'
+          cache-dependency-path: 'frontend/package-lock.json'
 
       - name: Checkout code
         uses: actions/checkout@v4
