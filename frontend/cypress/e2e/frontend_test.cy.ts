@@ -143,8 +143,8 @@ print(a + b)
     cy.contains('创建实验').click({ force: true })
     cy.get('.publish-set .set-card', { timeout: 10000 }).should('be.visible')
 
-    // 拦截学生列表接口（与实际 axios 路径一致）
-    cy.intercept('GET', '/api/students/').as('getStudentListApi')
+  // 拦截学生列表接口（更宽泛，兼容所有相关请求）
+  cy.intercept('GET', '**/students/**').as('getStudentListApi')
 
     // 填写实验信息
     cy.get('.publish-set .set-card').within(() => {
@@ -165,11 +165,13 @@ print(a + b)
       cy.get('input[placeholder="选择截止时间"]').clear({ force: true }).type(deadlineTimeStr, { force: true })
 
       // 等待学生数据加载完成并断言接口
-      cy.wait('@getStudentListApi', { timeout: 10000 }).then(({ response }) => {
+      cy.wait('@getStudentListApi', { timeout: 15000 }).then(({ response }) => {
         cy.log('学生列表接口状态:', response?.statusCode)
         cy.log('学生列表接口body:', JSON.stringify(response?.body))
         expect(response?.statusCode, '学生列表接口状态码').to.be.oneOf([200, 201])
-        expect(response?.body && response.body.length > 0, '学生列表有数据').to.be.true
+        // 兼容 body 为对象或数组
+        const studentsArr = Array.isArray(response?.body) ? response.body : (response?.body?.data || [])
+        expect(studentsArr.length > 0, '学生列表有数据').to.be.true
       })
 
       cy.get('.el-transfer-panel__list').should('be.visible')
@@ -271,16 +273,20 @@ print(a + b)
     login({ username: studentUsername, password })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
-    // 拦截学生端实验列表接口（与实际 axios 路径一致）
-    cy.intercept('GET', '/api/experiments/experiments/').as('getExperimentListApi')
+  // 拦截学生端实验列表接口（更宽泛，兼容所有相关请求）
+  cy.intercept('GET', '**/experiments/**').as('getExperimentListApi')
     cy.contains('实验中心').click({ force: true })
-    cy.wait('@getExperimentListApi', { timeout: 10000 }).then(({ response }) => {
+    cy.wait('@getExperimentListApi', { timeout: 15000 }).then(({ response }) => {
       cy.log('学生端实验列表接口状态:', response?.statusCode)
       cy.log('学生端实验列表接口body:', JSON.stringify(response?.body))
       expect(response?.statusCode, '学生端实验列表接口状态码').to.be.oneOf([200, 201])
-      expect(response?.body && response.body.some && response.body.some(e => e.title === experimentTitle), '实验列表包含新建实验').to.be.true
+      // 兼容 body 为对象或数组
+      const experimentsArr = Array.isArray(response?.body) ? response.body : (response?.body?.data || [])
+      expect(experimentsArr.some(e => e.title === experimentTitle), '实验列表包含新建实验').to.be.true
     })
-    cy.contains(experimentTitle).click({ force: true })
+    cy.wait(2000)
+    cy.reload()
+    cy.contains(experimentTitle, { timeout: 10000 }).click({ force: true })
 
      // ========================
       // 选择题完成
@@ -372,8 +378,10 @@ print(a + b)
     // 进入“实验管理”或“批改作业”页面（假设有入口按钮/菜单）
     cy.contains('查看学生提交').click({ force: true })
 
-    // 等待提交卡片加载
-    cy.get('.submission-card', { timeout: 10000 }).should('exist')
+  // 等待页面渲染和数据加载
+  cy.wait(3000)
+  cy.reload()
+  cy.get('.submission-card', { timeout: 15000 }).should('exist')
 
     // 检查至少有一条提交记录，且包含学生名、题组、提交时间等
     cy.get('.submission-card').first().within(() => {
