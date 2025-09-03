@@ -1,11 +1,10 @@
-# 单元测试
+# materials/tests.py
 from django.test import TestCase, override_settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from .models import LearningMaterial
 import os
-from unittest.mock import MagicMock
 
 User = get_user_model()
 
@@ -16,14 +15,10 @@ TEST_MEDIA_ROOT = os.path.join(settings.BASE_DIR, 'test_media')
 class LearningMaterialModelTest(TestCase):
     def setUp(self):
         os.makedirs(TEST_MEDIA_ROOT, exist_ok=True)
-        # 创建用户
+        # 创建用户，用于 uploader_username
         self.user = User.objects.create_user(username='u1', password='pwd', email='u1@t.com')
-
-        # 模拟 Experiment 对象
-        self.experiment = MagicMock()
-        self.experiment.id = 1
-        self.experiment.title = "Exp1"
-        self.experiment.teacher_id = self.user.id  # 如果需要 teacher_id
+        # question_set 可以用整数代替原来的 Experiment id
+        self.question_set_id = 1
 
     def tearDown(self):
         # 清理测试文件夹
@@ -44,7 +39,8 @@ class LearningMaterialModelTest(TestCase):
         lm = LearningMaterial.objects.create(
             title='Doc1', description='d', type='pdf',
             file=SimpleUploadedFile('a.pdf', b'12345', content_type='application/pdf'),
-            created_by=self.user, question_set_id=self.experiment.id  # 使用 experiment 的 id
+            uploader_username=self.user.username,
+            question_set=self.question_set_id
         )
         self.assertEqual(str(lm), 'Doc1')
 
@@ -52,7 +48,8 @@ class LearningMaterialModelTest(TestCase):
         lm = LearningMaterial.objects.create(
             title='', description='d', type='pdf',
             file=SimpleUploadedFile('z.pdf', b'1', content_type='application/pdf'),
-            created_by=self.user, question_set_id=self.experiment.id
+            uploader_username=self.user.username,
+            question_set=self.question_set_id
         )
         self.assertEqual(str(lm), '')
 
@@ -60,7 +57,8 @@ class LearningMaterialModelTest(TestCase):
         lm = LearningMaterial.objects.create(
             title='Doc2', description='d', type='pdf',
             file=SimpleUploadedFile('b.pdf', b'abc', content_type='application/pdf'),
-            created_by=self.user, question_set_id=self.experiment.id
+            uploader_username=self.user.username,
+            question_set=self.question_set_id
         )
         # 刚创建文件应存在
         self.assertTrue(lm.file_exists)
@@ -74,7 +72,8 @@ class LearningMaterialModelTest(TestCase):
         lm = LearningMaterial(
             title='Doc3', description='d', type='pdf',
             file=SimpleUploadedFile('c.pdf', content, content_type='application/pdf'),
-            created_by=self.user, question_set_id=self.experiment.id
+            uploader_username=self.user.username,
+            question_set=self.question_set_id
         )
         lm.save()
         self.assertEqual(lm.size, len(content))
@@ -85,7 +84,8 @@ class LearningMaterialModelTest(TestCase):
         lm = LearningMaterial(
             title='Doc4', description='d', type='pdf',
             file=SimpleUploadedFile('d.pdf', content, content_type='application/pdf'),
-            created_by=self.user, question_set_id=self.experiment.id,
+            uploader_username=self.user.username,
+            question_set=self.question_set_id,
             size=999
         )
         lm.save()
