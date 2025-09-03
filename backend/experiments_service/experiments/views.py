@@ -1,36 +1,58 @@
+import logging
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
-from .models import *
-from .serializers import *
-from .services import ExperimentService
-from .docker_execute import DockerJudge
-import logging
-import json
+from django.utils import timezone
 from django.db import transaction
+from django.contrib.contenttypes.models import ContentType
 
-logger = logging.getLogger('experiment_app')
+from .models import (
+    Experiment, ChoiceProblem, FillProblem, CodingProblem,
+    Submission, Answer, CodingSubmission, TestResult
+)
+from .serializers import (
+    ExperimentSerializer, ChoiceProblemSerializer, FillProblemSerializer,
+    CodingProblemSerializer, SubmissionSerializer, AnswerSerializer,
+    TestResultSerializer
+)
+from .docker_execute import DockerJudge
+
+logger = logging.getLogger('experiment')
 
 class ExperimentViewSet(viewsets.ModelViewSet):
     queryset = Experiment.objects.all()
     serializer_class = ExperimentSerializer
-    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        """创建实验（只允许教师操作）"""
-        # 验证当前用户是否为教师
-        if not ExperimentService.validate_teacher_role(request.user.id):
-            return Response({"detail": "无权限操作"}, status=status.HTTP_403_FORBIDDEN)
+        # 从JWT令牌中获取用户信息
+        user = request.user
         
+        # 验证用户角色是否为教师
+        if not hasattr(user, 'role') or user.role != 'teacher':
+            return Response({"detail": "只有教师可以创建实验"}, status=status.HTTP_403_FORBIDDEN)
+        
+        # 设置教师ID
+        request.data['teacher_id'] = user.id
         return super().create(request, *args, **kwargs)
 
-class CodeJudgeApi(APIView):
-    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        # 从JWT令牌中获取用户信息
+        user = self.request.user
+        
+        # 根据用户角色过滤实验
+        if hasattr(user, 'role') and user.role == 'teacher':
+            # 教师可以看到自己创建的所有实验
+            return Experiment.objects.filter(teacher_id=user.id)
+        else:
+            # 学生只能看到分配给自己的实验
+            return Experiment.objects.filter(student_ids__contains=[user.id])
 
+class CodeJudgeApi(APIView):
     def post(self, request):
-        """代码评测API"""
+        # 从JWT令牌中获取用户信息
+        user = request.user
+        
         code = request.data.get('code')
         problem_id = request.data.get('problemId')
         
@@ -49,7 +71,7 @@ class CodeJudgeApi(APIView):
             # 保存提交记录
             submission = CodingSubmission.objects.create(
                 coding_problem=problem,
-                user_id=request.user.id,
+                user_id=user.id,  # 使用JWT中的用户ID
                 code=code,
                 passed_count=result['passed'],
                 total_count=result['total'],
@@ -64,11 +86,11 @@ class CodeJudgeApi(APIView):
             return Response({'error': '服务器内部错误'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class SubmitExperimentApi(APIView):
-    permission_classes = [IsAuthenticated]
-
     @transaction.atomic
     def post(self, request):
-        """提交实验答案"""
+        # 从JWT令牌中获取用户信息
+        user = request.user
+        
         try:
             data = request.data
             experiment_id = data.get('experiment_id')
@@ -84,7 +106,7 @@ class SubmitExperimentApi(APIView):
             # 创建提交记录
             submission = Submission.objects.create(
                 experiment=experiment,
-                user_id=request.user.id
+                user_id=user.id  # 使用JWT中的用户ID
             )
             
             # 处理选择题答案
@@ -131,9 +153,9 @@ class SubmitExperimentApi(APIView):
                 passed = result['passed'] == result['total']
                 
                 # 创建编程题提交记录
-                coding_submission = CodingSubmission.objects.create(
+                CodingSubmission.objects.create(
                     coding_problem=problem,
-                    user_id=request.user.id,
+                    user_id=user.id,  # 使用JWT中的用户ID
                     code=code,
                     passed_count=result['passed'],
                     total_count=result['total'],

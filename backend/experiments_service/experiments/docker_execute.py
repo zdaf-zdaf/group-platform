@@ -1,117 +1,50 @@
-# server/experiment_judge/docker_execute.py
-import time
 import docker
+import logging
+import time
+from django.conf import settings
 
-import socket as std_socket
+logger = logging.getLogger('docker_execute')
 
 class DockerJudge:
-    """使用Docker容器执行代码评测"""
-
+    """使用Docker执行代码的判题器"""
+    
     def __init__(self):
         self.client = docker.from_env()
-
-    def run_code(self, problem: dict, code: str) -> dict:
-        """执行代码评测
-
-        :param problem: 题目配置
-            {
-                "name": "add",
-                "timeout": 10,
-                "mem_limit": 512,
-                "test_cases": [{"input": "...", "output": "..."}]
-            }
-        :param code: 提交的代码
-        :return: 评测结果字典
-        """
-        passed = 0
-        details = []
+    
+    def run_code(self, problem_config, code):
+        """执行代码并返回结果"""
         try:
-            for tc in problem["test_cases"]:
-                # 运行容器执行测试用例
-                try:
-                    result = self._run_container(
-                        code,
-                        problem["timeout"],
-                        problem["mem_limit"],
-                        tc["input"]
-                    )
-                except Exception as e:
-                    # 捕获容器运行异常，返回详细错误
-                    result = f"Error while running code in Docker: {str(e)}"
-
-                # 比较输出结果
-                is_passed = self._compare_output(result, tc["output"])
-                details.append({
-                    "input": tc["input"],
-                    "expected": tc["output"],
-                    "actual": result,
-                    "is_passed": is_passed
-                })
-
-                if is_passed:
-                    passed += 1
-
-            return {
-                "passed": passed,
-                "total": len(problem["test_cases"]),
-                "details": details
-            }
-        except Exception as e:
-            # 顶层捕获所有异常，返回统一错误信息
-            return {
-                "passed": 0,
-                "total": len(problem["test_cases"]),
-                "details": [],
-                "error": f"Error while fetching server API version: {str(e)}"
-            }
-
-    def _run_container(self, code: str, timeout: int, mem_limit: int, input_str: str) -> str:
-        container = None
-        try:
+            # 创建临时容器
             container = self.client.containers.run(
-                image='python:3.9-slim',
-                command=['python', '-u', '-c', code],  # -u 禁用缓冲
-                stdin_open=True,
-                stdout=True,
-                stderr=True,
-                detach=True,
-                mem_limit=f'{mem_limit}m',
+                image=settings.DOCKER_JUDGE_IMAGE,
+                command=f"python -c '{code}'",
+                environment={
+                    'INPUT': problem_config.get('test_cases', '')
+                },
+                mem_limit=f"{problem_config.get('mem_limit', 256)}m",
                 network_mode='none',
+                detach=True
             )
-
-            # attach_socket 返回 socket-like 对象，直接操作即可
+            
+            # 等待容器执行完成
             try:
-                sock = container.attach_socket(params={'stdin': 1, 'stream': 1})
-                if input_str:
-                    sock.sendall(input_str.encode('utf-8') + b'\n')
-                sock.close()
-            except AttributeError as e:
-                # 捕获 socket 相关属性错误
-                return f"Error: SocketIO attribute error: {str(e)}"
-            except Exception as e:
-                return f"Error: SocketIO or attach_socket error: {str(e)}"
-
-            exit_code = container.wait()['StatusCode']
-
-            stdout = container.logs(stdout=True, stderr=False).decode('utf-8')
-            stderr = container.logs(stdout=False, stderr=True).decode('utf-8')
-
-            if exit_code != 0:
-                return f"错误，退出码 {exit_code}：{stderr.strip()}"
-
-            return stdout.strip()
-
-        except docker.errors.DockerException as e:
-            return f"Error: Docker API error: {str(e)}"
+                container.wait(timeout=problem_config.get('timeout', 10))
+            except docker.errors.ContainerError as e:
+                logger.error(f"容器执行错误: {str(e)}")
+            
+            # 获取日志输出
+            logs = container.logs().decode('utf-8')
+            
+            # 清理容器
+            container.remove()
+            
+            return {
+                'status': 'success',
+                'output': logs
+            }
         except Exception as e:
-            return f"Error: Unexpected error: {str(e)}"
-        finally:
-            if container:
-                try:
-                    container.remove(force=True)
-                except Exception:
-                    pass
-
-    def _compare_output(self, actual: str, expected: str) -> bool:
-        """比较实际输出和预期输出"""
-        return actual.rstrip() == expected.rstrip()
+            logger.exception(f"执行代码失败: {str(e)}")
+            return {
+                'status': 'error',
+                'message': str(e)
+            }
