@@ -263,29 +263,14 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -uroot -prootpassword"
+          --health-cmd="mysqladmin ping -uroot -prootpassword"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-          
+
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
-
-      - name: 等待MySQL就绪
-        run: |
-          sudo apt-get update && sudo apt-get install -y mysql-client
-          for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-              echo "MySQL已就绪"; break
-            fi
-            echo "等待MySQL...($i/30)"; sleep 2
-          done
-          # 配置远程访问
-          mysql -h"127.0.0.1" -uroot -prootpassword -e "
-            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            FLUSH PRIVILEGES;"
 
       - name: 构建公告微服务镜像
         run: docker build -t notice_service:test ./backend/notice_service
@@ -293,9 +278,31 @@ jobs:
       - name: 查看本地镜像
         run: docker images
 
+      - name: 找到 GitHub Actions 默认网络
+        id: get-network
+        run: |
+          NETWORK_ID=$(docker network ls --format "{{.Name}}" | grep "github_network" || true)
+          if [ -z "$NETWORK_ID" ]; then
+            echo "未找到 github_network，列出所有网络："
+            docker network ls
+            exit 1
+          fi
+          echo "network=$NETWORK_ID" >> $GITHUB_OUTPUT
+
+      - name: 等待 MySQL 在容器网络内可访问
+        run: |
+          for i in {1..30}; do
+            if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
+              mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_notice; then
+              echo "✅ MySQL 在容器内可访问"; break
+            fi
+            echo "等待 MySQL...($i/30)"; sleep 2
+          done
+
       - name: 运行公告微服务容器
         run: |
           docker run -d --name notice_service_test \
+            --network ${{ steps.get-network.outputs.network }} \
             -p 8001:8000 \
             -e DJANGO_SETTINGS_MODULE=server.settings \
             -e DB_ENGINE=django.db.backends.mysql \
@@ -312,22 +319,16 @@ jobs:
 
       - name: 检查容器状态和日志
         run: |
-          echo "=== 1. 列出所有容器（包括已退出的）==="
+          echo "=== 容器列表 ==="
           docker ps -a
-
-          echo "=== 2. 查看公告服务容器的日志 ==="
-          docker logs notice_service_test || echo "无法获取日志，容器可能不存在或从未启动"
-
-          echo "=== 3. 检查容器的退出状态码 ==="
-          docker inspect notice_service_test --format='{{.State.ExitCode}}' || echo "无法检查容器状态"
-
-      - name: 确认容器是否在运行
-        run: |
-          docker ps -a
+          echo "=== 容器日志 ==="
           docker logs notice_service_test || true
+          echo "=== 容器退出状态码 ==="
+          docker inspect notice_service_test --format='{{.State.ExitCode}}' || true
 
       - name: 运行单元测试
         run: docker exec notice_service_test python manage.py test --verbosity=2
+
 
 
   # ================ 实验微服务单元测试 ================
