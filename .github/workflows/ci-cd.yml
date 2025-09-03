@@ -32,7 +32,7 @@ jobs:
           
           # 如果没有变更，默认构建所有服务（用于测试）
           if [ -z "$changed_dirs" ]; then
-            changed_dirs="backend/forum backend/materials backend/notice backend/experiments backend/user"
+            changed_dirs="backend/forum backend/materials backend/notice backend/user"
             echo "=== 无变更，构建所有服务 ==="
           fi
           
