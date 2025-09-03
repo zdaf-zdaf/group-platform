@@ -98,7 +98,7 @@ jobs:
           docker run -d --name forum_service_test \
             --network ${{ steps.get-network.outputs.network }} \
             -p 8001:8000 \
-            -e DJANGO_SETTINGS_MODULE=server.settings \
+            -e DJANGO_SETTINGS_MODULE=forum_service.settings \
             -e DB_ENGINE=django.db.backends.mysql \
             -e DB_NAME=test_db_forum \
             -e DB_USER=root \
