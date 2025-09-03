@@ -544,7 +544,7 @@ jobs:
          
 
       # ================== 检查前后端服务互联 ==================
-      - name: 检查前后端服务互联
+      - name: 检查后端 login 接口可用
         run: |
           echo "检查后端 login 接口..."
           for i in {1..10}; do
@@ -554,14 +554,19 @@ jobs:
             fi
             echo "后端 login 接口未就绪，重试...($i/10)"; sleep 2
           done
+        working-directory: ./backend
+
+      - name: 检查前端页面可访问
+        run: |
           echo "检查前端页面可访问..."
           for i in {1..10}; do
-            if curl -s http://127.0.0.1:8080 | grep -q '<div'; then
+            code=$(curl -s -o page.html -w "%{http_code}" http://127.0.0.1:8080)
+            if [ "$code" = "200" ] && (grep -q '<div' page.html || grep -q 'id="app"' page.html); then
               echo "前端页面正常"; break
             fi
             echo "前端页面未就绪，重试...($i/10)"; sleep 2
           done
-          echo "前后端服务均已可访问，准备运行 Cypress 测试。"
+          rm -f page.html
         working-directory: ./frontend
 
       # ================== 运行 Cypress ==================
