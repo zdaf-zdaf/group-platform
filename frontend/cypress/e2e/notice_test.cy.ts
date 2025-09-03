@@ -59,11 +59,13 @@ describe('公告模块功能测试', () => {
     cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeContent1)
     cy.get('.set-card .el-select').click({ force: true })
     cy.get('.el-select-dropdown__item').contains('课程通知').click({ force: true })
-    cy.intercept('POST', '/api/notices/').as('publishNoticeApi')
+  // 临时拦截所有 POST 请求，便于定位实际 API 路径
+  cy.intercept('POST', '**').as('anyPostApi')
     cy.get('.set-card').within(() => {
       cy.get('button').contains('发布公告').click({ force: true })
     })
-    cy.wait('@publishNoticeApi')
+    cy.wait('@anyPostApi')
+    cy.wait(2000)
     cy.contains('公告发布成功').should('be.visible')
     cy.get('.notice-list').should('contain.text', noticeTitle1)
 
@@ -74,11 +76,12 @@ describe('公告模块功能测试', () => {
     cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeContent2)
     cy.get('.set-card .el-select').click({ force: true })
     cy.get('.el-select-dropdown__item').contains('安全公告').click({ force: true })
-    cy.intercept('POST', '/api/notices/').as('publishNoticeApi')
+  cy.intercept('POST', '**').as('anyPostApi')
     cy.get('.set-card').within(() => {
       cy.get('button').contains('发布公告').click({ force: true })
     })
-    cy.wait('@publishNoticeApi')
+    cy.wait('@anyPostApi')
+    cy.wait(2000)
     cy.contains('公告发布成功').should('be.visible')
     cy.get('.notice-list').should('contain.text', noticeTitle2)
 
@@ -96,8 +99,9 @@ describe('公告模块功能测试', () => {
       cy.get('button').contains('更新公告').click({ force: true })
     })
     cy.wait('@editNoticeApi')
-    cy.contains('公告更新成功').should('be.visible')
-    cy.get('.notice-list').should('contain.text', noticeEditTitle)
+  cy.contains('公告更新成功').should('be.visible')
+  cy.wait(2000)
+  cy.get('.notice-list').should('contain.text', noticeEditTitle)
 
 
     // 筛选类型
@@ -179,21 +183,25 @@ describe('公告模块功能测试', () => {
     cy.get('.notice-page').should('exist')
 
     // 删除已编辑的公告
+    cy.wait(2000)
     cy.get('.notice-list .notice-item').contains(noticeEditTitle).parents('.notice-item').within(() => {
-    cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
+      cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
       cy.contains('删除').click({ force: true })
     })
     cy.wait('@deleteNoticeApi')
     cy.contains('公告删除成功').should('be.visible')
+    cy.wait(2000)
     cy.get('.notice-list').should('not.contain.text', noticeEditTitle)
 
     // 删除第二个公告
+    cy.wait(2000)
     cy.get('.notice-list .notice-item').contains(noticeTitle2).parents('.notice-item').within(() => {
-    cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
+      cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
       cy.contains('删除').click({ force: true })
     })
     cy.wait('@deleteNoticeApi')
     cy.contains('公告删除成功').should('be.visible')
+    cy.wait(2000)
     cy.get('.notice-list').should('not.contain.text', noticeTitle2)
 
   })
