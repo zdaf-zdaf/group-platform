@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: materials-service
+  labels:
+    app: materials-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: materials-service
+  template:
+    metadata:
+      labels:
+        app: materials-service
+    spec:
+      containers:
+      - name: materials-service
+        image: materials-service:latest  # 请替换为实际镜像地址
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DJANGO_SETTINGS_MODULE
+          value: "materials_service.settings.production"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health/
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10

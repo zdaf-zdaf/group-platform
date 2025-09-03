@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service # 其他应用将通过这个名称连接
+  labels:
+    app: mysql
+spec:
+  selector:
+    app: mysql # 选择标签为 app=mysql 的 Pod
+  ports:
+    - port: 3306 # Service 暴露的端口
+      targetPort: 3306 # 容器监听的端口
+  clusterIP: None # 这将创建一个“Headless Service”，对于有状态应用 like MySQL 是常见选择
+  # 如果不需要 Headless，可以移除 `clusterIP: None`，它会自动分配一个 ClusterIP
