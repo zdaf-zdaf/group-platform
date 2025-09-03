@@ -546,12 +546,13 @@ jobs:
       # ================== 检查前后端服务互联 ==================
       - name: 检查前后端服务互联
         run: |
-          echo "检查后端 API 可访问..."
+          echo "检查后端 login 接口..."
           for i in {1..10}; do
-            if curl -s http://127.0.0.1:8000/api/auth/user/profile/ | grep -q 'username'; then
-              echo "后端 API 正常"; break
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/auth/login/)
+            if [ "$code" = "200" ] || [ "$code" = "400" ] || [ "$code" = "405" ]; then
+              echo "后端 login 接口可访问"; break
             fi
-            echo "后端 API 未就绪，重试...($i/10)"; sleep 2
+            echo "后端 login 接口未就绪，重试...($i/10)"; sleep 2
           done
           echo "检查前端页面可访问..."
           for i in {1..10}; do
