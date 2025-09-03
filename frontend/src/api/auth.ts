@@ -3,7 +3,7 @@ import type { AxiosResponse } from 'axios';
 import type { LoginForm } from '@/views/auth/Login.vue';
 
 // 配置后端基础 URL（根据你的实际后端地址修改）
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000/'; // 统一使用环境变量
+const BASE_URL = import.meta.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000/'; // 统一使用环境变量
 
 // 创建 axios 实例
 export const apiClient = axios.create({
