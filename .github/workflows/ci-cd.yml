@@ -687,6 +687,9 @@ jobs:
       run:
         working-directory: ./frontend
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -694,8 +697,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+
 
         # 修复依赖步骤
       - name: Repair and install dependencies
@@ -781,6 +783,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test-frontend]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -788,8 +793,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Cache npm dependencies
         uses: actions/cache@v3
