@@ -7,45 +7,45 @@ on:
     branches: [ "main" ]
 
 jobs:
-  # ================ 检测变更的微服务 ================
-  detect-changed-services:
-    runs-on: ubuntu-latest
-    outputs:
-      changed-services: ${{ steps.changed.outputs.changed }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: 识别变更的微服务
-        id: changed
-        run: |
-          # 调试：显示所有变更的文件
-          echo "=== 所有变更文件 ==="
-          git diff --name-only HEAD^ HEAD || echo "无法获取差异"
+  # # ================ 检测变更的微服务 ================
+  # detect-changed-services:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     changed-services: ${{ steps.changed.outputs.changed }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     - name: 识别变更的微服务
+  #       id: changed
+  #       run: |
+  #         # 调试：显示所有变更的文件
+  #         echo "=== 所有变更文件 ==="
+  #         git diff --name-only HEAD^ HEAD || echo "无法获取差异"
           
-          # 检测backend目录下变更的微服务
-          changed_dirs=$(git diff --name-only HEAD^ HEAD | grep -o '^backend/[^/]*' | sort | uniq)
+  #         # 检测backend目录下变更的微服务
+  #         changed_dirs=$(git diff --name-only HEAD^ HEAD | grep -o '^backend/[^/]*' | sort | uniq)
           
-          # 调试：显示检测到的服务
-          echo "=== 检测到的服务变更 ==="
-          echo "$changed_dirs"
+  #         # 调试：显示检测到的服务
+  #         echo "=== 检测到的服务变更 ==="
+  #         echo "$changed_dirs"
           
-          # 如果没有变更，默认构建所有服务（用于测试）
-          if [ -z "$changed_dirs" ]; then
-            changed_dirs="backend/forum backend/materials backend/notice backend/user"
-            echo "=== 无变更，构建所有服务 ==="
-          fi
+  #         # 如果没有变更，默认构建所有服务（用于测试）
+  #         if [ -z "$changed_dirs" ]; then
+  #           changed_dirs="backend/forum backend/materials backend/notice backend/experiments backend/user"
+  #           echo "=== 无变更，构建所有服务 ==="
+  #         fi
           
-          # 转换为简单格式（去掉backend/前缀）
-          simple_dirs=$(echo "$changed_dirs" | sed 's|backend/||g')
-          echo "changed_services=$simple_dirs" >> $GITHUB_OUTPUT
-          echo "=== 最终输出 ==="
-          echo "$simple_dirs"
+  #         # 转换为简单格式（去掉backend/前缀）
+  #         simple_dirs=$(echo "$changed_dirs" | sed 's|backend/||g')
+  #         echo "changed_services=$simple_dirs" >> $GITHUB_OUTPUT
+  #         echo "=== 最终输出 ==="
+  #         echo "$simple_dirs"
   
   # ================ 论坛微服务单元测试 ================
   test-forum-service:
     runs-on: ubuntu-latest
-    needs: detect-changed-services
+    # needs: detect-changed-services
     if: ${{ always() }}
     services:
       mysql:
@@ -126,7 +126,7 @@ jobs:
   # ================ 资料微服务单元测试 ================
   test-materials-service:
     runs-on: ubuntu-latest
-    needs: detect-changed-services
+    # needs: detect-changed-services
     if: ${{ always() }}
     services:
       mysql:
@@ -207,7 +207,7 @@ jobs:
   # ================ 公告微服务单元测试 ================
   test-notice-service:
     runs-on: ubuntu-latest
-    needs: detect-changed-services
+    # needs: detect-changed-services
     if: ${{ always() }}
     services:
       mysql:
@@ -288,7 +288,7 @@ jobs:
   # # ================ 实验微服务单元测试 ================
   # test-experiments-service:
   #   runs-on: ubuntu-latest
-  #   needs: detect-changed-services
+    # # needs: detect-changed-services
   #   if: ${{ always() }}
   #   services:
   #     mysql:
@@ -369,7 +369,7 @@ jobs:
   # ================ 用户微服务单元测试 ================
   test-user-service:
     runs-on: ubuntu-latest
-    needs: detect-changed-services
+    # needs: detect-changed-services
     if: ${{ always() }}
     services:
       mysql:
@@ -447,17 +447,6 @@ jobs:
       - name: 运行单元测试
         run: docker exec user_service_test python manage.py test --verbosity=2
 
-  # # ================== 网关单元测试 ==================
-  # test-gateway:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-      
-  #     - name: Test gateway config
-  #       run: |
-  #         docker build -t gateway-test ./gateway
-  #         docker run --rm gateway-test nginx -t
-
   # ================== 前端单元测试 ==================
   test-frontend:
     runs-on: ubuntu-latest
@@ -510,7 +499,7 @@ jobs:
   # ================ 论坛镜像构建 ================
   build-forum-service:
     runs-on: ubuntu-latest
-    needs: [detect-changed-services, test-forum-service]
+    needs: [test-forum-service]
     # 仅当forum-service有变更时运行
     if: ${{ always() }}
     
@@ -537,7 +526,7 @@ jobs:
   # ================ 资料镜像构建 ================
   build-materials-service:
     runs-on: ubuntu-latest
-    needs: [detect-changed-services, test-materials-service]
+    needs: [test-materials-service]
     # 仅当materials-service有变更时运行
     if: ${{ always() }}
     
@@ -564,7 +553,7 @@ jobs:
   # ================ 公告镜像构建 ================
   build-notice-service:
     runs-on: ubuntu-latest
-    needs: [detect-changed-services, test-notice-service]
+    needs: [test-notice-service]
     # 仅当notice-service有变更时运行
     if: ${{ always() }}
     
@@ -591,9 +580,9 @@ jobs:
   # # ================ 实验镜像构建 ================
   # build-experiments-service:
   #   runs-on: ubuntu-latest
-  #   needs: [detect-changed-services, test-experiments-service]
+  #   needs: [test-experiments-service]
   #   # 仅当experiments-service有变更时运行
-  #   if: ${{ contains(fromJson(needs.detect-changed-services.outputs.changed-services), 'backend/experiments-service') }}
+  #   if: ${{ always}}
     
   #   steps:
   #     - name: 检出代码
@@ -618,7 +607,7 @@ jobs:
   # ================ 用户镜像构建 ================
   build-user-service:
     runs-on: ubuntu-latest
-    needs: [detect-changed-services, test-user-service]
+    needs: [test-user-service]
     # 仅当user-service有变更时运行
     if: ${{ always() }}
     
@@ -1033,6 +1022,76 @@ jobs:
         run: |
             pkill -f "runserver 0.0.0.0:8004" || true
 
+  # # ================== 生成部署脚本 ==================      
+  # generate-deployment-script:
+  #   name: 生成部署脚本
+  #   runs-on: ubuntu-latest
+  #   # 依赖所有微服务和前端
+  #   needs: 
+  #     - build-experiments-service
+  #     - build-forum-service
+  #     - build-materials-service
+  #     - build-notice-service
+  #     - build-user-service
+  #     - build-and-push-frontend
+      
+  #   steps:
+  #     - name: 检出代码
+  #       uses: actions/checkout@v4
+
+  #     - name: 生成部署脚本
+  #       run: |
+  #         cat > deploy-to-local.sh << 'EOF'
+  #         #!/bin/bash
+  #         echo "=== 开始部署微服务到本地K8s ==="
+          
+  #         # 1. 更新所有微服务镜像版本
+  #         sed -i "s|image:.*experiments-service:.*|image: ghcr.io/${{ github.repository_owner }}/experiments-service:${{ github.sha }}|g" backend/experiments-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*forum-service:.*|image: ghcr.io/${{ github.repository_owner }}/forum-service:${{ github.sha }}|g" backend/forum-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*materials-service:.*|image: ghcr.io/${{ github.repository_owner }}/materials-service:${{ github.sha }}|g" backend/materials-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*notice-service:.*|image: ghcr.io/${{ github.repository_owner }}/notice-service:${{ github.sha }}|g" backend/notice-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*user-service:.*|image: ghcr.io/${{ github.repository_owner }}/user-service:${{ github.sha }}|g" backend/user-service/k8s/deployment.yaml
+          
+  #         # 2. 更新前端镜像
+  #         sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
+          
+  #         # 3. 应用K8s配置
+  #         echo "应用实验微服务配置..."
+  #         kubectl apply -f backend/experiments_service/k8s/
+  #         echo "应用论坛微服务配置..."
+  #         kubectl apply -f backend/forum_service/k8s/
+  #         echo "应用资料微服务配置..."
+  #         kubectl apply -f backend/materials_service/k8s/
+  #         echo "应用通知微服务配置..."
+  #         kubectl apply -f backend/notice_service/k8s/
+  #         echo "应用用户微服务配置..."
+  #         kubectl apply -f backend/user_service/k8s/
+  #         echo "应用前端配置..."
+  #         kubectl apply -f k8s/frontend-deploy.yaml
+          
+  #         # 4. 等待服务就绪
+  #         echo "等待服务启动(约60秒)..."
+  #         sleep 60
+          
+  #         # 5. 显示访问信息
+  #         echo "=== 部署完成 ==="
+  #         echo "前端访问: http://localhost:30080"
+  #         echo "API文档: http://localhost:30080/api/docs"
+  #         EOF
+          
+  #         chmod +x deploy-to-local.sh
+  #         echo "已生成部署脚本: deploy-to-local.sh"
+
+  #     - name: 打包部署文件
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: microservices-deployment
+  #         path: |
+  #           backend/*/k8s/*.yaml  # 包含所有微服务的K8s配置
+  #           k8s/frontend-deploy.yaml
+  #           deploy-to-local.sh
+  #         retention-days: 7
+
   # ================ GUI 测试 ================
   # gui-test-cypress:
   #   name: Run Cypress GUI Tests
@@ -1084,76 +1143,6 @@ jobs:
   #     - name: Cleanup KinD Cluster
   #       run: kind delete cluster --name test-cluster
   #       if: always() 
-
-  # # ================== 生成部署脚本 ==================      
-  # generate-deployment-script:
-  #   name: 生成部署脚本
-  #   runs-on: ubuntu-latest
-  #   # 依赖所有微服务和前端
-  #   needs: 
-  #     - build-experiments-service
-  #     - build-forum-service
-  #     - build-materials-service
-  #     - build-notice-service
-  #     - build-user-service
-  #     - build-and-push-frontend
-      
-  #   steps:
-  #     - name: 检出代码
-  #       uses: actions/checkout@v4
-
-  #     - name: 生成部署脚本
-  #       run: |
-  #         cat > deploy-to-local.sh << 'EOF'
-  #         #!/bin/bash
-  #         echo "=== 开始部署微服务到本地K8s ==="
-          
-  #         # 1. 更新所有微服务镜像版本
-  #         sed -i "s|image:.*experiments-service:.*|image: ghcr.io/${{ github.repository_owner }}/experiments-service:${{ github.sha }}|g" backend/experiments-service/k8s/deployment.yaml
-  #         sed -i "s|image:.*forum-service:.*|image: ghcr.io/${{ github.repository_owner }}/forum-service:${{ github.sha }}|g" backend/forum-service/k8s/deployment.yaml
-  #         sed -i "s|image:.*materials-service:.*|image: ghcr.io/${{ github.repository_owner }}/materials-service:${{ github.sha }}|g" backend/materials-service/k8s/deployment.yaml
-  #         sed -i "s|image:.*notice-service:.*|image: ghcr.io/${{ github.repository_owner }}/notice-service:${{ github.sha }}|g" backend/notice-service/k8s/deployment.yaml
-  #         sed -i "s|image:.*user-service:.*|image: ghcr.io/${{ github.repository_owner }}/user-service:${{ github.sha }}|g" backend/user-service/k8s/deployment.yaml
-          
-  #         # 2. 更新前端镜像
-  #         sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
-          
-  #         # 3. 应用K8s配置
-  #         echo "应用实验微服务配置..."
-  #         kubectl apply -f backend/experiments-service/k8s/
-  #         echo "应用论坛微服务配置..."
-  #         kubectl apply -f backend/forum-service/k8s/
-  #         echo "应用资料微服务配置..."
-  #         kubectl apply -f backend/materials-service/k8s/
-  #         echo "应用通知微服务配置..."
-  #         kubectl apply -f backend/notice-service/k8s/
-  #         echo "应用用户微服务配置..."
-  #         kubectl apply -f backend/user-service/k8s/
-  #         echo "应用前端配置..."
-  #         kubectl apply -f k8s/frontend-deploy.yaml
-          
-  #         # 4. 等待服务就绪
-  #         echo "等待服务启动(约60秒)..."
-  #         sleep 60
-          
-  #         # 5. 显示访问信息
-  #         echo "=== 部署完成 ==="
-  #         echo "前端访问: http://localhost:30080"
-  #         echo "API文档: http://localhost:30080/api/docs"
-  #         EOF
-          
-  #         chmod +x deploy-to-local.sh
-  #         echo "已生成部署脚本: deploy-to-local.sh"
-
-  #     - name: 打包部署文件
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: microservices-deployment
-  #         path: |
-  #           backend/*/k8s/*.yaml  # 包含所有微服务的K8s配置
-  #           k8s/frontend-deploy.yaml
-  #           deploy-to-local.sh
-  #         retention-days: 7
 
   # # ==================== 通知 ====================
   # notify-deployment-ready:
