@@ -66,7 +66,7 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 构建公告微服务镜像
+      - name: 构建论坛微服务镜像
         run: docker build -t forum_service:test ./backend/forum_service
 
       - name: 查看本地镜像
@@ -88,12 +88,12 @@ jobs:
           for i in {1..30}; do
             if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
               mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_forum; then
-              echo "✅ MySQL 在容器内可访问"; break
+              echo "MySQL 在容器内可访问"; break
             fi
             echo "等待 MySQL...($i/30)"; sleep 2
           done
 
-      - name: 运行公告微服务容器
+      - name: 运行论坛服务容器
         run: |
           docker run -d --name forum_service_test \
             --network ${{ steps.get-network.outputs.network }} \
@@ -147,7 +147,7 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 构建公告微服务镜像
+      - name: 构建资料微服务镜像
         run: docker build -t materials_service:test ./backend/materials_service
 
       - name: 查看本地镜像
@@ -169,12 +169,12 @@ jobs:
           for i in {1..30}; do
             if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
               mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_materials; then
-              echo "✅ MySQL 在容器内可访问"; break
+              echo "MySQL 在容器内可访问"; break
             fi
             echo "等待 MySQL...($i/30)"; sleep 2
           done
 
-      - name: 运行公告微服务容器
+      - name: 运行资料微服务容器
         run: |
           docker run -d --name materials_service_test \
             --network ${{ steps.get-network.outputs.network }} \
@@ -250,7 +250,7 @@ jobs:
           for i in {1..30}; do
             if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
               mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_notice; then
-              echo "✅ MySQL 在容器内可访问"; break
+              echo "MySQL 在容器内可访问"; break
             fi
             echo "等待 MySQL...($i/30)"; sleep 2
           done
@@ -309,7 +309,7 @@ jobs:
   #     - name: 检出代码
   #       uses: actions/checkout@v4
 
-  #     - name: 构建公告微服务镜像
+  #     - name: 构建实验微服务镜像
   #       run: docker build -t experiments_service:test ./backend/experiments_service
 
   #     - name: 查看本地镜像
@@ -331,12 +331,12 @@ jobs:
   #         for i in {1..30}; do
   #           if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
   #             mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_experiments; then
-  #             echo "✅ MySQL 在容器内可访问"; break
+  #             echo "MySQL 在容器内可访问"; break
   #           fi
   #           echo "等待 MySQL...($i/30)"; sleep 2
   #         done
 
-  #     - name: 运行公告微服务容器
+  #     - name: 运行实验微服务容器
   #       run: |
   #         docker run -d --name experiments_service_test \
   #           --network ${{ steps.get-network.outputs.network }} \
@@ -390,7 +390,7 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 构建公告微服务镜像
+      - name: 构建用户微服务镜像
         run: docker build -t user_service:test ./backend/user_service
 
       - name: 查看本地镜像
@@ -412,12 +412,12 @@ jobs:
           for i in {1..30}; do
             if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
               mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_user; then
-              echo "✅ MySQL 在容器内可访问"; break
+              echo "MySQL 在容器内可访问"; break
             fi
             echo "等待 MySQL...($i/30)"; sleep 2
           done
 
-      - name: 运行公告微服务容器
+      - name: 运行用户微服务容器
         run: |
           docker run -d --name user_service_test \
             --network ${{ steps.get-network.outputs.network }} \
@@ -697,7 +697,7 @@ jobs:
 
   # 并行论坛api测试
   api-test-luntan:
-    name: Parallel Forum Tests
+    name: Forum API Tests
     runs-on: ubuntu-latest
     needs: [build-forum-service]
     
@@ -784,7 +784,7 @@ jobs:
 
   # # 并行实验api测试
   # api-test-lab:
-  #   name: Parallel Lab Tests
+  #   name: Experiments API Tests
   #   runs-on: ubuntu-latest
   #   needs: [build-experiments-service]
     
@@ -877,7 +877,7 @@ jobs:
 
   # 并行公告api测试
   api-test-gonggao:
-    name: Parallel Announcement Tests
+    name: Announcement API Tests
     runs-on: ubuntu-latest
     needs: [build-notice-service]
     
@@ -963,14 +963,10 @@ jobs:
             pkill -f "runserver 0.0.0.0:8003" || true
 
   # 并行资料api测试
-  api-test-materials:
-    name: Parallel Learning Materials Tests
+  api-test-ziliao:
+    name: Materials API Tests
     runs-on: ubuntu-latest
     needs: [build-materials-service] # 依赖后端单元测试
-    if: ${{ always() }}   
-    steps:
-      - name: Debug build status
-        run: echo "Status of build-materials-service = ${{ needs.build-materials-service.result }}"
     
     services:
       mysql-ziliao:  # 服务名称唯一
