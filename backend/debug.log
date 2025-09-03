@@ -2403,3 +2403,568 @@ INFO 2025-09-03 17:32:53,958 basehttp "GET /api/notices/ HTTP/1.1" 200 2729
 INFO 2025-09-03 17:32:54,091 basehttp "OPTIONS /api/notices/77/ HTTP/1.1" 200 0
 INFO 2025-09-03 17:32:54,135 basehttp "DELETE /api/notices/77/ HTTP/1.1" 204 0
 INFO 2025-09-03 17:32:54,234 basehttp "GET /api/notices/ HTTP/1.1" 200 2450
+INFO 2025-09-03 20:23:23,309 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:23:23,413 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:23:25,256 basehttp "OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:23:25,259 basehttp "OPTIONS /api/forum/questions/ HTTP/1.1" 200 0
+WARNING 2025-09-03 20:23:25,279 log Unauthorized: /api/notices/unread_count/
+WARNING 2025-09-03 20:23:25,282 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:23:25,284 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:23:25,285 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+INFO 2025-09-03 20:23:34,585 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:23:34,640 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+WARNING 2025-09-03 20:23:35,042 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:23:35,044 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:23:38,358 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:23:38,359 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:23:41,582 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:23:41,585 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:23:44,849 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:23:44,853 basehttp "POST /api/forum/questions/ HTTP/1.1" 401 366
+INFO 2025-09-03 20:26:32,746 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:26:32,827 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+WARNING 2025-09-03 20:26:33,992 log Unauthorized: /api/notices/unread_count/
+WARNING 2025-09-03 20:26:33,993 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:26:33,995 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:26:34,000 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+INFO 2025-09-03 20:26:40,049 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:26:40,119 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+WARNING 2025-09-03 20:26:40,549 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:26:40,552 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:26:43,751 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:26:43,753 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:26:48,569 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:26:48,571 basehttp "POST /api/forum/questions/ HTTP/1.1" 401 366
+INFO 2025-09-03 20:27:12,486 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:27:12,575 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+WARNING 2025-09-03 20:27:13,878 log Unauthorized: /api/notices/unread_count/
+WARNING 2025-09-03 20:27:13,878 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:27:13,878 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:27:13,878 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+INFO 2025-09-03 20:27:20,178 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:27:20,253 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+WARNING 2025-09-03 20:27:20,695 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:27:20,700 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:27:24,157 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:27:24,157 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:27:27,402 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:27:27,403 basehttp "POST /api/forum/questions/ HTTP/1.1" 401 366
+INFO 2025-09-03 20:29:49,129 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:29:49,205 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+WARNING 2025-09-03 20:29:50,407 log Unauthorized: /api/notices/unread_count/
+WARNING 2025-09-03 20:29:50,407 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 401 366
+INFO 2025-09-03 20:29:56,431 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:29:56,502 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+WARNING 2025-09-03 20:29:59,098 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:29:59,099 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+INFO 2025-09-03 20:30:00,515 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:30:00,607 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+WARNING 2025-09-03 20:30:01,518 log Unauthorized: /api/notices/unread_count/
+WARNING 2025-09-03 20:30:01,518 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 401 366
+INFO 2025-09-03 20:30:07,553 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:30:07,628 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+WARNING 2025-09-03 20:30:09,796 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:30:09,800 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:30:11,733 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:30:11,734 basehttp "GET /api/forum/questions/ HTTP/1.1" 401 366
+WARNING 2025-09-03 20:30:14,034 log Unauthorized: /api/forum/questions/
+WARNING 2025-09-03 20:30:14,035 basehttp "POST /api/forum/questions/ HTTP/1.1" 401 366
+INFO 2025-09-03 20:32:20,892 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:32:20,963 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:32:22,211 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:32:23,550 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:32:23,567 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:32:26,387 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:32:26,403 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:32:34,816 basehttp "POST /api/forum/questions/ HTTP/1.1" 201 352
+INFO 2025-09-03 20:32:34,983 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:32:41,497 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:32:41,542 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:32:43,343 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:32:43,449 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:32:44,338 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:32:45,886 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:32:45,915 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:32:48,505 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:32:48,529 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:32:56,141 basehttp "POST /api/forum/questions/ HTTP/1.1" 201 352
+INFO 2025-09-03 20:32:56,282 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 1337
+INFO 2025-09-03 20:33:02,187 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:33:02,254 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 1337
+INFO 2025-09-03 20:33:05,516 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:33:05,566 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 1337
+INFO 2025-09-03 20:33:07,635 basehttp "OPTIONS /api/forum/questions/134/toggle-like/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:33:07,672 basehttp "PATCH /api/forum/questions/134/toggle-like/ HTTP/1.1" 200 30
+INFO 2025-09-03 20:33:08,407 basehttp "PATCH /api/forum/questions/134/toggle-like/ HTTP/1.1" 200 31
+INFO 2025-09-03 20:33:08,796 basehttp "OPTIONS /api/forum/questions/134/comments/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:33:08,824 basehttp "POST /api/forum/questions/134/comments/ HTTP/1.1" 201 166
+INFO 2025-09-03 20:33:09,081 basehttp "OPTIONS /api/forum/comments/102/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:33:09,121 basehttp "DELETE /api/forum/comments/102/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:33:09,387 basehttp "OPTIONS /api/forum/questions/134/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:33:09,432 basehttp "DELETE /api/forum/questions/134/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:33:12,554 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:33:12,633 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:33:15,238 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:33:17,858 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:33:21,357 basehttp "POST /api/forum/questions/ HTTP/1.1" 201 352
+INFO 2025-09-03 20:33:21,660 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 1337
+INFO 2025-09-03 20:33:28,501 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 1337
+INFO 2025-09-03 20:33:32,066 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 1337
+INFO 2025-09-03 20:33:34,433 basehttp "OPTIONS /api/forum/questions/135/toggle-sticky/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:33:34,468 basehttp "PATCH /api/forum/questions/135/toggle-sticky/ HTTP/1.1" 200 18
+INFO 2025-09-03 20:33:35,296 basehttp "PATCH /api/forum/questions/135/toggle-sticky/ HTTP/1.1" 200 19
+INFO 2025-09-03 20:33:35,596 basehttp "OPTIONS /api/forum/questions/135/toggle-like/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:33:35,640 basehttp "PATCH /api/forum/questions/135/toggle-like/ HTTP/1.1" 200 30
+INFO 2025-09-03 20:33:36,552 basehttp "PATCH /api/forum/questions/135/toggle-like/ HTTP/1.1" 200 31
+INFO 2025-09-03 20:33:37,327 basehttp "OPTIONS /api/forum/questions/135/comments/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:33:37,367 basehttp "POST /api/forum/questions/135/comments/ HTTP/1.1" 201 166
+INFO 2025-09-03 20:33:38,150 basehttp "OPTIONS /api/forum/comments/103/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:33:38,192 basehttp "DELETE /api/forum/comments/103/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:33:39,055 basehttp "OPTIONS /api/forum/questions/135/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:33:39,116 basehttp "DELETE /api/forum/questions/135/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:33:42,049 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:33:46,542 basehttp "OPTIONS /api/forum/questions/128/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:33:46,584 basehttp "DELETE /api/forum/questions/128/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:35:57,547 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:35:57,624 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:35:59,050 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:36:00,256 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:36:00,276 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:36:03,023 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:36:03,043 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:36:06,916 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:36:06,981 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:36:07,828 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:36:09,497 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:36:09,552 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:36:12,140 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:36:12,148 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:36:19,703 basehttp "POST /api/forum/questions/ HTTP/1.1" 201 352
+INFO 2025-09-03 20:36:19,834 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:36:25,505 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:36:25,525 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:36:28,817 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:36:28,852 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:36:30,930 basehttp "OPTIONS /api/forum/questions/136/toggle-like/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:36:30,963 basehttp "PATCH /api/forum/questions/136/toggle-like/ HTTP/1.1" 200 30
+INFO 2025-09-03 20:36:31,612 basehttp "PATCH /api/forum/questions/136/toggle-like/ HTTP/1.1" 200 31
+INFO 2025-09-03 20:36:31,983 basehttp "OPTIONS /api/forum/questions/136/comments/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:36:32,025 basehttp "POST /api/forum/questions/136/comments/ HTTP/1.1" 201 166
+INFO 2025-09-03 20:36:32,228 basehttp "OPTIONS /api/forum/comments/104/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:36:32,262 basehttp "DELETE /api/forum/comments/104/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:36:32,465 basehttp "OPTIONS /api/forum/questions/136/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:36:32,499 basehttp "DELETE /api/forum/questions/136/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:36:35,869 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:36:35,936 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:36:37,504 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:36:39,772 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:36:41,998 basehttp "POST /api/forum/questions/ HTTP/1.1" 201 352
+INFO 2025-09-03 20:36:42,142 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:36:48,008 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:36:51,724 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:36:53,722 basehttp "OPTIONS /api/forum/questions/137/toggle-sticky/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:36:53,757 basehttp "PATCH /api/forum/questions/137/toggle-sticky/ HTTP/1.1" 200 18
+INFO 2025-09-03 20:36:54,429 basehttp "PATCH /api/forum/questions/137/toggle-sticky/ HTTP/1.1" 200 19
+INFO 2025-09-03 20:36:54,590 basehttp "OPTIONS /api/forum/questions/137/toggle-like/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:36:54,640 basehttp "PATCH /api/forum/questions/137/toggle-like/ HTTP/1.1" 200 30
+INFO 2025-09-03 20:36:55,258 basehttp "PATCH /api/forum/questions/137/toggle-like/ HTTP/1.1" 200 31
+INFO 2025-09-03 20:36:55,629 basehttp "OPTIONS /api/forum/questions/137/comments/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:36:55,662 basehttp "POST /api/forum/questions/137/comments/ HTTP/1.1" 201 166
+INFO 2025-09-03 20:36:55,928 basehttp "OPTIONS /api/forum/comments/105/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:36:55,954 basehttp "DELETE /api/forum/comments/105/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:36:56,144 basehttp "OPTIONS /api/forum/questions/137/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:36:56,185 basehttp "DELETE /api/forum/questions/137/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:36:59,187 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:37:06,661 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:37:06,736 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:37:08,123 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:37:09,533 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:37:09,554 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:37:12,125 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:37:12,147 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:37:19,665 basehttp "POST /api/forum/questions/ HTTP/1.1" 201 352
+INFO 2025-09-03 20:37:19,797 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:37:25,230 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:37:25,271 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:37:28,555 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:37:28,577 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:37:30,604 basehttp "OPTIONS /api/forum/questions/138/toggle-like/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:37:30,633 basehttp "PATCH /api/forum/questions/138/toggle-like/ HTTP/1.1" 200 30
+INFO 2025-09-03 20:37:31,261 basehttp "PATCH /api/forum/questions/138/toggle-like/ HTTP/1.1" 200 31
+INFO 2025-09-03 20:37:31,652 basehttp "OPTIONS /api/forum/questions/138/comments/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:37:31,697 basehttp "POST /api/forum/questions/138/comments/ HTTP/1.1" 201 166
+INFO 2025-09-03 20:37:31,927 basehttp "OPTIONS /api/forum/comments/106/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:37:31,962 basehttp "DELETE /api/forum/comments/106/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:37:32,203 basehttp "OPTIONS /api/forum/questions/138/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:37:32,240 basehttp "DELETE /api/forum/questions/138/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:37:35,552 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-03 20:37:35,631 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:37:37,239 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:37:39,592 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:37:41,869 basehttp "POST /api/forum/questions/ HTTP/1.1" 201 352
+INFO 2025-09-03 20:37:42,031 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:37:47,917 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:37:51,240 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 984
+INFO 2025-09-03 20:37:53,178 basehttp "OPTIONS /api/forum/questions/139/toggle-sticky/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:37:53,206 basehttp "PATCH /api/forum/questions/139/toggle-sticky/ HTTP/1.1" 200 18
+INFO 2025-09-03 20:37:53,846 basehttp "PATCH /api/forum/questions/139/toggle-sticky/ HTTP/1.1" 200 19
+INFO 2025-09-03 20:37:53,969 basehttp "OPTIONS /api/forum/questions/139/toggle-like/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:37:54,000 basehttp "PATCH /api/forum/questions/139/toggle-like/ HTTP/1.1" 200 30
+INFO 2025-09-03 20:37:54,654 basehttp "PATCH /api/forum/questions/139/toggle-like/ HTTP/1.1" 200 31
+INFO 2025-09-03 20:37:55,004 basehttp "OPTIONS /api/forum/questions/139/comments/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:37:55,048 basehttp "POST /api/forum/questions/139/comments/ HTTP/1.1" 201 166
+INFO 2025-09-03 20:37:55,256 basehttp "OPTIONS /api/forum/comments/107/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:37:55,290 basehttp "DELETE /api/forum/comments/107/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:37:55,521 basehttp "OPTIONS /api/forum/questions/139/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:37:55,558 basehttp "DELETE /api/forum/questions/139/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:37:57,656 basehttp "GET /api/forum/questions/ HTTP/1.1" 200 631
+INFO 2025-09-03 20:39:43,119 basehttp "OPTIONS /api/students/ HTTP/1.1" 200 0
+WARNING 2025-09-03 20:39:43,127 log Unauthorized: /api/students/
+WARNING 2025-09-03 20:39:43,129 basehttp "GET /api/students/ HTTP/1.1" 401 623
+INFO 2025-09-03 20:39:43,141 basehttp "OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+WARNING 2025-09-03 20:39:43,147 log Unauthorized: /api/experiments/experiments/
+WARNING 2025-09-03 20:39:43,149 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 401 623
+INFO 2025-09-03 20:55:36,536 basehttp "OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:55:37,828 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 20:55:41,090 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 20:55:42,244 basehttp "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:55:43,433 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 20:55:44,520 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 20:55:46,606 basehttp "OPTIONS /api/auth/user/profile/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:55:46,637 basehttp "PATCH /api/auth/user/profile/ HTTP/1.1" 200 122
+INFO 2025-09-03 20:55:51,330 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 20:55:52,502 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 20:55:53,172 basehttp "OPTIONS /api/students/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:55:53,530 basehttp "GET /api/students/ HTTP/1.1" 200 7358
+INFO 2025-09-03 20:55:53,621 basehttp "OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:55:53,756 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 20:56:02,371 basehttp "POST /api/experiments/experiments/ HTTP/1.1" 201 960
+INFO 2025-09-03 20:56:02,394 basehttp "OPTIONS /api/experiments/experiments/34/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:56:02,452 basehttp "GET /api/experiments/experiments/34/ HTTP/1.1" 200 960
+INFO 2025-09-03 20:56:02,511 basehttp "OPTIONS /api/notices/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:56:02,551 basehttp "POST /api/notices/ HTTP/1.1" 201 462
+INFO 2025-09-03 20:56:02,614 basehttp "OPTIONS /api/experiments/choice-problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:56:02,621 basehttp "OPTIONS /api/experiments/fill-problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:56:02,633 basehttp "OPTIONS /api/experiments/coding-problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:56:02,667 basehttp "POST /api/experiments/choice-problems/ HTTP/1.1" 201 195
+INFO 2025-09-03 20:56:02,704 basehttp "POST /api/experiments/fill-problems/ HTTP/1.1" 201 115
+INFO 2025-09-03 20:56:02,741 basehttp "POST /api/experiments/coding-problems/ HTTP/1.1" 201 156
+INFO 2025-09-03 20:56:03,014 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4054
+INFO 2025-09-03 20:56:05,607 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 20:56:06,785 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 20:56:07,242 basehttp "OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:56:07,283 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:56:07,688 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4054
+INFO 2025-09-03 20:56:08,006 basehttp "OPTIONS /api/experiments/experiments/34/problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:56:08,047 basehttp "GET /api/experiments/experiments/34/problems/ HTTP/1.1" 200 1281
+INFO 2025-09-03 20:56:09,070 basehttp "GET /api/experiments/experiments/34/coding/19/ HTTP/1.1" 200 195
+INFO 2025-09-03 20:56:26,921 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 20:56:28,102 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 20:56:28,754 basehttp "OPTIONS /api/experiments/submissions/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:56:28,858 basehttp "GET /api/experiments/submissions/ HTTP/1.1" 200 1268
+INFO 2025-09-03 20:56:28,889 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4054
+INFO 2025-09-03 20:56:29,318 basehttp "GET /api/experiments/submissions/1/ HTTP/1.1" 200 1266
+INFO 2025-09-03 20:56:30,255 basehttp "GET /api/students/ HTTP/1.1" 200 7358
+INFO 2025-09-03 20:56:30,413 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4054
+INFO 2025-09-03 20:56:30,873 basehttp "OPTIONS /api/experiments/experiments/34/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:56:30,951 basehttp "DELETE /api/experiments/experiments/34/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:56:31,164 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 20:57:53,820 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 20:58:02,292 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 20:58:06,576 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 20:58:09,032 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 20:58:10,306 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 20:58:11,902 basehttp "PATCH /api/auth/user/profile/ HTTP/1.1" 200 122
+INFO 2025-09-03 20:58:16,016 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 20:58:17,220 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 20:58:18,139 basehttp "GET /api/students/ HTTP/1.1" 200 7482
+INFO 2025-09-03 20:58:18,280 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 20:58:27,046 basehttp "POST /api/experiments/experiments/ HTTP/1.1" 201 968
+INFO 2025-09-03 20:58:27,071 basehttp "OPTIONS /api/experiments/experiments/35/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:58:27,145 basehttp "GET /api/experiments/experiments/35/ HTTP/1.1" 200 968
+INFO 2025-09-03 20:58:27,202 basehttp "POST /api/notices/ HTTP/1.1" 201 462
+INFO 2025-09-03 20:58:27,306 basehttp "POST /api/experiments/choice-problems/ HTTP/1.1" 201 195
+INFO 2025-09-03 20:58:27,310 basehttp "POST /api/experiments/fill-problems/ HTTP/1.1" 201 115
+INFO 2025-09-03 20:58:27,392 basehttp "POST /api/experiments/coding-problems/ HTTP/1.1" 201 156
+INFO 2025-09-03 20:58:27,608 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4062
+INFO 2025-09-03 20:58:30,036 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 20:58:31,409 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 20:58:31,914 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 20:58:32,226 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4062
+INFO 2025-09-03 20:58:32,466 basehttp "OPTIONS /api/experiments/experiments/35/problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:58:32,514 basehttp "GET /api/experiments/experiments/35/problems/ HTTP/1.1" 200 1291
+INFO 2025-09-03 20:58:33,219 basehttp "GET /api/experiments/experiments/35/coding/20/ HTTP/1.1" 200 195
+INFO 2025-09-03 20:58:40,531 basehttp "POST /api/experiments/judge/ HTTP/1.1" 200 119
+INFO 2025-09-03 20:58:43,468 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 20:58:44,604 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 20:58:45,348 basehttp "GET /api/experiments/submissions/ HTTP/1.1" 200 1268
+INFO 2025-09-03 20:58:45,376 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4062
+INFO 2025-09-03 20:58:45,817 basehttp "GET /api/experiments/submissions/1/ HTTP/1.1" 200 1266
+INFO 2025-09-03 20:58:46,569 basehttp "GET /api/students/ HTTP/1.1" 200 7482
+INFO 2025-09-03 20:58:46,775 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4062
+INFO 2025-09-03 20:58:47,250 basehttp "OPTIONS /api/experiments/experiments/35/ HTTP/1.1" 200 0
+INFO 2025-09-03 20:58:47,305 basehttp "DELETE /api/experiments/experiments/35/ HTTP/1.1" 204 0
+INFO 2025-09-03 20:58:47,478 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 21:00:53,460 basehttp "GET /api/students/ HTTP/1.1" 200 7482
+WARNING 2025-09-03 21:00:53,553 log Unauthorized: /api/students/
+WARNING 2025-09-03 21:00:53,553 basehttp "GET /api/students/ HTTP/1.1" 401 623
+WARNING 2025-09-03 21:00:53,598 log Unauthorized: /api/experiments/experiments/
+WARNING 2025-09-03 21:00:53,599 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 401 623
+INFO 2025-09-03 21:00:53,847 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 21:01:12,196 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 21:01:15,563 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 21:01:17,877 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:01:19,149 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:01:20,814 basehttp "PATCH /api/auth/user/profile/ HTTP/1.1" 200 122
+INFO 2025-09-03 21:01:24,811 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:01:26,019 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:01:26,608 basehttp "GET /api/students/ HTTP/1.1" 200 7544
+INFO 2025-09-03 21:01:26,836 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 21:01:35,267 basehttp "POST /api/experiments/experiments/ HTTP/1.1" 201 972
+INFO 2025-09-03 21:01:35,290 basehttp "OPTIONS /api/experiments/experiments/36/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:01:35,342 basehttp "GET /api/experiments/experiments/36/ HTTP/1.1" 200 972
+INFO 2025-09-03 21:01:35,419 basehttp "POST /api/notices/ HTTP/1.1" 201 462
+INFO 2025-09-03 21:01:35,502 basehttp "POST /api/experiments/choice-problems/ HTTP/1.1" 201 195
+INFO 2025-09-03 21:01:35,529 basehttp "POST /api/experiments/fill-problems/ HTTP/1.1" 201 115
+INFO 2025-09-03 21:01:35,559 basehttp "POST /api/experiments/coding-problems/ HTTP/1.1" 201 156
+INFO 2025-09-03 21:01:36,059 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4066
+INFO 2025-09-03 21:01:38,457 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:01:39,619 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:01:40,044 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 21:01:40,331 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4066
+INFO 2025-09-03 21:01:40,893 basehttp "OPTIONS /api/experiments/experiments/36/problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:01:40,927 basehttp "GET /api/experiments/experiments/36/problems/ HTTP/1.1" 200 1296
+INFO 2025-09-03 21:01:41,740 basehttp "GET /api/experiments/experiments/36/coding/21/ HTTP/1.1" 200 195
+INFO 2025-09-03 21:01:45,488 basehttp "POST /api/experiments/judge/ HTTP/1.1" 200 119
+INFO 2025-09-03 21:01:45,923 basehttp "GET /api/experiments/experiments/36/problems/ HTTP/1.1" 200 1517
+INFO 2025-09-03 21:01:46,481 basehttp "OPTIONS /submit/experiment/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:01:47,470 basehttp "POST /submit/experiment/ HTTP/1.1" 200 402
+INFO 2025-09-03 21:01:50,157 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:01:51,299 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:01:52,135 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4066
+INFO 2025-09-03 21:01:52,147 basehttp "GET /api/experiments/submissions/ HTTP/1.1" 200 2236
+INFO 2025-09-03 21:01:52,699 basehttp "GET /api/experiments/submissions/1/ HTTP/1.1" 200 1266
+INFO 2025-09-03 21:01:53,344 basehttp "GET /api/students/ HTTP/1.1" 200 7544
+INFO 2025-09-03 21:01:53,543 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4066
+INFO 2025-09-03 21:01:53,980 basehttp "OPTIONS /api/experiments/experiments/36/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:01:54,067 basehttp "DELETE /api/experiments/experiments/36/ HTTP/1.1" 204 0
+INFO 2025-09-03 21:01:54,205 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 21:03:59,382 basehttp "OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:00,111 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 21:04:03,551 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 21:04:04,953 basehttp "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:05,605 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:04:06,275 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:04:08,090 basehttp "OPTIONS /api/auth/user/profile/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:08,110 basehttp "PATCH /api/auth/user/profile/ HTTP/1.1" 200 122
+INFO 2025-09-03 21:04:11,742 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:04:12,302 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:04:13,032 basehttp "OPTIONS /api/students/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:13,368 basehttp "GET /api/students/ HTTP/1.1" 200 7606
+INFO 2025-09-03 21:04:13,471 basehttp "OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:13,525 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 21:04:21,939 basehttp "POST /api/experiments/experiments/ HTTP/1.1" 201 976
+INFO 2025-09-03 21:04:21,956 basehttp "OPTIONS /api/experiments/experiments/37/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:21,985 basehttp "GET /api/experiments/experiments/37/ HTTP/1.1" 200 976
+INFO 2025-09-03 21:04:22,051 basehttp "OPTIONS /api/notices/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:22,094 basehttp "POST /api/notices/ HTTP/1.1" 201 462
+INFO 2025-09-03 21:04:22,153 basehttp "OPTIONS /api/experiments/choice-problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:22,161 basehttp "OPTIONS /api/experiments/fill-problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:22,168 basehttp "OPTIONS /api/experiments/coding-problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:22,187 basehttp "POST /api/experiments/choice-problems/ HTTP/1.1" 201 195
+INFO 2025-09-03 21:04:22,206 basehttp "POST /api/experiments/fill-problems/ HTTP/1.1" 201 115
+INFO 2025-09-03 21:04:22,227 basehttp "POST /api/experiments/coding-problems/ HTTP/1.1" 201 156
+INFO 2025-09-03 21:04:22,434 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4070
+INFO 2025-09-03 21:04:24,604 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:04:25,094 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:04:25,584 basehttp "OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:25,604 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 21:04:25,873 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4070
+INFO 2025-09-03 21:04:26,130 basehttp "OPTIONS /api/experiments/experiments/37/problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:26,154 basehttp "GET /api/experiments/experiments/37/problems/ HTTP/1.1" 200 1301
+INFO 2025-09-03 21:04:26,903 basehttp "GET /api/experiments/experiments/37/coding/22/ HTTP/1.1" 200 195
+INFO 2025-09-03 21:04:32,042 basehttp "POST /api/experiments/judge/ HTTP/1.1" 200 119
+INFO 2025-09-03 21:04:34,271 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:04:34,794 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:04:35,482 basehttp "OPTIONS /api/experiments/submissions/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:35,572 basehttp "GET /api/experiments/submissions/ HTTP/1.1" 200 1268
+INFO 2025-09-03 21:04:35,590 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4070
+INFO 2025-09-03 21:04:36,028 basehttp "GET /api/experiments/submissions/1/ HTTP/1.1" 200 1266
+INFO 2025-09-03 21:04:36,845 basehttp "GET /api/students/ HTTP/1.1" 200 7606
+INFO 2025-09-03 21:04:37,020 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4070
+INFO 2025-09-03 21:04:37,564 basehttp "OPTIONS /api/experiments/experiments/37/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:04:37,616 basehttp "DELETE /api/experiments/experiments/37/ HTTP/1.1" 204 0
+INFO 2025-09-03 21:04:37,726 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 21:11:41,764 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 21:11:49,452 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 21:11:52,148 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:11:52,687 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:11:56,158 basehttp "PATCH /api/auth/user/profile/ HTTP/1.1" 200 122
+INFO 2025-09-03 21:12:03,918 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 21:12:10,529 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 21:12:12,872 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:12:14,109 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:12:15,832 basehttp "PATCH /api/auth/user/profile/ HTTP/1.1" 200 122
+INFO 2025-09-03 21:12:20,238 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:12:21,510 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:12:22,551 basehttp "GET /api/students/ HTTP/1.1" 200 7730
+INFO 2025-09-03 21:12:22,791 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 21:12:31,097 basehttp "POST /api/experiments/experiments/ HTTP/1.1" 201 984
+INFO 2025-09-03 21:12:31,124 basehttp "OPTIONS /api/experiments/experiments/38/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:12:31,173 basehttp "GET /api/experiments/experiments/38/ HTTP/1.1" 200 984
+INFO 2025-09-03 21:12:31,290 basehttp "POST /api/notices/ HTTP/1.1" 201 462
+INFO 2025-09-03 21:12:31,412 basehttp "POST /api/experiments/choice-problems/ HTTP/1.1" 201 195
+INFO 2025-09-03 21:12:31,444 basehttp "POST /api/experiments/fill-problems/ HTTP/1.1" 201 115
+INFO 2025-09-03 21:12:31,475 basehttp "POST /api/experiments/coding-problems/ HTTP/1.1" 201 156
+INFO 2025-09-03 21:12:31,739 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4078
+INFO 2025-09-03 21:12:34,781 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:12:35,921 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:12:36,401 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 11
+INFO 2025-09-03 21:12:36,701 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4078
+INFO 2025-09-03 21:12:36,938 basehttp "OPTIONS /api/experiments/experiments/38/problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:12:36,977 basehttp "GET /api/experiments/experiments/38/problems/ HTTP/1.1" 200 1311
+INFO 2025-09-03 21:12:37,792 basehttp "GET /api/experiments/experiments/38/coding/23/ HTTP/1.1" 200 195
+INFO 2025-09-03 21:12:42,215 basehttp "POST /api/experiments/judge/ HTTP/1.1" 200 119
+INFO 2025-09-03 21:12:42,595 basehttp "GET /api/experiments/experiments/38/problems/ HTTP/1.1" 200 1532
+INFO 2025-09-03 21:12:43,138 basehttp "OPTIONS /submit/experiment/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:12:43,964 basehttp "POST /submit/experiment/ HTTP/1.1" 200 402
+INFO 2025-09-03 21:12:46,643 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:12:47,900 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:12:48,717 basehttp "GET /api/experiments/submissions/ HTTP/1.1" 200 2236
+INFO 2025-09-03 21:12:48,718 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4078
+INFO 2025-09-03 21:12:49,140 basehttp "GET /api/experiments/submissions/1/ HTTP/1.1" 200 1266
+INFO 2025-09-03 21:12:50,089 basehttp "GET /api/students/ HTTP/1.1" 200 7730
+INFO 2025-09-03 21:12:50,272 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4078
+INFO 2025-09-03 21:12:50,703 basehttp "OPTIONS /api/experiments/experiments/38/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:12:50,794 basehttp "DELETE /api/experiments/experiments/38/ HTTP/1.1" 204 0
+INFO 2025-09-03 21:12:50,945 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 21:22:57,498 basehttp "OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:22:58,673 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 21:23:05,082 basehttp "POST /api/auth/register/ HTTP/1.1" 201 47
+INFO 2025-09-03 21:23:06,362 basehttp "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:07,542 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:23:08,738 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:23:10,415 basehttp "OPTIONS /api/auth/user/profile/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:10,450 basehttp "PATCH /api/auth/user/profile/ HTTP/1.1" 200 122
+INFO 2025-09-03 21:23:14,608 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:23:15,850 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:23:16,469 basehttp "OPTIONS /api/students/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:16,819 basehttp "GET /api/students/ HTTP/1.1" 200 7792
+INFO 2025-09-03 21:23:16,910 basehttp "OPTIONS /api/experiments/experiments/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:16,993 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+INFO 2025-09-03 21:23:25,386 basehttp "POST /api/experiments/experiments/ HTTP/1.1" 201 988
+INFO 2025-09-03 21:23:25,408 basehttp "OPTIONS /api/experiments/experiments/39/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:25,459 basehttp "GET /api/experiments/experiments/39/ HTTP/1.1" 200 988
+INFO 2025-09-03 21:23:25,496 basehttp "OPTIONS /api/notices/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:25,531 basehttp "POST /api/notices/ HTTP/1.1" 201 462
+INFO 2025-09-03 21:23:25,584 basehttp "OPTIONS /api/experiments/choice-problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:25,590 basehttp "OPTIONS /api/experiments/fill-problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:25,598 basehttp "OPTIONS /api/experiments/coding-problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:25,625 basehttp "POST /api/experiments/choice-problems/ HTTP/1.1" 201 195
+INFO 2025-09-03 21:23:25,667 basehttp "POST /api/experiments/fill-problems/ HTTP/1.1" 201 115
+INFO 2025-09-03 21:23:25,697 basehttp "POST /api/experiments/coding-problems/ HTTP/1.1" 201 156
+INFO 2025-09-03 21:23:25,924 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4082
+INFO 2025-09-03 21:23:28,609 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:23:29,798 basehttp "POST /api/auth/login/ HTTP/1.1" 200 843
+INFO 2025-09-03 21:23:30,190 basehttp "OPTIONS /api/notices/unread_count/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:30,213 basehttp "GET /api/notices/unread_count/ HTTP/1.1" 200 12
+INFO 2025-09-03 21:23:30,465 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4082
+INFO 2025-09-03 21:23:30,679 basehttp "OPTIONS /api/experiments/experiments/39/problems/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:30,740 basehttp "GET /api/experiments/experiments/39/problems/ HTTP/1.1" 200 1316
+INFO 2025-09-03 21:23:31,411 basehttp "GET /api/experiments/experiments/39/coding/24/ HTTP/1.1" 200 195
+INFO 2025-09-03 21:23:36,009 basehttp "POST /api/experiments/judge/ HTTP/1.1" 200 119
+INFO 2025-09-03 21:23:36,429 basehttp "GET /api/experiments/experiments/39/problems/ HTTP/1.1" 200 1537
+INFO 2025-09-03 21:23:36,992 basehttp "OPTIONS /submit/experiment/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:37,976 basehttp "POST /submit/experiment/ HTTP/1.1" 200 402
+INFO 2025-09-03 21:23:40,627 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:23:41,713 basehttp "POST /api/auth/login/ HTTP/1.1" 200 945
+INFO 2025-09-03 21:23:42,451 basehttp "OPTIONS /api/experiments/submissions/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:42,607 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4082
+INFO 2025-09-03 21:23:42,607 basehttp "GET /api/experiments/submissions/ HTTP/1.1" 200 2236
+INFO 2025-09-03 21:23:43,107 basehttp "GET /api/experiments/submissions/1/ HTTP/1.1" 200 1266
+INFO 2025-09-03 21:23:44,010 basehttp "GET /api/students/ HTTP/1.1" 200 7792
+INFO 2025-09-03 21:23:44,215 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 4082
+INFO 2025-09-03 21:23:44,644 basehttp "OPTIONS /api/experiments/experiments/39/ HTTP/1.1" 200 0
+INFO 2025-09-03 21:23:44,709 basehttp "DELETE /api/experiments/experiments/39/ HTTP/1.1" 204 0
+INFO 2025-09-03 21:23:44,855 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+WARNING 2025-09-03 22:19:46,310 log Unauthorized: /api/students/
+WARNING 2025-09-03 22:19:46,312 basehttp "GET /api/students/ HTTP/1.1" 401 623
+WARNING 2025-09-03 22:19:46,326 log Unauthorized: /api/experiments/experiments/
+WARNING 2025-09-03 22:19:46,329 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 401 623
+WARNING 2025-09-03 22:20:55,699 log Unauthorized: /api/students/
+WARNING 2025-09-03 22:20:55,699 basehttp "GET /api/students/ HTTP/1.1" 401 623
+WARNING 2025-09-03 22:20:55,726 log Unauthorized: /api/experiments/experiments/
+WARNING 2025-09-03 22:20:55,728 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 401 623
+WARNING 2025-09-03 23:59:26,297 log Not Found: /api/notice
+WARNING 2025-09-03 23:59:26,302 basehttp "GET /api/notice HTTP/1.1" 404 6696
+INFO 2025-09-04 00:02:02,759 basehttp "GET /api/notices HTTP/1.1" 301 0
+WARNING 2025-09-04 00:02:02,787 log Unauthorized: /api/notices/
+WARNING 2025-09-04 00:02:02,791 basehttp "GET /api/notices/ HTTP/1.1" 401 96
+INFO 2025-09-04 00:02:17,716 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+INFO 2025-09-04 00:02:38,565 basehttp "GET /api/notices HTTP/1.1" 301 0
+INFO 2025-09-04 00:02:38,720 basehttp "GET /api/notices/ HTTP/1.1" 200 5228
+ERROR 2025-09-04 00:02:53,032 log Internal Server Error: /api/notices
+Traceback (most recent call last):
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\utils\deprecation.py", line 122, in __call__
+    response = self.process_response(request, response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\middleware\common.py", line 108, in process_response
+    return self.response_redirect_class(self.get_full_path_with_slash(request))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\middleware\common.py", line 87, in get_full_path_with_slash
+    raise RuntimeError(
+RuntimeError: You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to 127.0.0.1:8000/api/notices/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+ERROR 2025-09-04 00:02:53,053 basehttp "POST /api/notices HTTP/1.1" 500 78683
+ERROR 2025-09-04 00:04:01,487 log Internal Server Error: /api/notices
+Traceback (most recent call last):
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\utils\deprecation.py", line 122, in __call__
+    response = self.process_response(request, response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\middleware\common.py", line 108, in process_response
+    return self.response_redirect_class(self.get_full_path_with_slash(request))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\middleware\common.py", line 87, in get_full_path_with_slash
+    raise RuntimeError(
+RuntimeError: You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to 127.0.0.1:8000/api/notices/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+ERROR 2025-09-04 00:04:01,492 basehttp "POST /api/notices HTTP/1.1" 500 78683
+INFO 2025-09-04 00:06:24,636 basehttp "POST /api/notices/ HTTP/1.1" 201 312
+INFO 2025-09-04 00:07:19,733 basehttp "DELETE /api/notices/84/ HTTP/1.1" 204 0
+INFO 2025-09-04 00:08:09,166 basehttp "POST /api/auth/login/ HTTP/1.1" 200 832
+WARNING 2025-09-04 00:08:26,820 log Not Found: /api/notices/83/read
+WARNING 2025-09-04 00:08:26,822 basehttp "POST /api/notices/83/read HTTP/1.1" 404 7981
+WARNING 2025-09-04 00:08:46,794 log Not Found: /api/notices/83/read/
+WARNING 2025-09-04 00:08:46,796 basehttp "POST /api/notices/83/read/ HTTP/1.1" 404 7984
+WARNING 2025-09-04 00:09:31,896 log Not Found: /api/notices/83/read/mark_as_read/
+WARNING 2025-09-04 00:09:31,898 basehttp "POST /api/notices/83/read/mark_as_read/ HTTP/1.1" 404 8023
+INFO 2025-09-04 00:09:38,695 basehttp "POST /api/notices/83/mark_as_read/ HTTP/1.1" 200 35
+ERROR 2025-09-04 00:23:33,465 log Internal Server Error: /api/experiments
+Traceback (most recent call last):
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\utils\deprecation.py", line 122, in __call__
+    response = self.process_response(request, response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\middleware\common.py", line 108, in process_response
+    return self.response_redirect_class(self.get_full_path_with_slash(request))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\BUAA\大三\小学期\github_lab\venv\Lib\site-packages\django\middleware\common.py", line 87, in get_full_path_with_slash
+    raise RuntimeError(
+RuntimeError: You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to 127.0.0.1:8000/api/experiments/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+ERROR 2025-09-04 00:23:33,470 basehttp "POST /api/experiments HTTP/1.1" 500 78739
+WARNING 2025-09-04 00:23:38,598 log Method Not Allowed: /api/experiments/
+WARNING 2025-09-04 00:23:38,600 basehttp "POST /api/experiments/ HTTP/1.1" 405 79
+INFO 2025-09-04 00:23:45,434 basehttp "GET /api/experiments/ HTTP/1.1" 200 415
+INFO 2025-09-04 00:24:09,375 basehttp "GET /api/experiments/experiments/ HTTP/1.1" 200 2627
+WARNING 2025-09-04 00:30:20,586 log Unauthorized: /materials/
+WARNING 2025-09-04 00:30:20,590 basehttp "GET /materials/ HTTP/1.1" 401 623
+INFO 2025-09-04 00:40:22,185 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\forum\views.py changed, reloading.
+INFO 2025-09-04 00:40:25,173 autoreload Watching for file changes with StatReloader
+INFO 2025-09-04 00:40:34,497 autoreload E:\BUAA\大三\小学期\github_lab\group-platform\backend\forum\views.py changed, reloading.
+INFO 2025-09-04 00:40:35,800 autoreload Watching for file changes with StatReloader
