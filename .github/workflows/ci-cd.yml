@@ -494,9 +494,12 @@ jobs:
         working-directory: ./frontend
 
       # ================== 初始化测试账号 ==================
-      - name: 新建日志文件夹
+      - name: 新建前端日志文件夹
         run: mkdir -p logs
         working-directory: ./frontend
+      - name: 新建后端日志文件夹
+        run: mkdir -p logs
+        working-directory: ./backend
         
       - name: 初始化测试账号
         run: |
