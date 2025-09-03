@@ -18,7 +18,7 @@ jobs:
           MYSQL_DATABASE: test_db
           MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
-          - 3311:3306  # 避免与其他服务端口冲突
+          - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -111,7 +111,6 @@ jobs:
     #  新增：执行数据库迁移
       - name: Run migrations
         run: |
-          set -e
           python manage.py makemigrations --noinput
           python manage.py migrate --noinput
         working-directory: ./backend
@@ -151,7 +150,7 @@ jobs:
             --reporters cli
       - name: Stop Django Server
         run: |
-            pkill -f "runserver 127.0.0.1:8001" || pkill -f "runserver 0.0.0.0:8001" || true
+            pkill -f "runserver 0.0.0.0:8001" || true
   # 并行实验测试（配置类似，但使用不同端口和数据库名）
   api-test-lab:
     name: Parallel Lab Tests
@@ -243,7 +242,7 @@ jobs:
             echo "===== End Logs ====="
       - name: Stop Django Server
         run: |
-            pkill -f "runserver 127.0.0.1:8002" || pkill -f "runserver 0.0.0.0:8002" || true
+            pkill -f "runserver 0.0.0.0:8002" || true
   # 并行公告测试（配置类似，但使用不同端口和数据库名）
   api-test-gonggao:
     name: Parallel Announcement Tests
@@ -329,7 +328,7 @@ jobs:
             --reporters cli
       - name: Stop Django Server
         run: |
-            pkill -f "runserver 127.0.0.1:8003" || pkill -f "runserver 0.0.0.0:8003" || true
+            pkill -f "runserver 0.0.0.0:8003" || true
     # 并行学习资料测试
   api-test-ziliao:
     name: Parallel Learning Materials Tests
@@ -399,7 +398,7 @@ jobs:
             --reporters cli
       - name: Stop Django Server
         run: |
-            pkill -f "runserver 127.0.0.1:8004" || pkill -f "runserver 0.0.0.0:8004" || true
+            pkill -f "runserver 0.0.0.0:8004" || true
   gui-test-cypress:
     name: Run Cypress GUI Tests
     runs-on: ubuntu-latest
@@ -559,13 +558,17 @@ jobs:
             # 确保使用正确的 npm 版本
             npm install -g npm@11.5.2
             
-            # 仅在依赖损坏时重建 lockfile
-            if ! npm ls --package-lock-only; then
-              rm -rf node_modules
-              rm -f package-lock.json
-              npm install --package-lock-only
-            fi
+            # 完全重新生成 lockfile
+            rm -rf node_modules
+            rm -f package-lock.json
+            
+            # 安装依赖并生成新的 lockfile
+            npm install --package-lock-only
+            
+            # 完整安装依赖
             npm install
+            
+            # 验证依赖是否同步
             npm ls --package-lock-only
       
       - name: Check Node.js version
@@ -609,7 +612,7 @@ jobs:
 
       - name: Update Dockerfile
         run: |
-            sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/Dockerfile
+            sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -662,19 +665,19 @@ jobs:
       - name: Update Dockerfile
         run: |
           # 仅更新Node版本
-          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/Dockerfile
+          sed -i 's/FROM node:20-alpine/FROM node:22-alpine/' frontend/dockerfile
           
           # 添加--legacy-peer-deps参数
-          sed -i 's/npm install/npm install --legacy-peer-deps/' frontend/Dockerfile
+          sed -i 's/npm install/npm install --legacy-peer-deps/' frontend/dockerfile
           
           # 添加vue-cli-service安装
-          sed -i '/npm install --legacy-peer-deps/a RUN npm install -g @vue/cli-service' frontend/Dockerfile
+          sed -i '/npm install --legacy-peer-deps/a RUN npm install -g @vue/cli-service' frontend/dockerfile
           
           # 添加调试命令
-          sed -i '/COPY \. \./a RUN npm ls --depth=0' frontend/Dockerfile
+          sed -i '/COPY \. \./a RUN npm ls --depth=0' frontend/dockerfile
           
           # 打印验证
-          cat frontend/Dockerfile
+          cat frontend/dockerfile
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -711,9 +714,8 @@ jobs:
           echo "开始部署到本地K8s环境..."
           
           # 1. 更新镜像版本
-          # 请手动替换 <your-backend-image-tag> 和 <your-frontend-image-tag> 为实际 tag
-          sed -i "s|image:.*backend:.*|image: <your-backend-image-tag>|g" k8s/backend-deployment.yaml
-          sed -i "s|image:.*frontend:.*|image: <your-frontend-image-tag>|g" k8s/frontend-deploy.yaml
+          sed -i "s|image:.*backend:.*|image: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}|g" k8s/backend-deployment.yaml
+          sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
           
           # 2. 部署到K8s
           kubectl apply -f k8s/
