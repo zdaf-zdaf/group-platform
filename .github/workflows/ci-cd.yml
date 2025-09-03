@@ -687,15 +687,15 @@ jobs:
       run:
         working-directory: ./frontend
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Checkout code
+        uses: actions/checkout@v4
 
         # 修复依赖步骤
       - name: Repair and install dependencies
@@ -727,6 +727,9 @@ jobs:
       - name: Run frontend unit tests
         run: npm run test:unit  # 确保package.json中有test:unit脚本
 
+      - name: Debug artifact upload before
+        run: ls -lh ./frontend && ls -lh ./frontend/node_modules || true
+
       - name: Save fixed dependencies
         uses: actions/upload-artifact@v4
         with:
@@ -735,6 +738,9 @@ jobs:
               ./frontend/package*.json
               ./frontend/node_modules/
             retention-days: 1
+
+      - name: Debug artifact upload after
+        run: echo "Artifact upload step已执行" && ls -lh ./frontend && ls -lh ./frontend/node_modules || true
 
       - name: Run frontend unit tests
         run: npm run test:unit
@@ -775,6 +781,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test-frontend]
     steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -802,7 +815,7 @@ jobs:
       - name: Fix esbuild binary permissions
         run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
         working-directory: ./frontend
-        
+
       - name: Update Dockerfile
         run: |
           # 仅更新Node版本
