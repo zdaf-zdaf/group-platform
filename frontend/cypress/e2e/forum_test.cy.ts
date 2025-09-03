@@ -21,6 +21,7 @@ describe('论坛模块功能测试', () => {
   })
   let token = ''
   function login(user: { username: string; password: string }) {
+    cy.intercept('POST', '/api/auth/login/').as('loginApi')
     cy.request('POST', 'http://127.0.0.1:8000/api/auth/login/', {
       username: user.username,
       password: user.password
@@ -33,6 +34,7 @@ describe('论坛模块功能测试', () => {
       cy.log(`最终 token: ${token}`);
 
       // 测试 token 是否可用
+      cy.intercept('GET', '/api/forum/questions/').as('getQuestionsApi')
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
@@ -85,7 +87,7 @@ describe('论坛模块功能测试', () => {
     cy.get('.forum').should('exist')
 
     // 发布帖子
-    cy.intercept('POST', '/api/forum/questions/').as('postQuestion')
+  cy.intercept('POST', '/api/forum/questions/').as('postQuestion')
     cy.get('.publish-card input[placeholder="请输入问题标题"]').clear().type(postTitle)
     cy.get('.publish-card textarea[placeholder="请输入问题内容"]').clear().type(postContent)
     cy.get('.publish-card button').contains('发布问题').click({ force: true })
@@ -97,14 +99,13 @@ describe('论坛模块功能测试', () => {
       if (status !== 201) {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
-      // 新增：发帖后请求帖子列表并输出日志，便于CI调试
+      cy.intercept('GET', '/api/forum/questions/').as('getQuestionsApi')
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
         headers: { Authorization: `Bearer ${token}` },
         failOnStatusCode: false // CI 调试用，避免非200直接失败
       }).then(res => {
-  // ...日志已移除...
         expect(res.body.some(q => q.title === postTitle)).to.be.true
       })
     })
@@ -118,29 +119,36 @@ describe('论坛模块功能测试', () => {
     cy.get('.post-card').should('contain.text', postTitle);
 
     // 点赞和取消点赞
+    cy.intercept('PATCH', /\/api\/forum\/questions\/\d+\/toggle-like\//).as('toggleLikeApi')
     cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
       cy.get('button').contains(/点赞|取消点赞/).click({ force: true })
-      cy.wait(500)
+      cy.wait('@toggleLikeApi')
       cy.get('button').contains(/点赞|取消点赞/).click({ force: true })
+      cy.wait('@toggleLikeApi')
     })
 
     // 评论
+    cy.intercept('POST', /\/api\/forum\/questions\/\d+\/comments\//).as('addCommentApi')
     cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
       cy.get('input[placeholder="写下你的评论..."]').type(postComment + '{enter}')
     })
+    cy.wait('@addCommentApi')
     cy.get('.post-card').contains(postComment).should('exist')
 
     // 删除评论
+    cy.intercept('DELETE', /\/api\/forum\/comments\/\d+\//).as('deleteCommentApi')
     cy.get('.post-card').contains(postComment).parents('.comment').within(() => {
       cy.get('button').contains('删除评论').click({ force: true })
     })
-  cy.get('.post-card').contains(postComment).should('not.exist')
+    cy.wait('@deleteCommentApi')
+    cy.get('.post-card').contains(postComment).should('not.exist')
 
     // 删除帖子
+    cy.intercept('DELETE', /\/api\/forum\/questions\/\d+\//).as('deletePostApi')
     cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
       cy.get('button').contains('删除').click({ force: true })
     })
-    cy.wait(1500)
+    cy.wait('@deletePostApi')
     cy.reload()
     cy.contains('.post-card', postTitle).should('not.exist')
   })
@@ -154,7 +162,7 @@ describe('论坛模块功能测试', () => {
     cy.get('.forum').should('exist')
 
     // 发布帖子
-    cy.intercept('POST', '/api/forum/questions/').as('postQuestion')
+  cy.intercept('POST', '/api/forum/questions/').as('postQuestion')
     cy.get('.publish-card input[placeholder="请输入问题标题"]').clear().type(postTitle)
     cy.get('.publish-card textarea[placeholder="请输入问题内容"]').clear().type(postContent)
     cy.get('.publish-card button').contains('发布问题').click({ force: true })
@@ -166,7 +174,7 @@ describe('论坛模块功能测试', () => {
       if (status !== 201) {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
-      // 新增：发帖后请求帖子列表并输出日志，便于CI调试
+      cy.intercept('GET', '/api/forum/questions/').as('getQuestionsApi')
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
@@ -186,37 +194,46 @@ describe('论坛模块功能测试', () => {
     cy.get('.post-card').should('contain.text', postTitle);
 
     // 置顶和取消置顶
+    cy.intercept('PATCH', /\/api\/forum\/questions\/\d+\/toggle-sticky\//).as('toggleStickyApi')
     cy.get('.post-card').first().within(() => {
       cy.get('button').contains(/置顶|取消置顶/).click({ force: true })
-      cy.wait(500)
+      cy.wait('@toggleStickyApi')
       cy.get('button').contains(/置顶|取消置顶/).click({ force: true })
+      cy.wait('@toggleStickyApi')
     })
 
     // 点赞和取消点赞
+    cy.intercept('PATCH', /\/api\/forum\/questions\/\d+\/toggle-like\//).as('toggleLikeApi')
     cy.get('.post-card').first().within(() => {
       cy.get('button').contains(/点赞|取消点赞/).click({ force: true })
-      cy.wait(500)
+      cy.wait('@toggleLikeApi')
       cy.get('button').contains(/点赞|取消点赞/).click({ force: true })
+      cy.wait('@toggleLikeApi')
     })
 
     // 评论
+    cy.intercept('POST', /\/api\/forum\/questions\/\d+\/comments\//).as('addCommentApi')
     cy.get('.post-card').first().within(() => {
       cy.get('input[placeholder="写下你的评论..."]').type(teacherComment + '{enter}')
     })
+    cy.wait('@addCommentApi')
     cy.get('.post-card').contains(teacherComment).should('exist')
     cy.get('.post-card').contains(teacherComment).should('exist')
 
     // 删除评论
+    cy.intercept('DELETE', /\/api\/forum\/comments\/\d+\//).as('deleteCommentApi')
     cy.get('.post-card').contains(teacherComment).parents('.comment').within(() => {
       cy.get('button').contains('删除评论').click({ force: true })
     })
+    cy.wait('@deleteCommentApi')
     cy.get('.post-card').contains(teacherComment).should('not.exist')
 
     // 删除帖子
+    cy.intercept('DELETE', /\/api\/forum\/questions\/\d+\//).as('deletePostApi')
     cy.get('.post-card').first().within(() => {
       cy.get('button').contains('删除').click({ force: true })
     })
-    cy.wait(1500)
+    cy.wait('@deletePostApi')
     cy.reload()
     cy.contains('.post-card', postTitle).should('not.exist')
   })
