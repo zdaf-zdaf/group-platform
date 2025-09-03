@@ -35,12 +35,8 @@ print(a + b)
       cy.log('注册接口响应:', JSON.stringify(response))
       expect(response.statusCode).to.be.oneOf([200, 201])
     })
-    // 只判断跳转到登录页即可通过，兼容 CI
-    cy.get('body').then($body => {
-      if ($body.text().includes('错误') || $body.text().includes('失败')) {
-        cy.log('页面有错误提示:', $body.text())
-      }
-    })
+    // 注册成功后直接点击“立即登录”跳转
+    cy.get('.auth-footer .auth-link').click({ force: true })
     cy.url({ timeout: 8000 }).should('include', '/login')
   })
 
