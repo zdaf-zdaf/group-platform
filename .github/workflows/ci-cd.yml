@@ -57,83 +57,71 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -uroot -prootpassword"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-          
+
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 等待MySQL就绪
+      - name: 构建公告微服务镜像
+        run: docker build -t forum_service:test ./backend/forum_service
+
+      - name: 查看本地镜像
+        run: docker images
+
+      - name: 找到 GitHub Actions 默认网络
+        id: get-network
         run: |
-          sudo apt-get update && sudo apt-get install -y mysql-client
+          NETWORK_ID=$(docker network ls --format "{{.Name}}" | grep "github_network" || true)
+          if [ -z "$NETWORK_ID" ]; then
+            echo "未找到 github_network，列出所有网络："
+            docker network ls
+            exit 1
+          fi
+          echo "network=$NETWORK_ID" >> $GITHUB_OUTPUT
+
+      - name: 等待 MySQL 在容器网络内可访问
+        run: |
           for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-              echo "MySQL已就绪"; break
+            if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
+              mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_forum; then
+              echo "✅ MySQL 在容器内可访问"; break
             fi
-            echo "等待MySQL...($i/30)"; sleep 2
+            echo "等待 MySQL...($i/30)"; sleep 2
           done
-          # 配置远程访问
-          mysql -h"127.0.0.1" -uroot -prootpassword -e "
-            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            FLUSH PRIVILEGES;"
-            
-      - name: 构建论坛微服务镜像
-        run: docker build -t forum-service:test ./backend/forum-service
-        
-      - name: 运行论坛微服务容器
+
+      - name: 运行公告微服务容器
         run: |
-          docker run -d --name forum-service-test \
+          docker run -d --name forum_service_test \
+            --network ${{ steps.get-network.outputs.network }} \
             -p 8001:8000 \
-            -e DJANGO_SETTINGS_MODULE=forum_service.settings \
+            -e DJANGO_SETTINGS_MODULE=server.settings \
             -e DB_ENGINE=django.db.backends.mysql \
             -e DB_NAME=test_db_forum \
             -e DB_USER=root \
             -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=127.0.0.1 \
+            -e DB_HOST=mysql \
             -e DB_PORT=3306 \
             -e DEBUG=True \
-            forum-service:test
-            
+            forum_service:test
+
       - name: 等待服务启动
         run: sleep 10
 
       - name: 检查容器状态和日志
         run: |
-          echo "=== 1. 列出所有容器（包括已退出的）==="
+          echo "=== 容器列表 ==="
           docker ps -a
+          echo "=== 容器日志 ==="
+          docker logs forum_service_test || true
+          echo "=== 容器退出状态码 ==="
+          docker inspect forum_service_test --format='{{.State.ExitCode}}' || true
 
-          echo "=== 2. 查看论坛服务容器的详细日志 ==="
-          docker logs forum-service-test || echo "无法获取日志，容器可能不存在或从未启动"
-
-          echo "=== 3. 检查容器的退出状态码 ==="
-          docker inspect forum-service-test --format='{{.State.ExitCode}}' || echo "无法检查容器状态"
-
-          echo "=== 4. 等待5秒后再次确认状态 ==="
-          sleep 5
-          docker ps -a | grep "forum-service-test" || echo "容器已消失"
-
-      - name: 重置迁移历史
-        run: |
-          # 删除所有迁移文件
-          docker exec forum-service-test bash -c 'rm forum/migrations/0*.py'
-          
-          # 创建新的初始迁移
-          docker exec forum-service-test python manage.py makemigrations forum
-          
-          # 应用迁移
-          docker exec forum-service-test python manage.py migrate
-        
-      - name: 运行数据库迁移
-        run: |
-          docker exec forum-service-test python manage.py makemigrations forum
-          docker exec forum-service-test python manage.py migrate
-        
       - name: 运行单元测试
-        run: docker exec forum-service-test python manage.py test --verbosity=2
+        run: docker exec forum_service_test python manage.py test --verbosity=2
 
   # ================ 资料微服务单元测试 ================
   test-materials-service:
@@ -150,103 +138,71 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -uroot -prootpassword"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-          
+
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 等待MySQL就绪
+      - name: 构建公告微服务镜像
+        run: docker build -t materials_service:test ./backend/materials_service
+
+      - name: 查看本地镜像
+        run: docker images
+
+      - name: 找到 GitHub Actions 默认网络
+        id: get-network
         run: |
-          sudo apt-get update && sudo apt-get install -y mysql-client
+          NETWORK_ID=$(docker network ls --format "{{.Name}}" | grep "github_network" || true)
+          if [ -z "$NETWORK_ID" ]; then
+            echo "未找到 github_network，列出所有网络："
+            docker network ls
+            exit 1
+          fi
+          echo "network=$NETWORK_ID" >> $GITHUB_OUTPUT
+
+      - name: 等待 MySQL 在容器网络内可访问
+        run: |
           for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-              echo "MySQL已就绪"; break
+            if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
+              mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_materials; then
+              echo "✅ MySQL 在容器内可访问"; break
             fi
-            echo "等待MySQL...($i/30)"; sleep 2
+            echo "等待 MySQL...($i/30)"; sleep 2
           done
-          # 配置远程访问
-          mysql -h"127.0.0.1" -uroot -prootpassword -e "
-            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            FLUSH PRIVILEGES;"
-            
-      - name: 构建论坛微服务镜像
-        run: docker build -t materials-service:test ./backend/materials-service
-        
-      - name: 运行论坛微服务容器
+
+      - name: 运行公告微服务容器
         run: |
-          docker run -d --name materials-service-test \
+          docker run -d --name materials_service_test \
+            --network ${{ steps.get-network.outputs.network }} \
             -p 8001:8000 \
-            -e DJANGO_SETTINGS_MODULE=materials-service.settings \
+            -e DJANGO_SETTINGS_MODULE=server.settings \
             -e DB_ENGINE=django.db.backends.mysql \
             -e DB_NAME=test_db_materials \
             -e DB_USER=root \
             -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=127.0.0.1 \
+            -e DB_HOST=mysql \
             -e DB_PORT=3306 \
             -e DEBUG=True \
-            materials-service:test
-            
+            materials_service:test
+
       - name: 等待服务启动
-        run: |
-          # 等待容器启动
-          for i in {1..30}; do
-            if docker ps | grep -q "materials-service-test"; then
-              echo "容器已启动"; break
-            fi
-            echo "等待容器启动...($i/30)"; sleep 2
-          done
-          
-          # 使用 Django 命令检查数据库连接
-          docker exec materials-service-test bash -c '
-            for i in {1..30}; do
-              if python manage.py check_db_connection; then
-                echo "数据库连接正常"; exit 0
-              fi
-              echo "等待数据库连接...($i/30)"; sleep 2
-            done
-            echo "数据库连接超时"; exit 1
-          '
+        run: sleep 10
 
       - name: 检查容器状态和日志
         run: |
-          echo "=== 1. 列出所有容器（包括已退出的）==="
+          echo "=== 容器列表 ==="
           docker ps -a
+          echo "=== 容器日志 ==="
+          docker logs materials_service_test || true
+          echo "=== 容器退出状态码 ==="
+          docker inspect materials_service_test --format='{{.State.ExitCode}}' || true
 
-          echo "=== 2. 查看论坛服务容器的详细日志 ==="
-          docker logs materials-service-test || echo "无法获取日志，容器可能不存在或从未启动"
-
-          echo "=== 3. 检查容器的退出状态码 ==="
-          docker inspect materials-service-test --format='{{.State.ExitCode}}' || echo "无法检查容器状态"
-
-          echo "=== 4. 等待5秒后再次确认状态 ==="
-          sleep 5
-          docker ps -a | grep "materials-service-test" || echo "容器已消失"
-
-
-
-      - name: 重置迁移历史
-        run: |
-          # 删除所有迁移文件
-          docker exec materials-service-test bash -c 'rm materials/migrations/0*.py'
-          
-          # 创建新的初始迁移
-          docker exec materials-service-test python manage.py makemigrations materials
-          
-          # 应用迁移
-          docker exec materials-service-test python manage.py migrate
-        
-      - name: 运行数据库迁移
-        run: |
-          docker exec materials-service-test python manage.py makemigrations materials
-          docker exec materials-service-test python manage.py migrate
-        
       - name: 运行单元测试
-        run: docker exec materials-service-test python manage.py test --verbosity=2
+        run: docker exec materials_service_test python manage.py test --verbosity=2
 
   # ================ 公告微服务单元测试 ================
   test-notice-service:
@@ -329,65 +285,86 @@ jobs:
       - name: 运行单元测试
         run: docker exec notice_service_test python manage.py test --verbosity=2
 
-
-
   # ================ 实验微服务单元测试 ================
   test-experiments-service:
     runs-on: ubuntu-latest
     needs: detect-changed-services
-    # 仅当experiments-service有变更时运行
-    if: ${{ contains(needs.detect-changed-services.outputs.changed-services, 'experiments') }}
+    if: ${{ always() }}
     services:
       mysql:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: rootpassword
-          MYSQL_DATABASE: test_db_experiments  # 服务专属数据库
+          MYSQL_DATABASE: test_db_experiments
           MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -uroot -prootpassword"
           --health-interval=10s
-          
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 等待MySQL就绪
+      - name: 构建公告微服务镜像
+        run: docker build -t experiments_service:test ./backend/experiments_service
+
+      - name: 查看本地镜像
+        run: docker images
+
+      - name: 找到 GitHub Actions 默认网络
+        id: get-network
         run: |
-          sudo apt-get update && sudo apt-get install -y mysql-client
+          NETWORK_ID=$(docker network ls --format "{{.Name}}" | grep "github_network" || true)
+          if [ -z "$NETWORK_ID" ]; then
+            echo "未找到 github_network，列出所有网络："
+            docker network ls
+            exit 1
+          fi
+          echo "network=$NETWORK_ID" >> $GITHUB_OUTPUT
+
+      - name: 等待 MySQL 在容器网络内可访问
+        run: |
           for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-              echo "MySQL已就绪"; break
+            if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
+              mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_experiments; then
+              echo "✅ MySQL 在容器内可访问"; break
             fi
-            echo "等待MySQL...($i/30)"; sleep 2
+            echo "等待 MySQL...($i/30)"; sleep 2
           done
-          # 配置远程访问
-          mysql -h"127.0.0.1" -uroot -prootpassword -e "
-            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            FLUSH PRIVILEGES;"
-            
-      - name: 构建论坛微服务镜像
-        run: docker build -t experiments-service:test ./backend/experiments-service
-        
-      - name: 运行论坛微服务容器
+
+      - name: 运行公告微服务容器
         run: |
-          docker run -d --name experiments-service \
+          docker run -d --name experiments_service_test \
+            --network ${{ steps.get-network.outputs.network }} \
+            -p 8001:8000 \
+            -e DJANGO_SETTINGS_MODULE=server.settings \
             -e DB_ENGINE=django.db.backends.mysql \
             -e DB_NAME=test_db_experiments \
             -e DB_USER=root \
             -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=127.0.0.1 \
+            -e DB_HOST=mysql \
             -e DB_PORT=3306 \
-            -e DEBUG=False \
-            experiments-service:test
-            
-      - name: 执行数据库迁移
-        run: docker exec experiments-service python manage.py migrate --noinput
-        
+            -e DEBUG=True \
+            experiments_service:test
+
+      - name: 等待服务启动
+        run: sleep 10
+
+      - name: 检查容器状态和日志
+        run: |
+          echo "=== 容器列表 ==="
+          docker ps -a
+          echo "=== 容器日志 ==="
+          docker logs experiments_service_test || true
+          echo "=== 容器退出状态码 ==="
+          docker inspect experiments_service_test --format='{{.State.ExitCode}}' || true
+
       - name: 运行单元测试
-        run: docker exec experiments-service python manage.py test --verbosity=2
+        run: docker exec experiments_service_test python manage.py test --verbosity=2
 
   # ================ 用户微服务单元测试 ================
   test-user-service:
@@ -404,83 +381,71 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -uroot -prootpassword"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-          
+
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 等待MySQL就绪
+      - name: 构建公告微服务镜像
+        run: docker build -t user_service:test ./backend/user_service
+
+      - name: 查看本地镜像
+        run: docker images
+
+      - name: 找到 GitHub Actions 默认网络
+        id: get-network
         run: |
-          sudo apt-get update && sudo apt-get install -y mysql-client
+          NETWORK_ID=$(docker network ls --format "{{.Name}}" | grep "github_network" || true)
+          if [ -z "$NETWORK_ID" ]; then
+            echo "未找到 github_network，列出所有网络："
+            docker network ls
+            exit 1
+          fi
+          echo "network=$NETWORK_ID" >> $GITHUB_OUTPUT
+
+      - name: 等待 MySQL 在容器网络内可访问
+        run: |
           for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-              echo "MySQL已就绪"; break
+            if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
+              mysql -hmysql -uroot -prootpassword -e "SELECT 1;" test_db_user; then
+              echo "✅ MySQL 在容器内可访问"; break
             fi
-            echo "等待MySQL...($i/30)"; sleep 2
+            echo "等待 MySQL...($i/30)"; sleep 2
           done
-          # 配置远程访问
-          mysql -h"127.0.0.1" -uroot -prootpassword -e "
-            ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
-            FLUSH PRIVILEGES;"
-            
-      - name: 构建论坛微服务镜像
-        run: docker build -t user-service:test ./backend/user-service
-        
-      - name: 运行论坛微服务容器
+
+      - name: 运行公告微服务容器
         run: |
-          docker run -d --name user-service-test \
+          docker run -d --name user_service_test \
+            --network ${{ steps.get-network.outputs.network }} \
             -p 8001:8000 \
-            -e DJANGO_SETTINGS_MODULE=user_service.settings \
+            -e DJANGO_SETTINGS_MODULE=server.settings \
             -e DB_ENGINE=django.db.backends.mysql \
             -e DB_NAME=test_db_user \
             -e DB_USER=root \
             -e DB_PASSWORD=rootpassword \
-            -e DB_HOST=127.0.0.1 \
+            -e DB_HOST=mysql \
             -e DB_PORT=3306 \
             -e DEBUG=True \
-            user-service:test
-            
+            user_service:test
+
       - name: 等待服务启动
         run: sleep 10
 
       - name: 检查容器状态和日志
         run: |
-          echo "=== 1. 列出所有容器（包括已退出的）==="
+          echo "=== 容器列表 ==="
           docker ps -a
+          echo "=== 容器日志 ==="
+          docker logs user_service_test || true
+          echo "=== 容器退出状态码 ==="
+          docker inspect user_service_test --format='{{.State.ExitCode}}' || true
 
-          echo "=== 2. 查看论坛服务容器的详细日志 ==="
-          docker logs user-service-test || echo "无法获取日志，容器可能不存在或从未启动"
-
-          echo "=== 3. 检查容器的退出状态码 ==="
-          docker inspect user-service-test --format='{{.State.ExitCode}}' || echo "无法检查容器状态"
-
-          echo "=== 4. 等待5秒后再次确认状态 ==="
-          sleep 5
-          docker ps -a | grep "user-service-test" || echo "容器已消失"
-
-      - name: 重置迁移历史
-        run: |
-          # 删除所有迁移文件
-          docker exec user-service-test bash -c 'rm user/migrations/0*.py'
-          
-          # 创建新的初始迁移
-          docker exec user-service-test python manage.py makemigrations user
-          
-          # 应用迁移
-          docker exec user-service-test python manage.py migrate
-        
-      - name: 运行数据库迁移
-        run: |
-          docker exec user-service-test python manage.py makemigrations user
-          docker exec user-service-test python manage.py migrate
-        
       - name: 运行单元测试
-        run: docker exec user-service-test python manage.py test --verbosity=2
+        run: docker exec user_service_test python manage.py test --verbosity=2
 
 
         
