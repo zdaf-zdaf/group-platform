@@ -457,12 +457,12 @@ jobs:
           python manage.py migrate --noinput
         working-directory: ./backend
         env:
-          DJANGO_SETTINGS_MODULE: server.settings
+          DJANGO_SETTINGS_MODULE: server.test_settings
           DB_ENGINE: django.db.backends.mysql
           DB_NAME: test_db_gui
           DB_USER: root
           DB_PASSWORD: rootpassword
-          DB_HOST: 127.0.0.1
+          DB_HOST: mysql-gui
           DB_PORT: 3306
           DEBUG: False
 
