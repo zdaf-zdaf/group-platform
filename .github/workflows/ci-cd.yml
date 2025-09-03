@@ -468,7 +468,8 @@ jobs:
 
       # ================== 启动 Django 和 Vue ==================
       # 先在 backend 目录启动 Django
-      - run: |
+      - name: Start Django Server
+        run: |
           mkdir -p logs
           python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > logs/django.log 2>&1 &
           echo $! > logs/django.pid
@@ -481,7 +482,8 @@ jobs:
         working-directory: ./backend
 
       # 再在 frontend 目录启动 Vue 并检测端口
-      - run: |
+      - name: Start Vue Server
+        run: |
           mkdir -p logs
           echo "VUE_APP_API_BASE_URL=http://127.0.0.1:8000" > .env
           echo "VUE_APP_DEBUG=true" >> .env
