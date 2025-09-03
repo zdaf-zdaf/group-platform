@@ -9,7 +9,8 @@ from .views import (
     ExperimentDetailView,
     CodingProblemDetailApi,
     CodeJudgeApi,
-    SubmitExperimentApi
+    SubmitExperimentApi,
+    AnswerCreateView
 )
 from rest_framework.routers import DefaultRouter
 
@@ -22,19 +23,10 @@ router.register(r'submissions', SubmissionViewSet, basename='submission')
 router.register(r'answers', AnswerViewSet, basename='answer')
 
 urlpatterns = [
-    # 包含自动生成的ViewSet路由
     path('', include(router.urls)),
-    
-    # 实验详情视图
     path('experiments/<int:experiment_id>/problems/', ExperimentDetailView.as_view(), name='experiment_detail'),
-    
-    # 编程题详情视图
-    path('experiments/<int:experiment_id>/coding/<int:problem_id>/', 
-         CodingProblemDetailApi.as_view(), name='coding_problem_detail'),
-    
-    # 代码评测端点
+    path('experiments/<int:experiment_id>/coding/<int:problem_id>/', CodingProblemDetailApi.as_view(), name='coding_problem_detail'),
     path('judge/', CodeJudgeApi.as_view(), name='code_judge'),
-    
-    # 实验提交端点
+    path('answers/', AnswerCreateView.as_view(), name='answer-create'),
     path('submit-experiment/', SubmitExperimentApi.as_view(), name='submit_experiment'),
 ]

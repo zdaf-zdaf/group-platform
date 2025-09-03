@@ -1,9 +1,28 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 from .models import (
     Experiment, ChoiceProblem, FillProblem, CodingProblem,
     Submission, Answer, CodingSubmission, TestResult
 )
 from django.contrib.contenttypes.models import ContentType
+
+User = get_user_model()
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'password')
+        read_only_fields = ('id',)
+
+class StudentSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'name']
+    
+    def get_name(self, obj):
+        return f"{obj.last_name}{obj.first_name}" if obj.last_name else obj.username
 
 class ChoiceProblemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,28 +36,23 @@ class FillProblemSerializer(serializers.ModelSerializer):
 
 class CodingProblemSerializer(serializers.ModelSerializer):
     test_cases = serializers.JSONField()
-    
     class Meta:
         model = CodingProblem
         fields = [
             'description', 'test_cases', 'timeout',
             'mem_limit', 'experiment', 'score', 'order', 'id'
         ]
-        extra_kwargs = {
-            'id': {'read_only': True}
-        }
+        extra_kwargs = {'id': {'read_only': True}}
 
 class TestResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestResult
-        fields = ['id', 'test_case_input', 'expected_output', 'actual_output', 'is_passed']
+        fields = ['id', 'test_case_input', 'expected_output','actual_output', 'is_passed']
 
 class AnswerSerializer(serializers.ModelSerializer):
     submission_id = serializers.IntegerField(write_only=True)
     question_type = serializers.CharField(write_only=True)
     question_id = serializers.IntegerField(write_only=True)
-
-    # 只读字段
     question_type_display = serializers.SerializerMethodField(read_only=True)
     prompt = serializers.SerializerMethodField()
     correct_answer = serializers.SerializerMethodField()
@@ -49,7 +63,7 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = [
-            'id', "submission", "submission_id", 'question_type', 'question_type_display',
+            'id', 'submission', 'submission_id', 'question_type', 'question_type_display',
             'question_id', 'prompt', 'correct_answer', 'student_answer',
             'answer_text', 'code', 'file', 'is_passed', 'test_results'
         ]
@@ -63,7 +77,6 @@ class AnswerSerializer(serializers.ModelSerializer):
         submission_id = validated_data.pop('submission_id')
         question_type = validated_data.pop('question_type')
         question_id = validated_data.pop('question_id')
-        
         try:
             submission = Submission.objects.get(id=submission_id)
         except Submission.DoesNotExist:
@@ -126,16 +139,8 @@ class ExperimentSerializer(serializers.ModelSerializer):
     choice_problems = ChoiceProblemSerializer(many=True, read_only=True)
     fill_problems = FillProblemSerializer(many=True, read_only=True)
     coding_problems = CodingProblemSerializer(many=True, read_only=True)
-    
-    # 学生ID列表
-    student_ids = serializers.ListField(
-        child=serializers.IntegerField(),
-        required=False
-    )
-    
-    # 教师ID从JWT令牌中获取
-    teacher_id = serializers.IntegerField(read_only=True)
-    
+    students = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
+    teacher = UserSerializer(read_only=True)
     has_submission = serializers.SerializerMethodField()
     start_time = serializers.DateTimeField()
     deadline = serializers.DateTimeField()
@@ -147,7 +152,7 @@ class ExperimentSerializer(serializers.ModelSerializer):
         model = Experiment
         fields = [
             'id', 'title', 'start_time', 'deadline', 'created_at',
-            'teacher_id', 'student_ids',
+            'teacher', 'students',
             'choice_problems', 'fill_problems', 'coding_problems',
             'has_submission',
             'allow_late_submission', 'late_submission_penalty',
@@ -155,31 +160,21 @@ class ExperimentSerializer(serializers.ModelSerializer):
         ]
 
     def get_has_submission(self, obj):
-        request = self.context.get('request')
-        if not request or not hasattr(request, 'user') or not hasattr(request.user, 'id'):
+        user = self.context.get('request').user
+        if user.is_anonymous:
             return False
-        
-        # 使用JWT令牌中的用户ID
-        user_id = request.user.id
-        return Submission.objects.filter(experiment=obj, user_id=user_id).exists()
+        return Submission.objects.filter(experiment=obj, user=user).exists()
 
 class SubmissionSerializer(serializers.ModelSerializer):
-    student_id = serializers.IntegerField(source='user_id', read_only=True)
-    student_name = serializers.SerializerMethodField()
-    experiment_id = serializers.IntegerField(source='experiment.id', read_only=True)
-    experiment_title = serializers.CharField(source='experiment.title', read_only=True)
+    studentId = serializers.IntegerField(source='user.id', read_only=True)
+    studentName = serializers.CharField(source='user.username', read_only=True)
+    setId = serializers.IntegerField(source='experiment.id', read_only=True)
+    setTitle = serializers.CharField(source='experiment.title', read_only=True)
     deadline = serializers.DateTimeField(source='experiment.deadline', read_only=True)
-    submitted_at = serializers.DateTimeField(source='submitted_at', read_only=True)
+    submittedAt = serializers.DateTimeField(source='submitted_at', read_only=True)
     passed = serializers.BooleanField(source='is_passed', read_only=True)
     answers = AnswerSerializer(many=True, read_only=True)
-
+    
     class Meta:
         model = Submission
-        fields = [
-            'id', 'student_id', 'student_name', 'experiment_id', 
-            'experiment_title', 'deadline', 'submitted_at', 'passed', 'answers'
-        ]
-
-    def get_student_name(self, obj):
-        # 返回基于ID的简单名称，不需要用户模型
-        return f"学生-{obj.user_id}"
+        fields = ['id', 'studentId', 'studentName', 'setId', 'setTitle', 'deadline', 'submittedAt', 'passed', 'answers']
