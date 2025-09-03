@@ -59,7 +59,7 @@ describe('公告模块功能测试', () => {
     cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeContent1)
     cy.get('.set-card .el-select').click({ force: true })
     cy.get('.el-select-dropdown__item').contains('课程通知').click({ force: true })
-    cy.intercept('POST', '/api/notice/notice/').as('publishNoticeApi')
+    cy.intercept('POST', '/api/notices/').as('publishNoticeApi')
     cy.get('.set-card').within(() => {
       cy.get('button').contains('发布公告').click({ force: true })
     })
@@ -74,7 +74,7 @@ describe('公告模块功能测试', () => {
     cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeContent2)
     cy.get('.set-card .el-select').click({ force: true })
     cy.get('.el-select-dropdown__item').contains('安全公告').click({ force: true })
-    cy.intercept('POST', '/api/notice/notice/').as('publishNoticeApi')
+    cy.intercept('POST', '/api/notices/').as('publishNoticeApi')
     cy.get('.set-card').within(() => {
       cy.get('button').contains('发布公告').click({ force: true })
     })
@@ -91,7 +91,7 @@ describe('公告模块功能测试', () => {
     cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeEditContent)
     cy.get('.set-card .el-select').click({ force: true })
     cy.get('.el-select-dropdown__item').contains('设备维护').click({ force: true })
-    cy.intercept('PATCH', /\/api\/notice\/notice\/\d+\//).as('editNoticeApi')
+    cy.intercept('PUT', /\/api\/notices\/\d+\//).as('editNoticeApi')
     cy.get('.set-card').within(() => {
       cy.get('button').contains('更新公告').click({ force: true })
     })
@@ -130,13 +130,26 @@ describe('公告模块功能测试', () => {
     cy.get('.notice-page').should('exist')
 
     // 检查未读数显示，兼容无未读公告的情况，自动等待未读数变化
+    cy.intercept('GET', '/api/notices/unread_count/').as('getUnreadCountApi')
     cy.get('.unread-info .unread-count').invoke('text').then(countText => {
       const unreadBefore = parseInt(countText)
       if (unreadBefore > 0) {
+        // 拦截“标记已读”接口
         cy.get('.notice-list .notice-item.unread').first().within(() => {
+          cy.intercept('POST', /\/api\/notices\/\d+\/mark_as_read\//).as('markAsReadApi')
           cy.get('.notice-header .title').click({ force: true })
         })
-        // 自动等待未读数变小
+        cy.wait('@markAsReadApi').then(({ response }) => {
+          cy.log('标记已读接口状态:', response?.statusCode)
+          cy.log('标记已读接口body:', JSON.stringify(response?.body))
+          expect(response?.statusCode, '标记已读接口状态码').to.be.oneOf([200, 201])
+        })
+        // 自动等待未读数变小，并断言“获取未读数量”接口
+        cy.wait('@getUnreadCountApi').then(({ response }) => {
+          cy.log('获取未读数量接口状态:', response?.statusCode)
+          cy.log('获取未读数量接口body:', JSON.stringify(response?.body))
+          expect(response?.statusCode, '获取未读数量接口状态码').to.be.oneOf([200, 201])
+        })
         cy.get('.unread-info .unread-count').should($span => {
           const countAfter = parseInt($span.text())
           expect(countAfter).to.be.lessThan(unreadBefore)
@@ -167,7 +180,7 @@ describe('公告模块功能测试', () => {
 
     // 删除已编辑的公告
     cy.get('.notice-list .notice-item').contains(noticeEditTitle).parents('.notice-item').within(() => {
-      cy.intercept('DELETE', /\/api\/notice\/notice\/\d+\//).as('deleteNoticeApi')
+    cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
       cy.contains('删除').click({ force: true })
     })
     cy.wait('@deleteNoticeApi')
@@ -176,7 +189,7 @@ describe('公告模块功能测试', () => {
 
     // 删除第二个公告
     cy.get('.notice-list .notice-item').contains(noticeTitle2).parents('.notice-item').within(() => {
-      cy.intercept('DELETE', /\/api\/notice\/notice\/\d+\//).as('deleteNoticeApi')
+    cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
       cy.contains('删除').click({ force: true })
     })
     cy.wait('@deleteNoticeApi')
