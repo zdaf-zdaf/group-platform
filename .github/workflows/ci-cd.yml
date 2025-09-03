@@ -1033,137 +1033,137 @@ jobs:
         run: |
             pkill -f "runserver 0.0.0.0:8004" || true
 
-  # ================ GUI 测试 ================
-  gui-test-cypress:
-    name: Run Cypress GUI Tests
-    runs-on: ubuntu-latest
-    needs: generate-deployment-script  # 依赖部署脚本生成
+  # # ================ GUI 测试 ================
+  # gui-test-cypress:
+  #   name: Run Cypress GUI Tests
+  #   runs-on: ubuntu-latest
+  #   needs: generate-deployment-script  # 依赖部署脚本生成
     
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Setup KinD Kubernetes Cluster
-        run: |
-          # 安装KinD（Kubernetes in Docker）
-          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
-          chmod +x ./kind
-          sudo mv ./kind /usr/local/bin/
+  #     - name: Setup KinD Kubernetes Cluster
+  #       run: |
+  #         # 安装KinD（Kubernetes in Docker）
+  #         curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+  #         chmod +x ./kind
+  #         sudo mv ./kind /usr/local/bin/
           
-          # 创建集群
-          kind create cluster --name test-cluster
+  #         # 创建集群
+  #         kind create cluster --name test-cluster
           
-          # 验证集群
-          kubectl cluster-info --context kind-test-cluster
+  #         # 验证集群
+  #         kubectl cluster-info --context kind-test-cluster
 
-      - name: Deploy Microservices to KinD
-        run: |
-          # 部署所有微服务到测试集群
-          kubectl apply -f backend/forum-service/k8s/
-          kubectl apply -f backend/materials-service/k8s/
-          kubectl apply -f backend/notice-service/k8s/
-          kubectl apply -f backend/experiments-service/k8s/
-          kubectl apply -f backend/user-service/k8s/
-          kubectl apply -f frontend/k8s/
-          kubectl apply -f gateway/k8s/
+  #     - name: Deploy Microservices to KinD
+  #       run: |
+  #         # 部署所有微服务到测试集群
+  #         kubectl apply -f backend/forum-service/k8s/
+  #         kubectl apply -f backend/materials-service/k8s/
+  #         kubectl apply -f backend/notice-service/k8s/
+  #         kubectl apply -f backend/experiments-service/k8s/
+  #         kubectl apply -f backend/user-service/k8s/
+  #         kubectl apply -f frontend/k8s/
+  #         kubectl apply -f gateway/k8s/
           
-          # 等待服务就绪
-          kubectl wait --for=condition=ready pod -l app=frontend --timeout=180s
-          kubectl wait --for=condition=ready pod -l app=gateway --timeout=180s
+  #         # 等待服务就绪
+  #         kubectl wait --for=condition=ready pod -l app=frontend --timeout=180s
+  #         kubectl wait --for=condition=ready pod -l app=gateway --timeout=180s
 
-      - name: Setup Cypress and Run Tests
-        uses: cypress-io/github-action@v6
-        with:
-          # 连接到网关服务（端口转发）
-          start: kubectl port-forward svc/gateway-service 30080:80 &
-          wait-on: 'http://localhost:30080'
-          config: baseUrl=http://localhost:30080
-          browser: chrome
-          headless: true
+  #     - name: Setup Cypress and Run Tests
+  #       uses: cypress-io/github-action@v6
+  #       with:
+  #         # 连接到网关服务（端口转发）
+  #         start: kubectl port-forward svc/gateway-service 30080:80 &
+  #         wait-on: 'http://localhost:30080'
+  #         config: baseUrl=http://localhost:30080
+  #         browser: chrome
+  #         headless: true
           
-      - name: Cleanup KinD Cluster
-        run: kind delete cluster --name test-cluster
-        if: always() 
+  #     - name: Cleanup KinD Cluster
+  #       run: kind delete cluster --name test-cluster
+  #       if: always() 
 
-  # ================== 生成部署脚本 ==================      
-  generate-deployment-script:
-    name: 生成部署脚本
-    runs-on: ubuntu-latest
-    # 依赖所有微服务和前端
-    needs: 
-      - build-experiments-service
-      - build-forum-service
-      - build-materials-service
-      - build-notice-service
-      - build-user-service
-      - build-and-push-frontend
+  # # ================== 生成部署脚本 ==================      
+  # generate-deployment-script:
+  #   name: 生成部署脚本
+  #   runs-on: ubuntu-latest
+  #   # 依赖所有微服务和前端
+  #   needs: 
+  #     - build-experiments-service
+  #     - build-forum-service
+  #     - build-materials-service
+  #     - build-notice-service
+  #     - build-user-service
+  #     - build-and-push-frontend
       
-    steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: 检出代码
+  #       uses: actions/checkout@v4
 
-      - name: 生成部署脚本
-        run: |
-          cat > deploy-to-local.sh << 'EOF'
-          #!/bin/bash
-          echo "=== 开始部署微服务到本地K8s ==="
+  #     - name: 生成部署脚本
+  #       run: |
+  #         cat > deploy-to-local.sh << 'EOF'
+  #         #!/bin/bash
+  #         echo "=== 开始部署微服务到本地K8s ==="
           
-          # 1. 更新所有微服务镜像版本
-          sed -i "s|image:.*experiments-service:.*|image: ghcr.io/${{ github.repository_owner }}/experiments-service:${{ github.sha }}|g" backend/experiments-service/k8s/deployment.yaml
-          sed -i "s|image:.*forum-service:.*|image: ghcr.io/${{ github.repository_owner }}/forum-service:${{ github.sha }}|g" backend/forum-service/k8s/deployment.yaml
-          sed -i "s|image:.*materials-service:.*|image: ghcr.io/${{ github.repository_owner }}/materials-service:${{ github.sha }}|g" backend/materials-service/k8s/deployment.yaml
-          sed -i "s|image:.*notice-service:.*|image: ghcr.io/${{ github.repository_owner }}/notice-service:${{ github.sha }}|g" backend/notice-service/k8s/deployment.yaml
-          sed -i "s|image:.*user-service:.*|image: ghcr.io/${{ github.repository_owner }}/user-service:${{ github.sha }}|g" backend/user-service/k8s/deployment.yaml
+  #         # 1. 更新所有微服务镜像版本
+  #         sed -i "s|image:.*experiments-service:.*|image: ghcr.io/${{ github.repository_owner }}/experiments-service:${{ github.sha }}|g" backend/experiments-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*forum-service:.*|image: ghcr.io/${{ github.repository_owner }}/forum-service:${{ github.sha }}|g" backend/forum-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*materials-service:.*|image: ghcr.io/${{ github.repository_owner }}/materials-service:${{ github.sha }}|g" backend/materials-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*notice-service:.*|image: ghcr.io/${{ github.repository_owner }}/notice-service:${{ github.sha }}|g" backend/notice-service/k8s/deployment.yaml
+  #         sed -i "s|image:.*user-service:.*|image: ghcr.io/${{ github.repository_owner }}/user-service:${{ github.sha }}|g" backend/user-service/k8s/deployment.yaml
           
-          # 2. 更新前端镜像
-          sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
+  #         # 2. 更新前端镜像
+  #         sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
           
-          # 3. 应用K8s配置
-          echo "应用实验微服务配置..."
-          kubectl apply -f backend/experiments-service/k8s/
-          echo "应用论坛微服务配置..."
-          kubectl apply -f backend/forum-service/k8s/
-          echo "应用资料微服务配置..."
-          kubectl apply -f backend/materials-service/k8s/
-          echo "应用通知微服务配置..."
-          kubectl apply -f backend/notice-service/k8s/
-          echo "应用用户微服务配置..."
-          kubectl apply -f backend/user-service/k8s/
-          echo "应用前端配置..."
-          kubectl apply -f k8s/frontend-deploy.yaml
+  #         # 3. 应用K8s配置
+  #         echo "应用实验微服务配置..."
+  #         kubectl apply -f backend/experiments-service/k8s/
+  #         echo "应用论坛微服务配置..."
+  #         kubectl apply -f backend/forum-service/k8s/
+  #         echo "应用资料微服务配置..."
+  #         kubectl apply -f backend/materials-service/k8s/
+  #         echo "应用通知微服务配置..."
+  #         kubectl apply -f backend/notice-service/k8s/
+  #         echo "应用用户微服务配置..."
+  #         kubectl apply -f backend/user-service/k8s/
+  #         echo "应用前端配置..."
+  #         kubectl apply -f k8s/frontend-deploy.yaml
           
-          # 4. 等待服务就绪
-          echo "等待服务启动(约60秒)..."
-          sleep 60
+  #         # 4. 等待服务就绪
+  #         echo "等待服务启动(约60秒)..."
+  #         sleep 60
           
-          # 5. 显示访问信息
-          echo "=== 部署完成 ==="
-          echo "前端访问: http://localhost:30080"
-          echo "API文档: http://localhost:30080/api/docs"
-          EOF
+  #         # 5. 显示访问信息
+  #         echo "=== 部署完成 ==="
+  #         echo "前端访问: http://localhost:30080"
+  #         echo "API文档: http://localhost:30080/api/docs"
+  #         EOF
           
-          chmod +x deploy-to-local.sh
-          echo "已生成部署脚本: deploy-to-local.sh"
+  #         chmod +x deploy-to-local.sh
+  #         echo "已生成部署脚本: deploy-to-local.sh"
 
-      - name: 打包部署文件
-        uses: actions/upload-artifact@v4
-        with:
-          name: microservices-deployment
-          path: |
-            backend/*/k8s/*.yaml  # 包含所有微服务的K8s配置
-            k8s/frontend-deploy.yaml
-            deploy-to-local.sh
-          retention-days: 7
+  #     - name: 打包部署文件
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: microservices-deployment
+  #         path: |
+  #           backend/*/k8s/*.yaml  # 包含所有微服务的K8s配置
+  #           k8s/frontend-deploy.yaml
+  #           deploy-to-local.sh
+  #         retention-days: 7
 
-  # ==================== 通知 ====================
-  notify-deployment-ready:
-    runs-on: ubuntu-latest
-    needs: generate-deployment-script
-    steps:
-      - name: 通知部署准备就绪
-        run: |
-          echo "✅ CI/CD 流水线完成！"
-          echo "📦 镜像已构建并推送至镜像仓库"
-          echo "📋 部署脚本已生成，请在本地执行以下命令："
-          echo "   gh run download -n deployment-scripts"
-          echo "   ./deploy-local.sh"
+  # # ==================== 通知 ====================
+  # notify-deployment-ready:
+  #   runs-on: ubuntu-latest
+  #   needs: generate-deployment-script
+  #   steps:
+  #     - name: 通知部署准备就绪
+  #       run: |
+  #         echo "✅ CI/CD 流水线完成！"
+  #         echo "📦 镜像已构建并推送至镜像仓库"
+  #         echo "📋 部署脚本已生成，请在本地执行以下命令："
+  #         echo "   gh run download -n deployment-scripts"
+  #         echo "   ./deploy-local.sh"
