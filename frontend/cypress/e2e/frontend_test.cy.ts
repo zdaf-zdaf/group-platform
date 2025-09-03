@@ -20,13 +20,6 @@ print(a + b)
   // 学生注册
   // ========================
   it('学生注册流程', () => {
-  cy.intercept('POST', '/api/auth/register/').as('registerApi')
-    cy.get('button').contains('注册账号').click()
-    cy.wait('@registerApi', { timeout: 10000 }).then(({ response }) => {
-      cy.log('注册接口响应:', JSON.stringify(response))
-      // 你也可以断言 response.statusCode === 201 或 200
-      expect(response.statusCode).to.be.oneOf([200, 201])
-    })
     cy.visit('/register')
     cy.get('form', { timeout: 10000 }).should('exist')
     cy.get('input[placeholder="请输入3-16位用户名"]').type(studentUsername)
@@ -36,7 +29,12 @@ print(a + b)
     cy.get('.el-select').click()
     cy.get('.el-select-dropdown__item').contains('学生').click({ force: true })
     cy.get('input[type="checkbox"]').check({ force: true })
+    cy.intercept('POST', '/api/auth/register/').as('registerApi')
     cy.get('button').contains('注册账号').click()
+    cy.wait('@registerApi', { timeout: 10000 }).then(({ response }) => {
+      cy.log('注册接口响应:', JSON.stringify(response))
+      expect(response.statusCode).to.be.oneOf([200, 201])
+    })
     // 只判断跳转到登录页即可通过，兼容 CI
     cy.get('body').then($body => {
       if ($body.text().includes('错误') || $body.text().includes('失败')) {
