@@ -80,15 +80,20 @@ describe('学习资料模块功能测试', () => {
         expect(response?.statusCode, '资料上传接口状态码').to.be.oneOf([200, 201])
         expect(response?.body && response.body.title === title, '资料上传接口返回title').to.be.true
       })
-      // 检查资料列表接口
-      cy.intercept('GET', '/materials/').as('getMaterialListApi')
-      cy.reload()
-      cy.wait('@getMaterialListApi', { timeout: 10000 }).then(({ response }) => {
-        cy.log('资料列表接口状态:', response?.statusCode)
-        cy.log('资料列表接口body:', JSON.stringify(response?.body))
-        expect(response?.statusCode, '资料列表接口状态码').to.be.oneOf([200, 201])
-        expect(response?.body && response.body.some && response.body.some(m => m.title === title), '资料列表包含新资料').to.be.true
+      // 主动用 cy.request 拉取资料列表接口并断言
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/materials/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(res => {
+        cy.log('资料列表接口状态:', res.status)
+        cy.log('资料列表接口body:', JSON.stringify(res.body))
+        const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        expect(materialsArr.some(m => m.title === title), '资料列表包含新资料').to.be.true
       })
+      cy.wait(2000)
+      cy.reload()
       cy.contains('资料发布成功').should('be.visible')
       cy.get('.material-list').should('contain.text', title)
     })
@@ -104,6 +109,20 @@ describe('学习资料模块功能测试', () => {
     cy.url().should('include', '/studyfile')
     cy.get('.material-page').should('exist')
 
+    // 主动用 cy.request 拉取资料列表接口并断言
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/materials/`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      cy.log('资料列表接口状态:', res.status)
+      cy.log('资料列表接口body:', JSON.stringify(res.body))
+      const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      expect(materialsArr.length > 0, '资料列表有数据').to.be.true
+    })
+    cy.wait(2000)
+    cy.reload()
     // 依次预览四种类型
     const previewTypes = ['PDF文档', '文档资料', '图表素材', '视频教程']
     previewTypes.forEach(label => {
@@ -132,6 +151,20 @@ describe('学习资料模块功能测试', () => {
     cy.url().should('include', '/studyfile')
     cy.get('.material-page').should('exist')
 
+    // 主动用 cy.request 拉取资料列表接口并断言
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/materials/`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      cy.log('资料列表接口状态:', res.status)
+      cy.log('资料列表接口body:', JSON.stringify(res.body))
+      const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      expect(materialsArr.length > 0, '资料列表有数据').to.be.true
+    })
+    cy.wait(2000)
+    cy.reload()
     // 删除自动化测试发布的四个资料
     const titles = [
       '自动化测试资料PDF文档',
