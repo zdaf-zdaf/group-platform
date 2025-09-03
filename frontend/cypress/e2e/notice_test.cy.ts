@@ -59,13 +59,25 @@ describe('公告模块功能测试', () => {
     cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeContent1)
     cy.get('.set-card .el-select').click({ force: true })
     cy.get('.el-select-dropdown__item').contains('课程通知').click({ force: true })
-  // 临时拦截所有 POST 请求，便于定位实际 API 路径
-  cy.intercept('POST', '**').as('anyPostApi')
+    cy.intercept('POST', '**').as('anyPostApi')
     cy.get('.set-card').within(() => {
       cy.get('button').contains('发布公告').click({ force: true })
     })
     cy.wait('@anyPostApi')
+    // 主动用 cy.request 拉取公告列表接口并断言
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/api/notices/`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      cy.log('公告列表接口状态:', res.status)
+      cy.log('公告列表接口body:', JSON.stringify(res.body))
+      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      expect(noticesArr.some(n => n.title === noticeTitle1), '公告列表包含新公告').to.be.true
+    })
     cy.wait(2000)
+    cy.reload()
     cy.contains('公告发布成功').should('be.visible')
     cy.get('.notice-list').should('contain.text', noticeTitle1)
 
@@ -76,12 +88,25 @@ describe('公告模块功能测试', () => {
     cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeContent2)
     cy.get('.set-card .el-select').click({ force: true })
     cy.get('.el-select-dropdown__item').contains('安全公告').click({ force: true })
-  cy.intercept('POST', '**').as('anyPostApi')
+    cy.intercept('POST', '**').as('anyPostApi')
     cy.get('.set-card').within(() => {
       cy.get('button').contains('发布公告').click({ force: true })
     })
     cy.wait('@anyPostApi')
+    // 主动用 cy.request 拉取公告列表接口并断言
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/api/notices/`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      cy.log('公告列表接口状态:', res.status)
+      cy.log('公告列表接口body:', JSON.stringify(res.body))
+      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      expect(noticesArr.some(n => n.title === noticeTitle2), '公告列表包含新公告').to.be.true
+    })
     cy.wait(2000)
+    cy.reload()
     cy.contains('公告发布成功').should('be.visible')
     cy.get('.notice-list').should('contain.text', noticeTitle2)
 
@@ -182,8 +207,21 @@ describe('公告模块功能测试', () => {
     cy.url().should('include', '/notices')
     cy.get('.notice-page').should('exist')
 
-    // 删除已编辑的公告
+    // 主动用 cy.request 拉取公告列表接口并断言
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/api/notices/`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      cy.log('公告列表接口状态:', res.status)
+      cy.log('公告列表接口body:', JSON.stringify(res.body))
+      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      expect(noticesArr.length > 0, '公告列表有数据').to.be.true
+    })
     cy.wait(2000)
+    cy.reload()
+    // 删除已编辑的公告
     cy.get('.notice-list .notice-item').contains(noticeEditTitle).parents('.notice-item').within(() => {
       cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
       cy.contains('删除').click({ force: true })
@@ -194,7 +232,19 @@ describe('公告模块功能测试', () => {
     cy.get('.notice-list').should('not.contain.text', noticeEditTitle)
 
     // 删除第二个公告
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/api/notices/`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      cy.log('公告列表接口状态:', res.status)
+      cy.log('公告列表接口body:', JSON.stringify(res.body))
+      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      expect(noticesArr.length > 0, '公告列表有数据').to.be.true
+    })
     cy.wait(2000)
+    cy.reload()
     cy.get('.notice-list .notice-item').contains(noticeTitle2).parents('.notice-item').within(() => {
       cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
       cy.contains('删除').click({ force: true })
