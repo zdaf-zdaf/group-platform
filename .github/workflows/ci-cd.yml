@@ -467,25 +467,24 @@ jobs:
           DEBUG: False
 
       # ================== 启动 Django 和 Vue ==================
+      # 先在 backend 目录启动 Django
       - run: |
           mkdir -p logs
-
-          # 启动 Django
           python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > logs/django.log 2>&1 &
           echo $! > logs/django.pid
+        working-directory: ./backend
 
-          # 启动 Vue
+      # 再在 frontend 目录启动 Vue 并检测端口
+      - run: |
           echo "VUE_APP_API_BASE_URL=http://127.0.0.1:8000" > .env
           echo "VUE_APP_DEBUG=true" >> .env
           npm run dev -- --host 0.0.0.0 --port 8080 > logs/vue.log 2>&1 &
           echo $! > logs/vue.pid
-
-          # 等待端口启动
           npm install -g wait-on
           if ! wait-on --timeout 180000 http://127.0.0.1:8080 http://127.0.0.1:8000; then
             echo "❌ 服务启动失败，输出日志："
             echo "=== Django 日志 ==="
-            cat logs/django.log || echo "无 Django 日志"
+            cat ../backend/logs/django.log || echo "无 Django 日志"
             echo "=== Vue 日志 ==="
             cat logs/vue.log || echo "无 Vue 日志"
             exit 1
