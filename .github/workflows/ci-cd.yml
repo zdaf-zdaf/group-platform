@@ -13,41 +13,51 @@ jobs:
     services:
       mysql:
         image: mysql:8.0
-          DEBUG: False
-
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db
+          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Start Django Server (Port 8002)
         run: |
-            python manage.py runserver 127.0.0.1:8002 &
-            sleep 5  # 等待服务器启动
+          python manage.py runserver 127.0.0.1:8002 &
+          sleep 5  # 等待服务器启动
         working-directory: ./backend
         env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_lab  # 指定独立数据库
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3308  # 使用3308端口
-            DEBUG: False
-
+          DJANGO_SETTINGS_MODULE: server.settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_lab  # 指定独立数据库
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3308  # 使用3308端口
+          DEBUG: False
       - name: Install Newman
         run: npm install -g newman
-
       - name: Run Lab Tests
         run: |
-            newman run postman/collection2-Lab.json \
+          newman run postman/collection2-Lab.json \
             --environment postman/environment.json \
             --env-var "baseUrl=http://127.0.0.1:8002/api" \
             --reporters cli
       - name: Display Server Logs on Failure
-        if: failure()  
+        if: failure()
         run: |
-            echo "===== Django Server Logs ====="
-            cat backend/debug.log  # 假设服务器日志输出到backend/debug.log
-            echo "===== End Logs ====="
+          echo "===== Django Server Logs ====="
+          cat backend/debug.log  # 假设服务器日志输出到backend/debug.log
+          echo "===== End Logs ====="
       - name: Stop Django Server
         run: |
-            pkill -f "runserver 0.0.0.0:8002" || true
+          pkill -f "runserver 0.0.0.0:8002" || true
   # 并行公告测试（配置类似，但使用不同端口和数据库名）
   api-test-gonggao:
     name: Parallel Announcement Tests
