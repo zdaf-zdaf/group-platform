@@ -96,6 +96,7 @@ CORS_ALLOW_HEADERS = [
 ]
 
 SIMPLE_JWT = {
+    'ALGORITHM': 'HS256',
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # 缩短token有效期便于测试
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,

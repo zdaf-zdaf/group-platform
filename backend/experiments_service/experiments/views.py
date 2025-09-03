@@ -28,16 +28,13 @@ class ExperimentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        # 从JWT令牌中获取用户信息
         user = request.user
+        logger.debug(f"创建实验请求 - 用户ID: {user.id}, 角色: {getattr(user, 'role', '未定义')}")
         
-        # 验证用户角色是否为教师
         if not hasattr(user, 'role') or user.role != 'teacher':
+            logger.warning(f"权限拒绝 - 用户 {user.id} 角色不是教师")
             return Response({"detail": "只有教师可以创建实验"}, status=status.HTTP_403_FORBIDDEN)
         
-        # 设置教师ID
-        request.data['teacher_id'] = user.id
-        return super().create(request, *args, **kwargs)
 
     def get_queryset(self):
         # 从JWT令牌中获取用户信息
