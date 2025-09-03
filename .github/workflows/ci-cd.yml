@@ -263,7 +263,7 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -h localhost -uroot -prootpassword"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
@@ -286,7 +286,13 @@ jobs:
             ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
             ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'rootpassword';
             FLUSH PRIVILEGES;"
-            
+
+      - name: 构建公告微服务镜像
+        run: docker build -t notice_service:test ./backend/notice_service
+
+      - name: 查看本地镜像
+        run: docker images
+
       - name: 运行公告微服务容器
         run: |
           docker run -d --name notice_service_test \
@@ -300,7 +306,7 @@ jobs:
             -e DB_PORT=3306 \
             -e DEBUG=True \
             notice_service:test
-            
+
       - name: 等待服务启动
         run: sleep 10
 
@@ -309,39 +315,20 @@ jobs:
           echo "=== 1. 列出所有容器（包括已退出的）==="
           docker ps -a
 
-          echo "=== 2. 查看论坛服务容器的详细日志 ==="
-          docker logs notice_service-test || echo "无法获取日志，容器可能不存在或从未启动"
+          echo "=== 2. 查看公告服务容器的日志 ==="
+          docker logs notice_service_test || echo "无法获取日志，容器可能不存在或从未启动"
 
           echo "=== 3. 检查容器的退出状态码 ==="
-          docker inspect notice_service-test --format='{{.State.ExitCode}}' || echo "无法检查容器状态"
+          docker inspect notice_service_test --format='{{.State.ExitCode}}' || echo "无法检查容器状态"
 
-          echo "=== 4. 等待5秒后再次确认状态 ==="
-          sleep 5
-          docker ps -a | grep "notice_service-test" || echo "容器已消失"
-
-      # - name: 重置迁移历史
-      #   run: |
-      #     # 删除所有迁移文件
-      #     docker exec notice-service-test bash -c 'rm notice/migrations/0*.py'
-          
-      #     # 创建新的初始迁移
-      #     docker exec notice-service-test python manage.py makemigrations notice
-          
-      #     # 应用迁移
-      #     docker exec notice-service-test python manage.py migrate
-        
-      # - name: 运行数据库迁移
-      #   run: |
-      #     docker exec notice-service-test python manage.py makemigrations notice
-      #     docker exec notice-service-test python manage.py migrate
-        
       - name: 确认容器是否在运行
         run: |
           docker ps -a
           docker logs notice_service_test || true
 
       - name: 运行单元测试
-        run: docker exec notice_service-test python manage.py test --verbosity=2
+        run: docker exec notice_service_test python manage.py test --verbosity=2
+
 
   # ================ 实验微服务单元测试 ================
   test-experiments-service:
