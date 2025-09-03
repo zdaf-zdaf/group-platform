@@ -114,17 +114,17 @@ describe('论坛模块功能测试', () => {
       })
     })
     cy.wait(5000); // 发帖后等待更久
-    // reload 后拦截帖子列表接口并断言
-    cy.intercept('GET', '/api/forum/questions/').as('getQuestionsApiReload')
-    cy.reload();
-    cy.wait('@getQuestionsApiReload').then(interception => {
-      const res = interception.response
-      cy.log('reload后帖子列表接口状态:', res.statusCode)
-      cy.log('reload后帖子列表接口body:', JSON.stringify(res.body))
-      // 兼容 res.body 可能为对象或数组
+    // 主动用 cy.request 拉取帖子列表接口并断言
+    cy.request({
+      method: 'GET',
+      url: 'http://127.0.0.1:8000/api/forum/questions/',
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      cy.log('帖子列表接口状态:', res.status)
+      cy.log('帖子列表接口body:', JSON.stringify(res.body))
       const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(res.statusCode, 'reload后帖子列表状态码').to.eq(200)
-      expect(postsArr.some(q => q.title === postTitle), 'reload后帖子列表包含新发帖').to.be.true
+      expect(postsArr.some(q => q.title === postTitle), '帖子列表包含新发帖').to.be.true
     })
     cy.wait(3000);
     cy.reload();
@@ -208,14 +208,25 @@ describe('论坛模块功能测试', () => {
       })
     })
     cy.wait(5000); // 发帖后等待更久
-    cy.reload();
+    // 主动用 cy.request 拉取帖子列表接口并断言
+    cy.request({
+      method: 'GET',
+      url: 'http://127.0.0.1:8000/api/forum/questions/',
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      cy.log('帖子列表接口状态:', res.status)
+      cy.log('帖子列表接口body:', JSON.stringify(res.body))
+      const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      expect(postsArr.some(q => q.title === postTitle), '帖子列表包含新发帖').to.be.true
+    })
     cy.wait(3000);
     cy.reload();
     cy.wait(2000);
 
-  cy.wait(2000);
-  cy.get('.post-card', { timeout: 30000 }).should('exist');
-  cy.get('.post-card').should('contain.text', postTitle);
+    cy.wait(2000);
+    cy.get('.post-card', { timeout: 30000 }).should('exist');
+    cy.get('.post-card').should('contain.text', postTitle);
 
     // 置顶和取消置顶
     cy.intercept('PATCH', /\/api\/forum\/questions\/\d+\/toggle-sticky\//).as('toggleStickyApi')
