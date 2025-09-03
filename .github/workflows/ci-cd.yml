@@ -426,7 +426,10 @@ jobs:
         with:
             name: frontend-dependencies
             path: ./frontend
-
+      - name: Restore npm dependencies
+        run: npm install
+        working-directory: ./frontend
+        
       - name: Create log directory
         run: mkdir -p logs
 
@@ -712,7 +715,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: frontend-dependencies
-            path: ./frontend/package*.json
+            path: |
+              ./frontend/package*.json
+              ./frontend/node_modules/
             retention-days: 1
 
       - name: Run frontend unit tests
@@ -769,6 +774,11 @@ jobs:
         with:
             name: frontend-dependencies
             path: ./frontend
+
+      - name: Restore npm dependencies
+        run: npm install
+        working-directory: ./frontend
+
       - name: Update Dockerfile
         run: |
           # 仅更新Node版本
