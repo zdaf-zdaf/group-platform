@@ -40,6 +40,15 @@ describe('学习资料模块功能测试', () => {
   // ========================
   it('教师端依次发布四种类型学习资料', () => {
     login(teacher)
+    // 检查 token 注入
+    cy.window().then(win => {
+      const tk = win.localStorage.getItem('token')
+      const info = win.localStorage.getItem('userInfo')
+      cy.log('localStorage token:', tk)
+      cy.log('localStorage userInfo:', info)
+      expect(tk, 'token存在').to.match(/^.+$/)
+      expect(info, 'userInfo存在').to.match(/^.+$/)
+    })
 
     cy.contains('学习资料').click({ force: true })
     cy.url().should('include', '/studyfile')
@@ -60,10 +69,26 @@ describe('学习资料模块功能测试', () => {
       cy.get('textarea[placeholder="请输入资料描述"]').clear().type(`这是${item.label}类型的测试资料`)
       cy.get('.set-card .el-select').click({ force: true })
       cy.get('.el-select-dropdown__item').contains(item.label).click({ force: true })
+      // 检查文件是否存在
+      cy.readFile(item.file, 'binary', { timeout: 10000 }).should('exist')
       cy.get('.el-upload input[type="file"]').selectFile(item.file, { force: true })
       cy.intercept('POST', '/api/materials/material/').as('publishMaterialApi')
       cy.contains('发布资料').click({ force: true })
-      cy.wait('@publishMaterialApi')
+      cy.wait('@publishMaterialApi', { timeout: 10000 }).then(({ response }) => {
+        cy.log('资料上传接口状态:', response?.statusCode)
+        cy.log('资料上传接口body:', JSON.stringify(response?.body))
+        expect(response?.statusCode, '资料上传接口状态码').to.be.oneOf([200, 201])
+        expect(response?.body && response.body.title === title, '资料上传接口返回title').to.be.true
+      })
+      // 检查资料列表接口
+      cy.intercept('GET', '/api/materials/material/').as('getMaterialListApi')
+      cy.reload()
+      cy.wait('@getMaterialListApi', { timeout: 10000 }).then(({ response }) => {
+        cy.log('资料列表接口状态:', response?.statusCode)
+        cy.log('资料列表接口body:', JSON.stringify(response?.body))
+        expect(response?.statusCode, '资料列表接口状态码').to.be.oneOf([200, 201])
+        expect(response?.body && response.body.some && response.body.some(m => m.title === title), '资料列表包含新资料').to.be.true
+      })
       cy.contains('资料发布成功').should('be.visible')
       cy.get('.material-list').should('contain.text', title)
     })
