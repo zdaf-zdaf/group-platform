@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: experiments-service
+  name: experiment-service
 spec:
   selector:
-    app: experiments-service
+    app: experiment-service
   ports:
   - port: 80
     targetPort: 8000

@@ -21,10 +21,28 @@ spec:
         ports:
         - containerPort: 8000
         env:
+        - name: PYTHONPATH
+          value: "/backend/user_service"
         - name: DJANGO_SETTINGS_MODULE
-          value: "user_service.settings.production"
+          value: "server.settings"
+        # 数据库连接配置
         - name: DB_HOST
-          value: "postgres-service"  # 假设使用PostgreSQL
+          value: "mysql"
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: MYSQL_DATABASE_USER
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: MYSQL_USER_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: MYSQL_PASSWORD_USER
         resources:
           requests:
             memory: "256Mi"
@@ -32,15 +50,4 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "200m"
-        livenessProbe:
-          httpGet:
-            path: /health/
-            port: 8000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health/
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        livenessProbe: null

@@ -21,8 +21,28 @@ spec:
         ports:
         - containerPort: 8000
         env:
+        - name: PYTHONPATH
+          value: "/backend/materials_service"
         - name: DJANGO_SETTINGS_MODULE
-          value: "materials_service.settings.production"
+          value: "server.settings"
+        # 数据库连接配置
+        - name: DB_HOST
+          value: "mysql"
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: MYSQL_DATABASE_MATERIALS
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: MYSQL_USER_MATERIALS
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: MYSQL_PASSWORD_MATERIALS
         resources:
           requests:
             memory: "256Mi"
@@ -30,9 +50,4 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "200m"
-        livenessProbe:
-          httpGet:
-            path: /health/
-            port: 8000
-          initialDelaySeconds: 30
-          periodSeconds: 10
+        livenessProbe: null

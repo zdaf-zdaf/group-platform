@@ -139,15 +139,15 @@ WSGI_APPLICATION = 'server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'user_service_db',
-        'USER': 'root',
-        'PASSWORD': 'Zgq0412@',
-        'HOST': 'host.docker.internal',
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.mysql'),
+        'NAME': os.getenv('DB_NAME', 'materials_db'),
+        'USER': os.getenv('DB_USER', 'root'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'root'),
+        'HOST': 'mysql',
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
-        }
+        },
     }
 }
 

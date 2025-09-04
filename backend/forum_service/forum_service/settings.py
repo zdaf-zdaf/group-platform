@@ -81,11 +81,12 @@ WSGI_APPLICATION = 'forum_service.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
+        'NAME': os.environ['DB_NAME'],  # 使用K8s实际注入的变量名
+        'USER': os.environ['DB_USER'],
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': 'mysql',
         'PORT': '3306',
+        'OPTIONS': {'charset': 'utf8mb4'}
     }
 }
 

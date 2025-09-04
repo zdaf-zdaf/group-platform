@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS lab_platform_experiment;
+    CREATE DATABASE IF NOT EXISTS lab_platform_forum;
+    CREATE DATABASE IF NOT EXISTS lab_platform_materials;
+    CREATE DATABASE IF NOT EXISTS lab_platform_user;
+    CREATE DATABASE IF NOT EXISTS lab_platform_notice;
+
+    CREATE USER IF NOT EXISTS 'course_experiment'@'%' IDENTIFIED BY 'course_experiment';
+    CREATE USER IF NOT EXISTS 'course_forum'@'%' IDENTIFIED BY 'course_forum';
+    CREATE USER IF NOT EXISTS 'course_materials'@'%' IDENTIFIED BY 'course_materials';
+    CREATE USER IF NOT EXISTS 'course_user'@'%' IDENTIFIED BY 'course_user';
+    CREATE USER IF NOT EXISTS 'course_notice'@'%' IDENTIFIED BY 'course_notice';
+
+    GRANT ALL PRIVILEGES ON lab_platform_experiment.* TO 'course_experiment'@'%';
+    GRANT ALL PRIVILEGES ON lab_platform_forum.* TO 'course_forum'@'%';
+    GRANT ALL PRIVILEGES ON lab_platform_materials.* TO 'course_materials'@'%';
+    GRANT ALL PRIVILEGES ON lab_platform_user.* TO 'course_user'@'%';
+    GRANT ALL PRIVILEGES ON lab_platform_notice.* TO 'course_notice'@'%';
+
+    FLUSH PRIVILEGES;

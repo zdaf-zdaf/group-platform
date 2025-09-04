@@ -1,28 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: notice-service
+  name: experiment-service
   labels:
-    app: notice-service
+    app: experiment-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: notice-service
+      app: experiment-service
   template:
     metadata:
       labels:
-        app: notice-service
+        app: experiment-service
     spec:
       containers:
-      - name: notice-service
-        image: notice-service:latest  # 请替换为实际镜像地址
+      - name: experiment-service
+        image: experiment-service:latest  # 请替换为实际镜像地址
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
         env:
         - name: PYTHONPATH
-          value: "/backend/notice_service"
+          value: "/backend/experiment_service"
         - name: DJANGO_SETTINGS_MODULE
           value: "server.settings"
         # 数据库连接配置
@@ -32,22 +32,22 @@ spec:
           valueFrom:
             secretKeyRef:
               name: mysql-secret
-              key: MYSQL_DATABASE_NOTICE
+              key: MYSQL_DATABASE_EXPERIMENT
         - name: DB_USER
           valueFrom:
             secretKeyRef:
               name: mysql-secret
-              key: MYSQL_USER_NOTICE
+              key: MYSQL_USER_EXPERIMENT
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
               name: mysql-secret
-              key: MYSQL_PASSWORD_NOTICE
+              key: MYSQL_PASSWORD_EXPERIMENT
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
+            memory: "512Mi"  # 论坛服务可能需要更多内存
             cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
         livenessProbe: null
