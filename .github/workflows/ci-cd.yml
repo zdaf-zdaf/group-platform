@@ -788,7 +788,7 @@ jobs:
     name: Generate Deployment Script
     runs-on: ubuntu-latest
     # 依赖所有测试和构建作业
-    needs: [test-backend, test-frontend, build-and-push-backend, build-and-push-frontend, api-test-luntan, api-test-lab, api-test-ziliao, gui-test-cypress]
+    needs: [test-backend, test-frontend, build-and-push-backend, build-and-push-frontend, api-test-luntan, api-test-lab, api-test-ziliao, api-test-gonggao, gui-test-cypress]
 
     steps:
       - name: Checkout code
