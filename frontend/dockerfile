@@ -1,32 +1,45 @@
-# 构建阶段
-FROM node:22-alpine as build-stage
+# frontend/dockerfile
+
+# ---- 1. 构建阶段 ----
+# 使用一个包含完整构建工具的Node.js镜像
+FROM node:18-alpine AS build-stage
 
 # 设置工作目录
 WORKDIR /app
 
-# 安装全局npm版本（保持与本地一致）
-RUN npm install -g npm@11.5.2 --unsafe-perm
-
-# 复制依赖文件
+# 复制 package.json 和 lock 文件
 COPY package*.json ./
 
-# 安装依赖（保留本地lockfile）
-RUN npm install --legacy-peer-deps
+# 安装项目依赖
+RUN npm install
 
-# 确保vue-cli-service已安装
-RUN npm install -g @vue/cli-service
-
-# 复制项目文件
+# 复制所有源代码
 COPY . .
 
-# 调试：显示已安装依赖
-RUN npm ls --depth=0
+# 构建生产版本的应用
+# 这里的 'npm run build' 应该与您 package.json 中的脚本匹配
+RUN npm run build && \
+    echo "--- Listing contents of /app/dist ---" && \
+    ls -la /app/dist
 
-# Vue构建命令
-RUN npm run build
-
-# 生产阶段
-FROM nginx:stable-alpine as production-stage
+# ---- 2. 运行阶段 ----
+# 使用一个非常轻量级的Nginx镜像
+FROM nginx:stable-alpine
+# 安装curl工具，用于健康检查
+RUN apk add --no-cache curl
+# 从构建阶段复制打包好的静态文件到Nginx的Web根目录
+# 'dist' 目录是 'npm run build' 通常的输出目录，请根据您的项目确认
 COPY --from=build-stage /app/dist /usr/share/nginx/html
+
+# 检查复制过来的文件是否存在
+RUN echo "--- Listing contents of /usr/share/nginx/html after copy ---" && \
+    ls -la /usr/share/nginx/html
+
+# 复制自定义的Nginx配置，用于处理SPA（单页应用）的路由
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# 暴露80端口
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;", "npm", "run", "serve", "--", "--port", "80"]
+
+# 启动Nginx
+CMD ["nginx", "-g", "daemon off;"]
