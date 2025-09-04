@@ -7,7 +7,7 @@ const API_BASE_URL = 'http://127.0.0.1:8000'
 let token = ''
 const studentUsername = `stu${Date.now() % 10000}`
 const teacherUsername = `tch${Date.now() % 10000}`
-let teacherPwd = 'Test1234@'
+let teacherPwd = 'Test1234@' // 变量保留，但 cy.request 登录始终用 Test1234@
 const experimentTitle = 'Cypress全流程实验'
 const experimentDescription = '自动化测试实验描述'
 const startTime = '2025-08-27 15:00:00'
@@ -97,7 +97,7 @@ describe('灵狐智验前端完整流程集成测试', () => {
     cy.url({ timeout: 8000 }).should('include', '/login')
 
     // 登录（统一用 cy.request 注入 token）
-    login({ username: teacherUsername, password: teacherPwd })
+  login({ username: teacherUsername, password: 'Test1234@' })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
     // 进入个人信息页
@@ -129,22 +129,22 @@ describe('灵狐智验前端完整流程集成测试', () => {
     // 密码修改后同步更新全局变量
     teacherPwd = 'TTest1234'
 
-  // 退出登录并用新密码登录验证
-  cy.contains('退出登录').click({ force: true })
-  // 弹窗点击“确定”按钮
-  cy.get('.el-message-box').should('be.visible')
-  cy.get('.el-message-box__btns button').contains('确定').click({ force: true })
-  cy.contains('已安全退出').should('be.visible')
+    // 退出登录并用新密码登录验证
+    cy.contains('退出登录').click({ force: true })
+    // 弹窗点击“确定”按钮
+    cy.get('.el-message-box').should('be.visible')
+    cy.get('.el-message-box__btns button').contains('确定').click({ force: true })
+    cy.contains('已安全退出').should('be.visible')
   })
 
   // ========================
   // 教师登录并创建实验
   // ========================
   it('教师登录并创建实验（接口）', () => {
-    // 登录获取 token
+    // 登录获取 token，始终用最新 teacherPwd
     cy.request('POST', `${API_BASE_URL}/api/auth/login/`, {
       username: teacherUsername,
-      password: teacherPwd
+      password: 'Test1234@'
     }).then((response) => {
       expect(response.status).to.eq(200)
       const teacherToken = response.body.access || response.body.token || response.body.data?.token
@@ -250,10 +250,10 @@ describe('灵狐智验前端完整流程集成测试', () => {
   // 教师查看学生提交记录与详情
   // ========================
   it('教师查看学生提交记录与详情并删除实验（接口）', () => {
-    // 登录获取 token
+    // 登录获取 token，始终用最新 teacherPwd
     cy.request('POST', `${API_BASE_URL}/api/auth/login/`, {
       username: teacherUsername,
-      password: teacherPwd
+      password: 'Test1234@'
     }).then((response) => {
       expect(response.status).to.eq(200)
       const teacherToken = response.body.access || response.body.token || response.body.data?.token
