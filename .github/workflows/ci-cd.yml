@@ -580,7 +580,7 @@ jobs:
         run: |
           set -o pipefail
           npx cypress run --headless --config baseUrl=http://127.0.0.1:8080 2>&1 | tee logs/cypress.log || (
-          
+
             echo "=== stuTest Token ==="
             [ -f logs/stuToken.json ] && cat logs/stuToken.json || echo "stuToken.json 不存在"
 
@@ -788,8 +788,8 @@ jobs:
     name: Generate Deployment Script
     runs-on: ubuntu-latest
     # 依赖所有测试和构建作业
-    needs: [test-backend, test-frontend, build-and-push-backend, build-and-push-frontend]
-    
+    needs: [test-backend, test-frontend, build-and-push-backend, build-and-push-frontend, api-test-luntan, api-test-lab, api-test-ziliao, gui-test-cypress]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
