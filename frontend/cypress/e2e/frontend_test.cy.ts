@@ -230,7 +230,7 @@ describe('灵狐智验前端完整流程集成测试', () => {
         // 完成实验提交
         cy.request({
           method: 'POST',
-          url: `${API_BASE_URL}/api/experiments/submit/`,
+          url: `${API_BASE_URL}/api/experiments/submissions/`,
           headers: { Authorization: `Bearer ${studentToken}` },
           body: {
             experiment: experimentId,
