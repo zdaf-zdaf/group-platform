@@ -48,7 +48,7 @@ jobs:
           fi
           echo "network=$NETWORK_ID" >> $GITHUB_OUTPUT
 
-      - name: 等待 MySQL 在容器网络内可访问
+      - name: 等待MySQL在容器网络内可访问
         run: |
           for i in {1..30}; do
             if docker run --rm --network ${{ steps.get-network.outputs.network }} mysql:8.0 \
