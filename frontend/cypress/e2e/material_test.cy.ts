@@ -55,10 +55,10 @@ describe('学习资料模块功能测试', () => {
     cy.get('.material-page').should('exist')
 
     const types = [
-      { label: 'PDF文档', value: 'pdf', file: 'cypress/fixtures/test.pdf' },
-      { label: '文档资料', value: 'doc', file: 'cypress/fixtures/test.docx' },
-      { label: '图表素材', value: 'image', file: 'cypress/fixtures/test.png' },
-      { label: '视频教程', value: 'video', file: 'cypress/fixtures/test.mp4' }
+      { label: 'PDF文档', value: 'pdf', file: 'test.pdf' },
+      { label: '文档资料', value: 'doc', file: 'test.docx' },
+      { label: '图表素材', value: 'image', file: 'test.png' },
+      { label: '视频教程', value: 'video', file: 'test.mp4' }
     ];
 
     types.forEach((item) => {
