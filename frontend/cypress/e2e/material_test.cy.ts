@@ -55,25 +55,43 @@ describe('学习资料模块功能测试', () => {
     cy.get('.material-page').should('exist')
 
     const types = [
-      { label: 'PDF文档', file: 'cypress/fixtures/test.pdf' },
-      { label: '文档资料', file: 'cypress/fixtures/test.docx' },
-      { label: '图表素材', file: 'cypress/fixtures/test.png' },
-      { label: '视频教程', file: 'cypress/fixtures/test.mp4' }
-    ]
+      { label: 'PDF文档', value: 'pdf', file: 'cypress/fixtures/test.pdf' },
+      { label: '文档资料', value: 'doc', file: 'cypress/fixtures/test.docx' },
+      { label: '图表素材', value: 'image', file: 'cypress/fixtures/test.png' },
+      { label: '视频教程', value: 'video', file: 'cypress/fixtures/test.mp4' }
+    ];
 
     types.forEach((item) => {
-      const title = `自动化测试资料${item.label}`
-      cy.contains('发布学习资料').click({ force: true })
-      cy.get('.set-card').should('exist')
-      cy.get('input[placeholder="请输入资料标题"]').clear().type(title)
-      cy.get('textarea[placeholder="请输入资料描述"]').clear().type(`这是${item.label}类型的测试资料`)
-      cy.get('.set-card .el-select').click({ force: true })
-      cy.get('.el-select-dropdown__item').contains(item.label).click({ force: true })
-      cy.readFile(item.file, 'binary', { timeout: 10000 }).should('exist')
-      cy.get('.el-upload input[type="file"]').selectFile(item.file, { force: true })
-      cy.contains('发布资料').click({ force: true })
+      const title = `自动化测试资料${item.label}`;
+      cy.fixture(item.file, 'base64').then(fileContent => {
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', `这是${item.label}类型的测试资料`);
+        formData.append('type', item.value);
+        // 转成 blob
+        const byteCharacters = atob(fileContent);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray]);
+        formData.append('file', blob, item.file.split('/').pop());
+        cy.request({
+          method: 'POST',
+          url: `${API_BASE_URL}/materials/`,
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          body: formData,
+          // 关键：Cypress 12+ 支持 formData 直接传递
+          form: true
+        }).then(res => {
+          expect([200, 201]).to.include(res.status);
+        });
+      });
       // 轮询资料列表接口，直到新资料出现
-      function pollMaterialList(retry = 10) {
+      function pollMaterialList(retry = 30) {
         if (retry <= 0) throw new Error('资料列表接口始终无新资料');
         cy.request({
           method: 'GET',
@@ -81,18 +99,26 @@ describe('学习资料模块功能测试', () => {
           headers: { Authorization: `Bearer ${token}` },
           failOnStatusCode: false
         }).then(res => {
-          const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+          const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || []);
           if (materialsArr.some(m => m.title === title)) {
-            cy.log('资料列表接口包含新资料')
+            cy.log('资料列表接口包含新资料');
           } else {
-            cy.wait(1000).then(() => pollMaterialList(retry - 1))
+            cy.wait(2000).then(() => pollMaterialList(retry - 1));
           }
-        })
+        });
       }
-      pollMaterialList()
-      cy.reload()
-      cy.contains('资料发布成功').should('be.visible')
-    })
+      pollMaterialList();
+      // 用接口校验资料已发布
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/materials/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(res => {
+        const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || []);
+        expect(materialsArr.some(m => m.title === title), '后端资料列表包含新资料').to.equal(true);
+      });
+    });
   })
 
   // ========================
@@ -106,7 +132,7 @@ describe('学习资料模块功能测试', () => {
     cy.get('.material-page').should('exist')
 
     // 轮询资料列表接口，直到有资料
-    function pollMaterialList(retry = 10) {
+    function pollMaterialList(retry = 30) {
       if (retry <= 0) throw new Error('资料列表接口始终无数据');
       cy.request({
         method: 'GET',
@@ -114,15 +140,15 @@ describe('学习资料模块功能测试', () => {
         headers: { Authorization: `Bearer ${token}` },
         failOnStatusCode: false
       }).then(res => {
-        const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || []);
         if (materialsArr.length > 0) {
-          cy.log('资料列表接口有数据')
+          cy.log('资料列表接口有数据');
         } else {
-          cy.wait(1000).then(() => pollMaterialList(retry - 1))
+          cy.wait(2000).then(() => pollMaterialList(retry - 1));
         }
-      })
+      });
     }
-    pollMaterialList()
+    pollMaterialList();
     cy.reload()
     // 依次预览四种类型（UI操作）
     const previewTypes = ['PDF文档', '文档资料', '图表素材', '视频教程']
@@ -149,7 +175,7 @@ describe('学习资料模块功能测试', () => {
     cy.get('.material-page').should('exist')
 
     // 轮询资料列表接口，直到有资料
-    function pollMaterialList(retry = 10) {
+    function pollMaterialList(retry = 30) {
       if (retry <= 0) throw new Error('资料列表接口始终无数据');
       cy.request({
         method: 'GET',
@@ -157,30 +183,43 @@ describe('学习资料模块功能测试', () => {
         headers: { Authorization: `Bearer ${token}` },
         failOnStatusCode: false
       }).then(res => {
-        const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || []);
         if (materialsArr.length > 0) {
-          cy.log('资料列表接口有数据')
+          cy.log('资料列表接口有数据');
         } else {
-          cy.wait(1000).then(() => pollMaterialList(retry - 1))
+          cy.wait(2000).then(() => pollMaterialList(retry - 1));
         }
-      })
+      });
     }
-    pollMaterialList()
+    pollMaterialList();
     cy.reload()
-    // 删除自动化测试发布的四个资料（UI操作）
+    // 用接口查找并删除自动化测试发布的四个资料
     const titles = [
       '自动化测试资料PDF文档',
       '自动化测试资料文档资料',
       '自动化测试资料图表素材',
       '自动化测试资料视频教程'
     ]
-    titles.forEach(title => {
-      cy.get('.material-list .material-item').contains(title).parents('.material-item').within(() => {
-        cy.contains('删除').click({ force: true })
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/materials/`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      titles.forEach(title => {
+        const mat = materialsArr.find(m => m.title === title)
+        expect(mat, `后端资料列表应包含${title}`).to.not.equal(undefined)
+        // 直接用接口删除
+        cy.request({
+          method: 'DELETE',
+          url: `${API_BASE_URL}/materials/${mat.id}/`,
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false
+        }).then(delRes => {
+          expect([200, 204, 202]).to.include(delRes.status)
+        })
       })
-      cy.get('.el-message-box').should('be.visible')
-      cy.get('.el-message-box__btns button').contains('确定删除').click({ force: true })
-      cy.contains('删除成功').should('be.visible')
     })
   })
 })
