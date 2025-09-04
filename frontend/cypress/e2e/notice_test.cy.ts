@@ -60,6 +60,9 @@ describe('公告模块功能测试', () => {
         failOnStatusCode: false
       }).then(res => {
         cy.log('发布公告1返回', res.status, JSON.stringify(res.body))
+        if (res.status === 400) {
+          cy.log('公告发布400错误详情:', JSON.stringify(res.body))
+        }
         expect([200, 201]).to.include(res.status)
       }).then(() => {
         // 轮询接口直到新公告出现
@@ -94,6 +97,9 @@ describe('公告模块功能测试', () => {
           failOnStatusCode: false
         }).then(res => {
           cy.log('发布公告2返回', res.status, JSON.stringify(res.body))
+          if (res.status === 400) {
+            cy.log('公告发布400错误详情:', JSON.stringify(res.body))
+          }
           expect([200, 201]).to.include(res.status)
         }).then(() => {
           function pollNoticeList2(retry = 20) {
