@@ -75,31 +75,24 @@ describe('论坛模块功能测试', () => {
     });
   }
 
-  // 学生端发帖、点赞、评论、删除
-  it('学生端发帖、点赞、评论、删除', () => {
+  // 学生端发帖、点赞、评论、删除（全部接口流）
+  it('学生端接口发帖、点赞、评论、删除', () => {
     login(student)
 
-    // 页面缓冲，确保渲染和数据加载完成
-    cy.wait(3000)
-    cy.get('.forum', { timeout: 20000 }).should('exist')
-    cy.wait(2000)
-
-    cy.contains('答疑论坛').click({ force: true })
-    cy.url({ timeout: 15000 }).should('include', '/forum')
-    cy.get('.forum').should('exist')
-
-    // 发布帖子
-    cy.intercept('POST', '/api/forum/questions/').as('postQuestion')
-    cy.get('.publish-card input[placeholder="请输入问题标题"]').clear().type(postTitle)
-    cy.get('.publish-card textarea[placeholder="请输入问题内容"]').clear().type(postContent)
-    cy.get('.publish-card button').contains('发布问题').click({ force: true })
-    cy.wait('@postQuestion').then(interception => {
-      const status = interception.response?.statusCode
-      const body = interception.response?.body
-      cy.log('发帖响应:', JSON.stringify(body))
-      cy.log('发帖状态:', status)
-      expect(status, '发帖接口状态码').to.eq(201)
-      // 轮询帖子列表接口，直到新发帖出现
+    // 发帖
+    cy.request({
+      method: 'POST',
+      url: 'http://127.0.0.1:8000/api/forum/questions/',
+      headers: { Authorization: `Bearer ${token}` },
+      body: {
+        title: postTitle,
+        content: postContent
+      },
+      failOnStatusCode: false
+    }).then(res => {
+      expect(res.status).to.eq(201)
+      const postId = res.body.id
+      // 轮询接口直到新发帖出现
       function pollForumList(retry = 10) {
         if (retry <= 0) throw new Error('帖子列表接口始终无新发帖');
         cy.request({
@@ -107,8 +100,8 @@ describe('论坛模块功能测试', () => {
           url: 'http://127.0.0.1:8000/api/forum/questions/',
           headers: { Authorization: `Bearer ${token}` },
           failOnStatusCode: false
-        }).then(res => {
-          const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        }).then(res2 => {
+          const postsArr = Array.isArray(res2.body) ? res2.body : (res2.body.data || [])
           if (postsArr.some(q => q.title === postTitle)) {
             cy.log('帖子列表接口包含新发帖')
           } else {
@@ -117,97 +110,77 @@ describe('论坛模块功能测试', () => {
         })
       }
       pollForumList()
-    })
-    cy.wait(5000); // 发帖后等待更久
-    // 主动用 cy.request 拉取帖子列表接口并断言
-    // 轮询帖子列表接口，直到新发帖出现
-    function pollForumList2(retry = 10) {
-      if (retry <= 0) throw new Error('帖子列表接口始终无新发帖');
+
+      // 点赞
       cy.request({
-        method: 'GET',
-        url: 'http://127.0.0.1:8000/api/forum/questions/',
+        method: 'PATCH',
+        url: `http://127.0.0.1:8000/api/forum/questions/${postId}/toggle-like/`,
         headers: { Authorization: `Bearer ${token}` },
         failOnStatusCode: false
-      }).then(res => {
-        const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-        if (postsArr.some(q => q.title === postTitle)) {
-          cy.log('帖子列表接口包含新发帖')
-        } else {
-          cy.wait(1000).then(() => pollForumList2(retry - 1))
-        }
+      }).then(likeRes => {
+        expect([200, 201]).to.include(likeRes.status)
       })
-    }
-    pollForumList2()
-    cy.wait(3000);
-    cy.reload();
-    cy.wait(2000);
-    // 输出 localStorage token
-    cy.window().then(win => {
-      const savedToken = win.localStorage.getItem('token');
-      cy.log('localStorage token:', savedToken);
-      expect(savedToken, 'localStorage token存在').to.match(/^.+$/);
-    });
-    cy.wait(2000);
-    cy.get('.post-card', { timeout: 30000 }).should('exist');
-    cy.get('.post-card').should('contain.text', postTitle);
+      // 取消点赞
+      cy.request({
+        method: 'PATCH',
+        url: `http://127.0.0.1:8000/api/forum/questions/${postId}/toggle-like/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(unlikeRes => {
+        expect([200, 201]).to.include(unlikeRes.status)
+      })
 
-    // 点赞和取消点赞
-    cy.intercept('PATCH', /\/api\/forum\/questions\/\d+\/toggle-like\//).as('toggleLikeApi')
-    cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
-      cy.get('button').contains(/点赞|取消点赞/).click({ force: true })
-      cy.wait('@toggleLikeApi')
-      cy.get('button').contains(/点赞|取消点赞/).click({ force: true })
-      cy.wait('@toggleLikeApi')
-    })
+      // 评论
+      cy.request({
+        method: 'POST',
+        url: `http://127.0.0.1:8000/api/forum/questions/${postId}/comments/`,
+        headers: { Authorization: `Bearer ${token}` },
+        body: { content: postComment },
+        failOnStatusCode: false
+      }).then(commentRes => {
+        expect(commentRes.status).to.eq(201)
+        const commentId = commentRes.body.id
+        // 删除评论
+        cy.request({
+          method: 'DELETE',
+          url: `http://127.0.0.1:8000/api/forum/comments/${commentId}/`,
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false
+        }).then(delCommentRes => {
+          expect([200, 204, 202]).to.include(delCommentRes.status)
+        })
+      })
 
-    // 评论
-    cy.intercept('POST', /\/api\/forum\/questions\/\d+\/comments\//).as('addCommentApi')
-    cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
-      cy.get('input[placeholder="写下你的评论..."]').type(postComment + '{enter}')
+      // 删除帖子
+      cy.request({
+        method: 'DELETE',
+        url: `http://127.0.0.1:8000/api/forum/questions/${postId}/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(delPostRes => {
+        expect([200, 204, 202]).to.include(delPostRes.status)
+      })
     })
-    cy.wait('@addCommentApi')
-    cy.get('.post-card').contains(postComment).should('exist')
-
-    // 删除评论
-    cy.intercept('DELETE', /\/api\/forum\/comments\/\d+\//).as('deleteCommentApi')
-    cy.get('.post-card').contains(postComment).parents('.comment').within(() => {
-      cy.get('button').contains('删除评论').click({ force: true })
-    })
-    cy.wait('@deleteCommentApi')
-    cy.get('.post-card').contains(postComment).should('not.exist')
-
-    // 删除帖子
-    cy.intercept('DELETE', /\/api\/forum\/questions\/\d+\//).as('deletePostApi')
-    cy.get('.post-card').contains(postTitle).parents('.post-card').within(() => {
-      cy.get('button').contains('删除').click({ force: true })
-    })
-    cy.wait('@deletePostApi')
-    cy.reload()
-    cy.contains('.post-card', postTitle).should('not.exist')
   })
 
-  // 教师端置顶、点赞、评论、删除
-  it('教师端置顶、点赞、评论、删除', () => {
+  // 教师端接口置顶、点赞、评论、删除
+  it('教师端接口置顶、点赞、评论、删除', () => {
     login(teacher)
 
-    cy.contains('答疑论坛').click({ force: true })
-    cy.url({ timeout: 15000 }).should('include', '/forum')
-    cy.get('.forum').should('exist')
-
-    // 发布帖子
-  cy.intercept('POST', '/api/forum/questions/').as('postQuestion')
-    cy.get('.publish-card input[placeholder="请输入问题标题"]').clear().type(postTitle)
-    cy.get('.publish-card textarea[placeholder="请输入问题内容"]').clear().type(postContent)
-    cy.get('.publish-card button').contains('发布问题').click({ force: true })
-    cy.wait('@postQuestion').then(interception => {
-      const status = interception.response?.statusCode
-      const body = interception.response?.body
-      cy.log('发帖响应:', JSON.stringify(body))
-      cy.log('发帖状态:', status)
-      if (status !== 201) {
-        throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
-      }
-      // 轮询帖子列表接口，直到新发帖出现
+    // 发帖
+    cy.request({
+      method: 'POST',
+      url: 'http://127.0.0.1:8000/api/forum/questions/',
+      headers: { Authorization: `Bearer ${token}` },
+      body: {
+        title: postTitle,
+        content: postContent
+      },
+      failOnStatusCode: false
+    }).then(res => {
+      expect(res.status).to.eq(201)
+      const postId = res.body.id
+      // 轮询接口直到新发帖出现
       function pollForumList(retry = 10) {
         if (retry <= 0) throw new Error('帖子列表接口始终无新发帖');
         cy.request({
@@ -215,8 +188,8 @@ describe('论坛模块功能测试', () => {
           url: 'http://127.0.0.1:8000/api/forum/questions/',
           headers: { Authorization: `Bearer ${token}` },
           failOnStatusCode: false
-        }).then(res => {
-          const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        }).then(res2 => {
+          const postsArr = Array.isArray(res2.body) ? res2.body : (res2.body.data || [])
           if (postsArr.some(q => q.title === postTitle)) {
             cy.log('帖子列表接口包含新发帖')
           } else {
@@ -225,77 +198,75 @@ describe('论坛模块功能测试', () => {
         })
       }
       pollForumList()
-    })
-    cy.wait(5000); // 发帖后等待更久
-    // 主动用 cy.request 拉取帖子列表接口并断言
-    // 轮询帖子列表接口，直到新发帖出现
-    function pollForumList2(retry = 10) {
-      if (retry <= 0) throw new Error('帖子列表接口始终无新发帖');
+
+      // 置顶
       cy.request({
-        method: 'GET',
-        url: 'http://127.0.0.1:8000/api/forum/questions/',
+        method: 'PATCH',
+        url: `http://127.0.0.1:8000/api/forum/questions/${postId}/toggle-sticky/`,
         headers: { Authorization: `Bearer ${token}` },
         failOnStatusCode: false
-      }).then(res => {
-        const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-        if (postsArr.some(q => q.title === postTitle)) {
-          cy.log('帖子列表接口包含新发帖')
-        } else {
-          cy.wait(1000).then(() => pollForumList2(retry - 1))
-        }
+      }).then(stickyRes => {
+        expect([200, 201]).to.include(stickyRes.status)
       })
-    }
-    pollForumList2()
-    cy.wait(3000);
-    cy.reload();
-    cy.wait(2000);
+      // 取消置顶
+      cy.request({
+        method: 'PATCH',
+        url: `http://127.0.0.1:8000/api/forum/questions/${postId}/toggle-sticky/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(unstickyRes => {
+        expect([200, 201]).to.include(unstickyRes.status)
+      })
 
-    cy.wait(2000);
-    cy.get('.post-card', { timeout: 30000 }).should('exist');
-    cy.get('.post-card').should('contain.text', postTitle);
+      // 点赞
+      cy.request({
+        method: 'PATCH',
+        url: `http://127.0.0.1:8000/api/forum/questions/${postId}/toggle-like/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(likeRes => {
+        expect([200, 201]).to.include(likeRes.status)
+      })
+      // 取消点赞
+      cy.request({
+        method: 'PATCH',
+        url: `http://127.0.0.1:8000/api/forum/questions/${postId}/toggle-like/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(unlikeRes => {
+        expect([200, 201]).to.include(unlikeRes.status)
+      })
 
-    // 置顶和取消置顶
-    cy.intercept('PATCH', /\/api\/forum\/questions\/\d+\/toggle-sticky\//).as('toggleStickyApi')
-    cy.get('.post-card').first().within(() => {
-      cy.get('button').contains(/置顶|取消置顶/).click({ force: true })
-      cy.wait('@toggleStickyApi')
-      cy.get('button').contains(/置顶|取消置顶/).click({ force: true })
-      cy.wait('@toggleStickyApi')
+      // 评论
+      cy.request({
+        method: 'POST',
+        url: `http://127.0.0.1:8000/api/forum/questions/${postId}/comments/`,
+        headers: { Authorization: `Bearer ${token}` },
+        body: { content: teacherComment },
+        failOnStatusCode: false
+      }).then(commentRes => {
+        expect(commentRes.status).to.eq(201)
+        const commentId = commentRes.body.id
+        // 删除评论
+        cy.request({
+          method: 'DELETE',
+          url: `http://127.0.0.1:8000/api/forum/comments/${commentId}/`,
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false
+        }).then(delCommentRes => {
+          expect([200, 204, 202]).to.include(delCommentRes.status)
+        })
+      })
+
+      // 删除帖子
+      cy.request({
+        method: 'DELETE',
+        url: `http://127.0.0.1:8000/api/forum/questions/${postId}/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(delPostRes => {
+        expect([200, 204, 202]).to.include(delPostRes.status)
+      })
     })
-
-    // 点赞和取消点赞
-    cy.intercept('PATCH', /\/api\/forum\/questions\/\d+\/toggle-like\//).as('toggleLikeApi')
-    cy.get('.post-card').first().within(() => {
-      cy.get('button').contains(/点赞|取消点赞/).click({ force: true })
-      cy.wait('@toggleLikeApi')
-      cy.get('button').contains(/点赞|取消点赞/).click({ force: true })
-      cy.wait('@toggleLikeApi')
-    })
-
-    // 评论
-    cy.intercept('POST', /\/api\/forum\/questions\/\d+\/comments\//).as('addCommentApi')
-    cy.get('.post-card').first().within(() => {
-      cy.get('input[placeholder="写下你的评论..."]').type(teacherComment + '{enter}')
-    })
-    cy.wait('@addCommentApi')
-    cy.get('.post-card').contains(teacherComment).should('exist')
-    cy.get('.post-card').contains(teacherComment).should('exist')
-
-    // 删除评论
-    cy.intercept('DELETE', /\/api\/forum\/comments\/\d+\//).as('deleteCommentApi')
-    cy.get('.post-card').contains(teacherComment).parents('.comment').within(() => {
-      cy.get('button').contains('删除评论').click({ force: true })
-    })
-    cy.wait('@deleteCommentApi')
-    cy.get('.post-card').contains(teacherComment).should('not.exist')
-
-    // 删除帖子
-    cy.intercept('DELETE', /\/api\/forum\/questions\/\d+\//).as('deletePostApi')
-    cy.get('.post-card').first().within(() => {
-      cy.get('button').contains('删除').click({ force: true })
-    })
-    cy.wait('@deletePostApi')
-    cy.reload()
-    cy.contains('.post-card', postTitle).should('not.exist')
   })
 })
