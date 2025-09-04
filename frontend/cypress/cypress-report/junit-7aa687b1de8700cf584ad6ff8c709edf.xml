@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="15.352" tests="2" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-09-04T05:01:49" tests="0" file="cypress\e2e\forum_test.cy.ts" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="论坛模块功能测试" timestamp="2025-09-04T05:01:49" tests="2" time="15.253" failures="0">
+    <testcase name="论坛模块功能测试 学生端发帖、点赞、评论、删除" time="7.800" classname="学生端发帖、点赞、评论、删除">
+    </testcase>
+    <testcase name="论坛模块功能测试 教师端置顶、点赞、评论、删除" time="7.358" classname="教师端置顶、点赞、评论、删除">
+    </testcase>
+  </testsuite>
+</testsuites>

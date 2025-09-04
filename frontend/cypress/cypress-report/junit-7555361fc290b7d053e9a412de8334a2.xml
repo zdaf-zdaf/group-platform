@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="13.876" tests="2" failures="1">
+  <testsuite name="Root Suite" timestamp="2025-09-04T05:21:42" tests="0" file="cypress\e2e\2-advanced-examples\aliasing.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Aliasing" timestamp="2025-09-04T05:21:42" tests="2" time="13.738" failures="1">
+    <testcase name="Aliasing .as() - alias a DOM element for later use" time="1.455" classname=".as() - alias a DOM element for later use">
+    </testcase>
+    <testcase name="Aliasing .as() - alias a route for later use" time="0.000" classname=".as() - alias a route for later use">
+      <failure message="Timed out retrying after 4000ms: expected undefined to equal 200" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: expected undefined to equal 200
+    at Context.eval (webpack://lab-platform/./cypress/e2e/2-advanced-examples/aliasing.cy.js:37:54)
+
+      + expected - actual:  failed to generate Mocha diff
+]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

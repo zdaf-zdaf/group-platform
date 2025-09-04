@@ -1,0 +1,125 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 2,
+    "passes": 2,
+    "pending": 0,
+    "failures": 0,
+    "start": "2025-09-04T05:01:49.653Z",
+    "end": "2025-09-04T05:02:05.005Z",
+    "duration": 15352,
+    "testsRegistered": 2,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "d9df55a8-18ad-4deb-8a11-d9326c915e1b",
+      "title": "",
+      "fullFile": "cypress\\e2e\\forum_test.cy.ts",
+      "file": "cypress\\e2e\\forum_test.cy.ts",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "dc82b412-f588-42f6-aa8b-b09083c53f36",
+          "title": "论坛模块功能测试",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "学生端发帖、点赞、评论、删除",
+              "fullTitle": "论坛模块功能测试 学生端发帖、点赞、评论、删除",
+              "timedOut": null,
+              "duration": 7800,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/login');\ncy.wait(1000);\ncy.get('input[placeholder=\"请输入用户名\"]').type(student.username);\ncy.get('input[placeholder=\"请输入密码\"]').type(student.password);\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\ncy.contains('答疑论坛').click({ force: true });\ncy.url().should('include', '/forum');\ncy.get('.forum').should('exist');\n// 发布帖子\ncy.get('.publish-card input[placeholder=\"请输入问题标题\"]').clear().type(postTitle);\ncy.get('.publish-card textarea[placeholder=\"请输入问题内容\"]').clear().type(postContent);\ncy.get('.publish-card button').contains('发布问题').click({ force: true });\ncy.contains('问题发布成功').should('be.visible');\ncy.get('.post-card').should('contain.text', postTitle);\n// 点赞和取消点赞\ncy.get('.post-card').contains(postTitle).parents('.post-card').within(function () {\n    cy.get('button').contains(/点赞|取消点赞/).click({ force: true });\n    cy.wait(500);\n    cy.get('button').contains(/点赞|取消点赞/).click({ force: true });\n});\n// 评论\ncy.get('.post-card').contains(postTitle).parents('.post-card').within(function () {\n    cy.get('input[placeholder=\"写下你的评论...\"]').type(postComment + '{enter}');\n});\ncy.contains('评论添加成功').should('be.visible');\ncy.get('.post-card').contains(postComment).should('exist');\n// 删除评论\ncy.get('.post-card').contains(postComment).parents('.comment').within(function () {\n    cy.get('button').contains('删除评论').click({ force: true });\n});\ncy.contains('评论已删除').should('be.visible');\n// 删除帖子\ncy.get('.post-card').contains(postTitle).parents('.post-card').within(function () {\n    cy.get('button').contains('删除').click({ force: true });\n});\ncy.contains('问题已删除').should('be.visible');",
+              "err": {},
+              "uuid": "c6d54acc-7d36-4300-9115-36ccf3f4c6c6",
+              "parentUUID": "dc82b412-f588-42f6-aa8b-b09083c53f36",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "教师端置顶、点赞、评论、删除",
+              "fullTitle": "论坛模块功能测试 教师端置顶、点赞、评论、删除",
+              "timedOut": null,
+              "duration": 7358,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/login');\ncy.wait(1000);\ncy.get('input[placeholder=\"请输入用户名\"]').type(teacher.username);\ncy.get('input[placeholder=\"请输入密码\"]').type(teacher.password);\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\ncy.contains('答疑论坛').click({ force: true });\ncy.url().should('include', '/forum');\ncy.get('.forum').should('exist');\n// 发布帖子\ncy.get('.publish-card input[placeholder=\"请输入问题标题\"]').clear().type(postTitle);\ncy.get('.publish-card textarea[placeholder=\"请输入问题内容\"]').clear().type(postContent);\ncy.get('.publish-card button').contains('发布问题').click({ force: true });\ncy.contains('问题发布成功').should('be.visible');\ncy.get('.post-card').should('contain.text', postTitle);\n// 置顶和取消置顶\ncy.get('.post-card').first().within(function () {\n    cy.get('button').contains(/置顶|取消置顶/).click({ force: true });\n    cy.wait(500);\n    cy.get('button').contains(/置顶|取消置顶/).click({ force: true });\n});\n// 点赞和取消点赞\ncy.get('.post-card').first().within(function () {\n    cy.get('button').contains(/点赞|取消点赞/).click({ force: true });\n    cy.wait(500);\n    cy.get('button').contains(/点赞|取消点赞/).click({ force: true });\n});\n// 评论\ncy.get('.post-card').first().within(function () {\n    cy.get('input[placeholder=\"写下你的评论...\"]').type(teacherComment + '{enter}');\n});\ncy.contains('评论添加成功').should('be.visible');\ncy.get('.post-card').contains(teacherComment).should('exist');\n// 删除评论\ncy.get('.post-card').contains(teacherComment).parents('.comment').within(function () {\n    cy.get('button').contains('删除评论').click({ force: true });\n});\ncy.contains('评论已删除').should('be.visible');\n// 删除帖子\ncy.get('.post-card').first().within(function () {\n    cy.get('button').contains('删除').click({ force: true });\n});\ncy.contains('问题已删除').should('be.visible');",
+              "err": {},
+              "uuid": "2a77766c-6750-4a68-bbc8-e96824821226",
+              "parentUUID": "dc82b412-f588-42f6-aa8b-b09083c53f36",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "c6d54acc-7d36-4300-9115-36ccf3f4c6c6",
+            "2a77766c-6750-4a68-bbc8-e96824821226"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 15158,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "id": "default",
+        "reportDir": "cypress/cypress-report",
+        "overwrite": false,
+        "html": true,
+        "json": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}

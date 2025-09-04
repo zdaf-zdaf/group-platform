@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="19.883" tests="3" failures="1">
+  <testsuite name="Root Suite" timestamp="2025-09-04T05:03:16" tests="0" file="cypress\e2e\notice_test.cy.ts" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="公告模块功能测试" timestamp="2025-09-04T05:03:16" tests="3" time="19.785" failures="1">
+    <testcase name="公告模块功能测试 教师端发布、编辑、筛选、搜索公告" time="8.894" classname="教师端发布、编辑、筛选、搜索公告">
+    </testcase>
+    <testcase name="公告模块功能测试 学生端查看公告、标记已读、未读数刷新、筛选和搜索" time="3.378" classname="学生端查看公告、标记已读、未读数刷新、筛选和搜索">
+    </testcase>
+    <testcase name="公告模块功能测试 教师端删除发布的两个公告" time="0.000" classname="教师端删除发布的两个公告">
+      <failure message="Timed out retrying after 4000ms: expected &apos;&lt;div.notice-list&gt;&apos; not to contain text &apos;自动化测试公告1-已编辑&apos;" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: expected '<div.notice-list>' not to contain text '自动化测试公告1-已编辑'
+    at Context.eval (webpack://lab-platform/./cypress/e2e/notice_test.cy.ts:148:27)
+
+      + expected - actual
+
+      -'安全公告自动化测试公告22025-09-04 05:03发布者: tchTest 已读: 0编辑删除这是自动化测试发布的公告内容2课程通知新实验发布：Cypress全流程实验2025-09-04 05:02发布者: tch8417 已读: 0编辑删除新实验已发布：Cypress全流程实验\n\n      实验描述：自动化测试实验描述\n\n      开始时间：2025-09-04 14:02\n      截止时间：2025-09-05 14:02\n\n      请按时完成实验！课程通知新实验发布：Cypress全流程实验2025-09-04 05:00发布者: tch3487 已读: 0编辑删除新实验已发布：Cypress全流程实验\n\n      实验描述：自动化测试实验描述\n\n      开始时间：2025-09-04 14:00\n      截止时间：2025-09-05 14:00\n\n      请按时完成实验！课程通知新实验发布：Cypress全流程实验2025-09-04 04:58发布者: tch9588 已读: 0编辑删除新实验已发布：Cypress全流程实验\n\n      实验描述：自动化测试实验描述\n\n      开始时间：2025-09-04 13:58\n      截止时间：2025-09-05 13:58\n\n      请按时完成实验！安全公告自动化测试公告22025-09-04 04:56发布者: tchTest 已读: 0编辑删除这是自动化测试发布的公告内容2设备维护自动化测试公告1-已编辑2025-09-04 04:56发布者: tchTest 已读: 0编辑删除这是编辑后的公告内容1课程通知新实验发布：Cypress全流程实验2025-09-04 04:56发布者: tch3754 已读: 0编辑删除新实验已发布：Cypress全流程实验\n\n      实验描述：自动化测试实验描述\n\n      开始时间：2025-09-04 13:55\n      截止时间：2025-09-05 13:55\n\n      请按时完成实验！课程通知新实验发布：Cypress全流程实验2025-09-04 04:50发布者: tch5979 已读: 0编辑删除新实验已发布：Cypress全流程实验\n\n      实验描述：自动化测试实验描述\n\n      开始时间：2025-09-04 13:50\n      截止时间：2025-09-05 13:50\n\n      请按时完成实验！课程通知小组作业最终分工与时间节点说明2025-06-08 12:56发布者: teacher 已读: 3编辑删除亲爱的同学们：\n\n为保障小组作业顺利进行，现发布**《小组作业最终分工与时间节点安排表》**，请各小组成员认真查阅并遵照执行。\n\n 本次附件内容包括：\n\n各小组成员任务分配\n\n每项任务的起止时间\n\n阶段性提交节点与验收标准\n\n请注意以下几点：\n\n各成员需对所分配任务负责，按时完成并提交阶段成果。\n\n请在每个阶段结束前2天提交进度汇报，用于阶段性检查与反馈。\n\n若需调整分工或延期，请提前与指导老师沟通，并提交申请。\n\n 附件请在公告下方或平台指定位置下载查阅。\n\n如有任何疑问，请在本周五（6月13日）前在答疑区留言，或私信课程助教。\n\n祝大家协作顺利、成果丰硕！\n\n—— 实验课程教学组\n2025年6月8日'
+      +'自动化测试公告1-已编辑'
+      ]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

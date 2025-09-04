@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="9.563" tests="18" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-09-04T05:11:22" tests="0" file="cypress\e2e\2-advanced-examples\traversal.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Traversal" timestamp="2025-09-04T05:11:22" tests="18" time="9.435" failures="0">
+    <testcase name="Traversal .children() - get child DOM elements" time="1.160" classname=".children() - get child DOM elements">
+    </testcase>
+    <testcase name="Traversal .closest() - get closest ancestor DOM element" time="0.327" classname=".closest() - get closest ancestor DOM element">
+    </testcase>
+    <testcase name="Traversal .eq() - get a DOM element at a specific index" time="0.339" classname=".eq() - get a DOM element at a specific index">
+    </testcase>
+    <testcase name="Traversal .filter() - get DOM elements that match the selector" time="0.355" classname=".filter() - get DOM elements that match the selector">
+    </testcase>
+    <testcase name="Traversal .find() - get descendant DOM elements of the selector" time="0.331" classname=".find() - get descendant DOM elements of the selector">
+    </testcase>
+    <testcase name="Traversal .first() - get first DOM element" time="0.315" classname=".first() - get first DOM element">
+    </testcase>
+    <testcase name="Traversal .last() - get last DOM element" time="0.319" classname=".last() - get last DOM element">
+    </testcase>
+    <testcase name="Traversal .next() - get next sibling DOM element" time="0.355" classname=".next() - get next sibling DOM element">
+    </testcase>
+    <testcase name="Traversal .nextAll() - get all next sibling DOM elements" time="0.316" classname=".nextAll() - get all next sibling DOM elements">
+    </testcase>
+    <testcase name="Traversal .nextUntil() - get next sibling DOM elements until next el" time="0.308" classname=".nextUntil() - get next sibling DOM elements until next el">
+    </testcase>
+    <testcase name="Traversal .not() - remove DOM elements from set of DOM elements" time="0.320" classname=".not() - remove DOM elements from set of DOM elements">
+    </testcase>
+    <testcase name="Traversal .parent() - get parent DOM element from DOM elements" time="0.406" classname=".parent() - get parent DOM element from DOM elements">
+    </testcase>
+    <testcase name="Traversal .parents() - get parent DOM elements from DOM elements" time="0.293" classname=".parents() - get parent DOM elements from DOM elements">
+    </testcase>
+    <testcase name="Traversal .parentsUntil() - get parent DOM elements from DOM elements until el" time="0.332" classname=".parentsUntil() - get parent DOM elements from DOM elements until el">
+    </testcase>
+    <testcase name="Traversal .prev() - get previous sibling DOM element" time="0.340" classname=".prev() - get previous sibling DOM element">
+    </testcase>
+    <testcase name="Traversal .prevAll() - get all previous sibling DOM elements" time="0.350" classname=".prevAll() - get all previous sibling DOM elements">
+    </testcase>
+    <testcase name="Traversal .prevUntil() - get all previous sibling DOM elements until el" time="0.333" classname=".prevUntil() - get all previous sibling DOM elements until el">
+    </testcase>
+    <testcase name="Traversal .siblings() - get all sibling DOM elements" time="0.336" classname=".siblings() - get all sibling DOM elements">
+    </testcase>
+  </testsuite>
+</testsuites>

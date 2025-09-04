@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="35.308" tests="6" failures="1">
+  <testsuite name="Root Suite" timestamp="2025-09-04T04:55:43" tests="0" file="cypress\e2e\frontend_test.cy.ts" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="灵狐智验前端完整流程集成测试" timestamp="2025-09-04T04:55:43" tests="6" time="35.204" failures="1">
+    <testcase name="灵狐智验前端完整流程集成测试 学生注册流程" time="3.687" classname="学生注册流程">
+    </testcase>
+    <testcase name="灵狐智验前端完整流程集成测试 教师注册后登录并修改个人信息和密码" time="7.149" classname="教师注册后登录并修改个人信息和密码">
+    </testcase>
+    <testcase name="灵狐智验前端完整流程集成测试 教师登录并创建实验" time="10.469" classname="教师登录并创建实验">
+    </testcase>
+    <testcase name="灵狐智验前端完整流程集成测试 学生登录完成实验" time="0.000" classname="学生登录完成实验">
+      <failure message="The following error originated from your application code, not from Cypress. It was caused by an unhandled promise rejection.
+
+  &gt; An unknown error has occurred: [object Event]
+
+When Cypress detects uncaught errors originating from your application it will automatically fail the current test.
+
+This behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.
+
+https://on.cypress.io/uncaught-exception-from-application" type="Error"><![CDATA[Error: The following error originated from your application code, not from Cypress. It was caused by an unhandled promise rejection.
+
+  > An unknown error has occurred: [object Event]
+
+When Cypress detects uncaught errors originating from your application it will automatically fail the current test.
+
+This behavior is configurable, and you can choose to turn this off by listening to the `uncaught:exception` event.
+
+https://on.cypress.io/uncaught-exception-from-application
+    at makeErrFromObj (http://localhost:5173/__cypress/runner/cypress_runner.js:77576:10)
+    at errorFromProjectRejectionEvent (http://localhost:5173/__cypress/runner/cypress_runner.js:77885:10)
+    at Object.errorFromUncaughtEvent (http://localhost:5173/__cypress/runner/cypress_runner.js:77890:65)
+    at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:141980:66)]]></failure>
+    </testcase>
+    <testcase name="灵狐智验前端完整流程集成测试 教师查看学生提交记录与详情" time="3.162" classname="教师查看学生提交记录与详情">
+    </testcase>
+    <testcase name="灵狐智验前端完整流程集成测试 教师删除创建的实验" time="3.541" classname="教师删除创建的实验">
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,144 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 3,
+    "passes": 3,
+    "pending": 0,
+    "failures": 0,
+    "start": "2025-09-04T04:56:22.400Z",
+    "end": "2025-09-04T04:56:46.570Z",
+    "duration": 24170,
+    "testsRegistered": 3,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "46dac950-c6f7-4ff8-a486-972166843efe",
+      "title": "",
+      "fullFile": "cypress\\e2e\\material_test.cy.ts",
+      "file": "cypress\\e2e\\material_test.cy.ts",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "1a269950-b0c2-4635-a725-86ddda6bc018",
+          "title": "学习资料模块功能测试",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "教师端依次发布四种类型学习资料",
+              "fullTitle": "学习资料模块功能测试 教师端依次发布四种类型学习资料",
+              "timedOut": null,
+              "duration": 10391,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/login');\ncy.get('input[placeholder=\"请输入用户名\"]').type('tchTest');\ncy.get('input[placeholder=\"请输入密码\"]').type('Test1234@');\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\ncy.contains('学习资料').click({ force: true });\ncy.url().should('include', '/studyfile');\ncy.get('.material-page').should('exist');\nvar types = [\n    { label: 'PDF文档', file: 'cypress/fixtures/test.pdf' },\n    { label: '文档资料', file: 'cypress/fixtures/test.docx' },\n    { label: '图表素材', file: 'cypress/fixtures/test.png' },\n    { label: '视频教程', file: 'cypress/fixtures/test.mp4' }\n];\ntypes.forEach(function (item) {\n    var title = \"\\u81EA\\u52A8\\u5316\\u6D4B\\u8BD5\\u8D44\\u6599\".concat(item.label);\n    cy.contains('发布学习资料').click({ force: true });\n    cy.get('.set-card').should('exist');\n    cy.get('input[placeholder=\"请输入资料标题\"]').clear().type(title);\n    cy.get('textarea[placeholder=\"请输入资料描述\"]').clear().type(\"\\u8FD9\\u662F\".concat(item.label, \"\\u7C7B\\u578B\\u7684\\u6D4B\\u8BD5\\u8D44\\u6599\"));\n    cy.get('.set-card .el-select').click({ force: true });\n    cy.get('.el-select-dropdown__item').contains(item.label).click({ force: true });\n    cy.get('.el-upload input[type=\"file\"]').selectFile(item.file, { force: true });\n    cy.contains('发布资料').click({ force: true });\n    cy.contains('资料发布成功').should('be.visible');\n    cy.get('.material-list').should('contain.text', title);\n});",
+              "err": {},
+              "uuid": "5474d65a-8d37-4ada-b71a-afe4af28ffcc",
+              "parentUUID": "1a269950-b0c2-4635-a725-86ddda6bc018",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "学生端查看并预览四种类型资料，下载第一个",
+              "fullTitle": "学习资料模块功能测试 学生端查看并预览四种类型资料，下载第一个",
+              "timedOut": null,
+              "duration": 7938,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/login');\ncy.get('input[placeholder=\"请输入用户名\"]').type('stuTest');\ncy.get('input[placeholder=\"请输入密码\"]').type('Test1234@');\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\ncy.contains('学习资料').click({ force: true });\ncy.url().should('include', '/studyfile');\ncy.get('.material-page').should('exist');\n// 依次预览四种类型\nvar previewTypes = ['PDF文档', '文档资料', '图表素材', '视频教程'];\npreviewTypes.forEach(function (label) {\n    cy.get('.material-list .material-item').contains(label).parents('.material-item').then(function ($item) {\n        cy.wrap($item).contains('在线预览').click({ force: true });\n        cy.wait(1000); // 等待新窗口弹出\n    });\n});\n// 下载第一个资料\ncy.get('.material-list .material-item').first().within(function () {\n    cy.contains('下载文件').click({ force: true });\n});",
+              "err": {},
+              "uuid": "1ce091d1-5ec5-4aba-afd9-3e602d9ec144",
+              "parentUUID": "1a269950-b0c2-4635-a725-86ddda6bc018",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "教师端删除学习资料",
+              "fullTitle": "学习资料模块功能测试 教师端删除学习资料",
+              "timedOut": null,
+              "duration": 5501,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit('http://localhost:5173/login');\ncy.get('input[placeholder=\"请输入用户名\"]').type('tchTest');\ncy.get('input[placeholder=\"请输入密码\"]').type('Test1234@');\ncy.get('input[type=\"checkbox\"]').check({ force: true });\ncy.get('button').contains('立即登录').click();\ncy.url().should('include', '/profile');\ncy.contains('学习资料').click({ force: true });\ncy.url().should('include', '/studyfile');\ncy.get('.material-page').should('exist');\n// 删除自动化测试发布的四个资料\nvar titles = [\n    '自动化测试资料PDF文档',\n    '自动化测试资料文档资料',\n    '自动化测试资料图表素材',\n    '自动化测试资料视频教程'\n];\ntitles.forEach(function (title) {\n    cy.get('.material-list .material-item').contains(title).parents('.material-item').within(function () {\n        cy.contains('删除').click({ force: true });\n    });\n    cy.get('.el-message-box').should('be.visible');\n    cy.get('.el-message-box__btns button').contains('确定删除').click({ force: true });\n    cy.contains('删除成功').should('be.visible');\n});",
+              "err": {},
+              "uuid": "11ba73ef-517b-4d34-aa34-c1708869e527",
+              "parentUUID": "1a269950-b0c2-4635-a725-86ddda6bc018",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "5474d65a-8d37-4ada-b71a-afe4af28ffcc",
+            "1ce091d1-5ec5-4aba-afd9-3e602d9ec144",
+            "11ba73ef-517b-4d34-aa34-c1708869e527"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 23830,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "id": "default",
+        "reportDir": "cypress/cypress-report",
+        "overwrite": false,
+        "html": true,
+        "json": true
+      },
+      "version": "6.2.0"
+    }
+  }
+}

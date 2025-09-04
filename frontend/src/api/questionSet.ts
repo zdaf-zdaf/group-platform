@@ -45,7 +45,7 @@ export const questionSetService = {
   // 获取所有实验
   async getAllSets(): Promise<QuestionSet[]> {
     try {
-  const response = await axios.get('/api/experiments/sets/')
+  const response = await axios.get('/api/experiments/experiments/')
       return response.data
     } catch (error) {
       throw new Error('获取实验列表失败')
@@ -55,7 +55,7 @@ export const questionSetService = {
   // 获取单个实验详情
   async getSetById(id: number): Promise<QuestionSet> {
     try {
-  const response = await axios.get(`/api/experiments/sets/${id}/`)
+  const response = await axios.get(`/api/experiments/experiments/${id}/`)
       return response.data
     } catch (error) {
       throw new Error('获取实验详情失败')
@@ -65,7 +65,7 @@ export const questionSetService = {
   // 创建实验
   async createSet(setData: Omit<QuestionSet, 'id'>): Promise<QuestionSet> {
     try {
-  const response = await axios.post('/api/experiments/sets/', setData)
+      const response = await axios.post('/api/experiments/experiments/', setData)
       return response.data
     } catch (error) {
       throw new Error('创建实验失败')
@@ -75,7 +75,7 @@ export const questionSetService = {
   // 更新实验
   async updateSet(id: number, setData: Partial<QuestionSet>): Promise<QuestionSet> {
     try {
-  const response = await axios.put(`/api/experiments/sets/${id}/`, setData)
+      const response = await axios.put(`/api/experiments/experiments/${id}/`, setData)
       return response.data
     } catch (error) {
       throw new Error('更新实验失败')
@@ -85,7 +85,7 @@ export const questionSetService = {
   // 删除实验
   async deleteSet(id: number): Promise<void> {
     try {
-  await axios.delete(`/api/experiments/sets/${id}/`)
+      await axios.delete(`/api/experiments/experiments/${id}/`)
     } catch (error) {
       throw new Error('删除实验失败')
     }
