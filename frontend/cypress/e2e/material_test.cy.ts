@@ -63,19 +63,15 @@ describe('学习资料模块功能测试', () => {
 
     types.forEach((item) => {
       const title = `自动化测试资料${item.label}`;
-      cy.fixture(item.file, 'base64').then(fileContent => {
+      cy.readFile(`cypress/fixtures/${item.file}`, 'base64').then(fileContent => {
+        if (!fileContent) {
+          throw new Error(`文件读取失败: ${item.file}`);
+        }
+        const blob = Cypress.Blob.base64StringToBlob(fileContent);
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', `这是${item.label}类型的测试资料`);
         formData.append('type', item.value);
-        // 转成 blob
-        const byteCharacters = atob(fileContent);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray]);
         formData.append('file', blob, item.file.split('/').pop());
         cy.request({
           method: 'POST',
@@ -84,7 +80,6 @@ describe('学习资料模块功能测试', () => {
             Authorization: `Bearer ${token}`
           },
           body: formData,
-          // 关键：Cypress 12+ 支持 formData 直接传递
           form: true
         }).then(res => {
           expect([200, 201]).to.include(res.status);
