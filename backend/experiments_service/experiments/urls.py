@@ -1,10 +1,7 @@
+from django.contrib import admin
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import ExperimentViewSet
-
-router = DefaultRouter()
-router.register(r'experiments', ExperimentViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('admin/', admin.site.urls),
+    path('api/experiments/', include('experiments.urls')),  # 只保留 experiments 自己的路由
 ]
