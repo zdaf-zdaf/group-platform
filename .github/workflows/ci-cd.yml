@@ -580,23 +580,21 @@ jobs:
         run: |
           set -o pipefail
           npx cypress run --headless --config baseUrl=http://127.0.0.1:8080 2>&1 | tee logs/cypress.log || (
-            echo "❌ Cypress 测试失败，输出日志："
-            cat logs/cypress.log
-
+          
             echo "=== stuTest Token ==="
             [ -f logs/stuToken.json ] && cat logs/stuToken.json || echo "stuToken.json 不存在"
 
             echo "=== tchTest Token ==="
             [ -f logs/tchToken.json ] && cat logs/tchToken.json || echo "tchToken.json 不存在"
 
-            echo "=== API 响应示例（stuTest） ==="
+           echo "=== API 响应示例（stuTest） ==="
             [ -f logs/stuToken.json ] && \
-              curl -s -H "Authorization: Bearer $(cat logs/stuToken.json | python3 -c 'import sys,json;print(json.load(sys.stdin).get(\"access\",\"\"))')" \
+              curl -s -H "Authorization: Bearer $(cat logs/stuToken.json | python3 -c 'import sys,json; print(json.load(sys.stdin).get("access", ""))')" \
               http://127.0.0.1:8000/api/auth/user/profile/ || echo "无法调用 API：stuTest Token 不存在"
 
             echo "=== API 响应示例（tchTest） ==="
             [ -f logs/tchToken.json ] && \
-              curl -s -H "Authorization: Bearer $(cat logs/tchToken.json | python3 -c 'import sys,json;print(json.load(sys.stdin).get(\"access\",\"\"))')" \
+              curl -s -H "Authorization: Bearer $(cat logs/tchToken.json | python3 -c 'import sys,json; print(json.load(sys.stdin).get("access", ""))')" \
               http://127.0.0.1:8000/api/auth/user/profile/ || echo "无法调用 API：tchTest Token 不存在"
 
             exit 1
