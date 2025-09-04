@@ -25,6 +25,9 @@ USE_TZ = True
 TIME_ZONE = 'Asia/Beijing'  # 或你服务器所在时区
 
 
+
+# 自动补全URL斜杠，避免路由404
+APPEND_SLASH = True
 # Application definition
 
 INSTALLED_APPS = [

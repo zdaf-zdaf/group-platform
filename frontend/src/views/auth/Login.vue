@@ -53,6 +53,8 @@ const handleLogin = async (formEl: FormInstance | undefined) => {
     localStorage.setItem('token', response.access);
     console.log('登录成功，当前Token:', localStorage.getItem('token'));
     router.push({ path: '/profile' })
+    // 强制跳转，兼容Cypress等自动化环境
+    window.location.href = '/profile'
   } catch (error) {
     ElMessage.error((error as Error).message || '登录失败')
   }

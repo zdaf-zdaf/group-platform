@@ -403,186 +403,225 @@ jobs:
     name: Run Cypress GUI Tests
     runs-on: ubuntu-latest
     needs: [test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao]
-    
+
     services:
       mysql-gui:
         image: mysql:8.0
         env:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: test_db_gui
-            MYSQL_ROOT_HOST: '%'
-            MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: test_db_gui
+          MYSQL_ROOT_HOST: '%'
+          MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
-            - 3306:3306
+          - 3306:3306
         options: >-
-            --health-cmd="mysqladmin ping"
-            --health-interval=10s
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Download fixed dependencies
-        uses: actions/download-artifact@v4
+      # ================== Node.js 前端 ==================
+      - uses: actions/setup-node@v4
         with:
-            name: frontend-dependencies
-            path: ./frontend
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
 
-      - name: Create log directory
-        run: mkdir -p logs
+      - run: npm install
+        working-directory: ./frontend
 
-      # =============== 后端服务设置 ===============
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      # ================== Python 后端 ==================
+      - uses: actions/setup-python@v5
         with:
-            python-version: '3.10'
-      
-      - name: Install backend dependencies
-        run: pip install -r requirements.txt
+          python-version: '3.10'
+
+      - run: pip install -r requirements.txt
         working-directory: ./backend
-      
-      - name: Configure MySQL
-        run: |
-            sudo apt-get update && sudo apt-get install -y mysql-client
-            for i in {1..30}; do
-            if mysqladmin ping -h"127.0.0.1" -uroot -prootpassword --silent; then
-                echo "MySQL for GUI is ready!"
-                break
-            fi
-            echo "Waiting for MySQL... (attempt $i/30)"
+
+      # ================== MySQL 配置 ==================
+      - run: |
+          sudo apt-get update && sudo apt-get install -y mysql-client
+          for i in {1..30}; do
+            if mysqladmin ping -h127.0.0.1 -uroot -prootpassword --silent; then break; fi
             sleep 2
-            done
-            
-            mysql -h127.0.0.1 -uroot -prootpassword -e "
-            CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
-            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-            FLUSH PRIVILEGES;"
-      
-      - name: Run migrations
-        run: |
-            python manage.py makemigrations --noinput
-            python manage.py migrate --noinput
+          done
+          mysql -h127.0.0.1 -uroot -prootpassword -e "
+          CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'rootpassword';
+          GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+          FLUSH PRIVILEGES;"
+
+      # ================== Django 数据库迁移 ==================
+      - run: |
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
         working-directory: ./backend
         env:
-            DJANGO_SETTINGS_MODULE: server.settings
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_gui
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
-            DEBUG: False
-      
-      - name: Start Django server
-        run: |
-            python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings > ../logs/django.log 2>&1 &
-            echo $! > ../logs/django.pid
-        working-directory: ./backend
-        env:
-            DB_ENGINE: django.db.backends.mysql
-            DB_NAME: test_db_gui
-            DB_USER: root
-            DB_PASSWORD: rootpassword
-            DB_HOST: 127.0.0.1
-            DB_PORT: 3306
-      
-      # =============== Vue前端服务设置 ===============
-      - name: Setup Node.js for Vue
-        uses: actions/setup-node@v4
-        with:
-            node-version: '22'
-            cache: 'npm'
-            cache-dependency-path: './frontend/package-lock.json'
+          DJANGO_SETTINGS_MODULE: server.test_settings
+          DB_ENGINE: django.db.backends.mysql
+          DB_NAME: test_db_gui
+          DB_USER: root
+          DB_PASSWORD: rootpassword
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DEBUG: False
 
-      - name: Install Vue dependencies
+      - name: Install wait-on
+        run: npm install -g wait-on
+      # ================== 启动 Django 和 Vue ==================
+      # 先在 backend 目录启动 Django
+      - name: Start Django Server
         run: |
-            # 安装依赖
-            npm install
-            
-            # 创建.env文件配置Vue环境变量
-            echo "VUE_APP_API_BASE_URL=http://localhost:8000" > .env
-            echo "VUE_APP_DEBUG=true" >> .env
-        working-directory: ./frontend
-
-      - name: Debug package.json scripts
-        run: |
-          echo "package.json scripts:"
-          npm run
-        working-directory: ./frontend
-
-      - name: Start Vue server
-        run: |
-            # 启动Vue开发服务器
-            npm run dev -- --port 8080 > ../logs/vue.log 2>&1 &
-            echo $! > ../logs/vue.pid
-            
-            # 等待服务启动并检查端口
-            for i in {1..10}; do
-              if nc -z localhost 8080; then
-                echo "Vue server is running on port 8080"
-                break
-              fi
-              echo "Waiting for Vue server to start... (attempt $i/10)"
-              sleep 10
-            done
-        working-directory: ./frontend
-      
-      # =============== 测试执行 ===============
-      - name: Wait for servers with timeout
-        run: |
-            npm install -g wait-on
-            
-            # 等待Vue前端(8080)和Django后端(8000)
-            timeout 180s wait-on http://localhost:8080 http://localhost:8000 || true
-            
-            # 添加 API 健康检查
-            echo "=== API 健康检查 ==="
-            curl -I http://localhost:8000/api/healthcheck
-            
-            # 添加前端健康检查
-            echo "=== 前端健康检查 ==="
-            curl -I http://localhost:8080
-
-            # 检查服务状态
-            echo "=== 服务状态检查 ==="
-            echo "检查端口 8080:"
-            nc -z localhost 8080 && echo "前端服务运行中" || echo "前端服务未响应"
-            
-            echo "检查端口 8000:"
-            nc -z localhost 8000 && echo "后端服务运行中" || echo "后端服务未响应"
-            
-            if ! nc -z localhost 8080 || ! nc -z localhost 8000; then
-            echo "❌❌ 服务启动失败，显示日志:"
-            echo "=== 后端日志 ==="
-            cat logs/django.log || echo "无后端日志"
-            echo "=== 前端日志 ==="
-            cat logs/vue.log || echo "无前端日志"
+          python manage.py runserver 0.0.0.0:8000 --insecure --settings=server.test_settings &
+          echo $! > django.pid
+          if ! wait-on --timeout 180000 http://127.0.0.1:8000; then
+            echo "❌ 服务启动失败，输出日志："
             exit 1
-            fi
-            
-            sleep 3
-      
-      - name: Run Cypress tests
+          fi
+        working-directory: ./backend
+
+      # 再在 frontend 目录启动 Vue 并检测端口
+      - name: Start Vue Server
         run: |
-          # 简化命令，移除所有可能导致冲突的参数
-          npx cypress run --headless --config baseUrl=http://localhost:8080
-          
-          # 如果失败，保存截图和视频
-          if [ $? -ne 0 ]; then
-            echo "Cypress测试失败，保存截图和视频..."
-            mkdir -p cypress-failures
-            cp -r cypress/screenshots cypress-failures/
-            cp -r cypress/videos cypress-failures/
+          wait-on --timeout 180000 http://127.0.0.1:8000
+          echo "VUE_APP_API_BASE_URL=http://127.0.0.1:8000" > .env
+          echo "VUE_APP_DEBUG=true" >> .env
+          npm run dev -- --host 0.0.0.0 --port 8080 &
+          npm install -g wait-on
+          if ! wait-on --timeout 180000 http://127.0.0.1:8080; then
+            echo "❌ Vue 服务启动失败"
+            exit 1
           fi
         working-directory: ./frontend
-      
-      # =============== 日志收集 ===============
-      - name: Show backend logs if failed
-        if: ${{ failure() }}
-        run: cat logs/django.log
-      
-      - name: Show frontend logs if failed
-        if: ${{ failure() }}
-        run: cat logs/vue.log
+
+      # ================== 初始化测试账号 ==================
+      - name: 新建前端日志文件夹
+        run: mkdir -p logs
+        working-directory: ./frontend
+      - name: 新建后端日志文件夹
+        run: mkdir -p logs
+        working-directory: ./backend
+        
+      - name: 初始化测试账号
+        run: |
+          # 注册 stuTest
+          echo "注册 stuTest："
+          curl -s -X POST http://127.0.0.1:8000/api/auth/register/ \
+            -H "Content-Type: application/json" \
+            -d '{"username":"stuTest","email":"stuTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"student","agreedToTerms":true}' || echo "stuTest 已存在"
+
+          # 注册 tchTest
+          echo "注册 tchTest："
+          curl -s -X POST http://127.0.0.1:8000/api/auth/register/ \
+            -H "Content-Type: application/json" \
+            -d '{"username":"tchTest","email":"tchTest@example.com","password":"Test1234@","confirmPassword":"Test1234@","role":"teacher","agreedToTerms":true}' || echo "tchTest 已存在"
+
+          # stuTest 登录获取 token
+          echo "stuTest 登录并获取 token："
+          curl -s -X POST http://127.0.0.1:8000/api/auth/login/ \
+            -H "Content-Type: application/json" \
+            -d '{"username":"stuTest","password":"Test1234@"}' > logs/stuToken.json
+
+          STU_TOKEN=$(cat logs/stuToken.json | python3 -c "import sys, json; print(json.load(sys.stdin).get('access',''))")
+          echo "stuTest TOKEN: $STU_TOKEN"
+
+          # tchTest 登录获取 token
+          echo "tchTest 登录并获取 token："
+          curl -s -X POST http://127.0.0.1:8000/api/auth/login/ \
+            -H "Content-Type: application/json" \
+            -d '{"username":"tchTest","password":"Test1234@"}' > logs/tchToken.json
+
+          TCH_TOKEN=$(cat logs/tchToken.json | python3 -c "import sys, json; print(json.load(sys.stdin).get('access',''))")
+          echo "tchTest TOKEN: $TCH_TOKEN"
+
+          # 测试 API 是否可访问
+          echo "检查 stuTest 用户信息："
+          curl -s -H "Authorization: Bearer $STU_TOKEN" http://127.0.0.1:8000/api/auth/user/profile/
+
+          echo "检查 tchTest 用户信息："
+          curl -s -H "Authorization: Bearer $TCH_TOKEN" http://127.0.0.1:8000/api/auth/user/profile/
+        working-directory: ./frontend
+         
+
+      # ================== 检查前后端服务互联 ==================
+      - name: 检查后端 login 接口可用
+        run: |
+          echo "检查后端 login 接口..."
+          for i in {1..10}; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/api/auth/login/)
+            if [ "$code" = "200" ] || [ "$code" = "400" ] || [ "$code" = "405" ]; then
+              echo "后端 login 接口可访问"; break
+            fi
+            echo "后端 login 接口未就绪，重试...($i/10)"; sleep 2
+          done
+        working-directory: ./backend
+
+      - name: 检查前端页面可访问
+        run: |
+          echo "检查前端页面可访问..."
+          for i in {1..10}; do
+            code=$(curl -s -o page.html -w "%{http_code}" http://127.0.0.1:8080)
+            if [ "$code" = "200" ] && (grep -q '<div' page.html || grep -q 'id="app"' page.html); then
+              echo "前端页面正常"; break
+            fi
+            echo "前端页面未就绪，重试...($i/10)"; sleep 2
+          done
+          rm -f page.html
+        working-directory: ./frontend
+
+      - name: test
+        run: |
+          curl -v -X POST http://localhost:8000/api/auth/register/ \
+            -H "Content-Type: application/json" \
+            -d '{"username":"ciuser","password":"Test1234@","email":"ciuser@ci.com","role":"student"}'
+
+      # ================== 运行 Cypress ==================
+      - name: Run Cypress GUI tests
+        run: |
+          set -o pipefail
+          npx cypress run --headless --config baseUrl=http://127.0.0.1:8080 2>&1 | tee logs/cypress.log || (
+
+            echo "=== stuTest Token ==="
+            [ -f logs/stuToken.json ] && cat logs/stuToken.json || echo "stuToken.json 不存在"
+
+            echo "=== tchTest Token ==="
+            [ -f logs/tchToken.json ] && cat logs/tchToken.json || echo "tchToken.json 不存在"
+
+           echo "=== API 响应示例（stuTest） ==="
+            [ -f logs/stuToken.json ] && \
+              curl -s -H "Authorization: Bearer $(cat logs/stuToken.json | python3 -c 'import sys,json; print(json.load(sys.stdin).get("access", ""))')" \
+              http://127.0.0.1:8000/api/auth/user/profile/ || echo "无法调用 API：stuTest Token 不存在"
+
+            echo "=== API 响应示例（tchTest） ==="
+            [ -f logs/tchToken.json ] && \
+              curl -s -H "Authorization: Bearer $(cat logs/tchToken.json | python3 -c 'import sys,json; print(json.load(sys.stdin).get("access", ""))')" \
+              http://127.0.0.1:8000/api/auth/user/profile/ || echo "无法调用 API：tchTest Token 不存在"
+
+            exit 1
+          )
+        working-directory: ./frontend
+
+      # ================== 上传 logs 和 Cypress artifact ==================
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-logs
+          path: logs/
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-screenshots
+          path: frontend/cypress/screenshots/
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: frontend/cypress/videos/
+          retention-days: 7
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -592,13 +631,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+
 
         # 修复依赖步骤
       - name: Repair and install dependencies
@@ -618,23 +659,35 @@ jobs:
             
             # 验证依赖是否同步
             npm ls --package-lock-only
+      
+      - name: Check Node.js version
+        run: node -v && npm -v
+        working-directory: ./frontend
+
+      - name: Fix esbuild binary permissions
+        run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
+        working-directory: ./frontend
+
+      - name: Debug artifact upload before
+        run: ls -lh ./frontend && ls -lh ./frontend/node_modules || true
 
       - name: Run frontend unit tests
-        run: npm run test:unit  # 确保package.json中有test:unit脚本
+        run: npm run test:unit
+
+      - name: Debug artifact upload after
+        run: echo "Artifact upload step已执行" && ls -lh ./frontend && ls -lh ./frontend/node_modules || true
 
       - name: Save fixed dependencies
         uses: actions/upload-artifact@v4
         with:
             name: frontend-dependencies
-            path: ./frontend/package*.json
+            path: |
+              ./frontend/package*.json
             retention-days: 1
-
-      - name: Run frontend unit tests
-        run: npm run test:unit
 
   build-and-push-backend:
     runs-on: ubuntu-latest
-    needs: [test-backend]
+    needs: [test-backend, test-frontend]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -671,11 +724,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cache npm dependencies
-        uses: actions/cache@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
 
         # 确保下载修复后的依赖文件
       - name: Download fixed dependencies
@@ -683,6 +737,20 @@ jobs:
         with:
             name: frontend-dependencies
             path: ./frontend
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+        working-directory: ./frontend
+
+      - name: Fix esbuild binary permissions
+        run: chmod +x ./frontend/node_modules/esbuild/bin/esbuild || true
+        working-directory: ./frontend
+
+      - name: Check Node.js version
+        run: node -v && npm -v
+        working-directory: ./frontend
+
+
       - name: Update Dockerfile
         run: |
           # 仅更新Node版本
@@ -715,58 +783,70 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/frontend:latest
             ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}
-  notify-deployment-ready:
+
+  generate-deployment-script:
+    name: Generate Deployment Script
     runs-on: ubuntu-latest
-    needs: [test-backend, test-frontend, api-test-luntan, api-test-lab, api-test-gonggao, api-test-ziliao, gui-test-cypress, build-and-push-backend, build-and-push-frontend] 
-    steps:
-      - name: Notify Team
-        run: |
-          echo "CI/CD 流水线成功完成！"
-          echo "所有测试（单元、API、GUI）均已通过！"
-          echo "所有Docker镜像已推送至 GitHub Container Registry。"
-          echo "请成员C在本地执行以下命令进行部署："
-          echo "kubectl apply -f k8s-manifests/"
-    # 在现有notify-deployment-ready作业后添加：
-  deploy-to-k8s:
-    name: Deploy to Kubernetes
-    runs-on: ubuntu-latest
-    needs: [notify-deployment-ready]
+    # 依赖所有测试和构建作业
+    needs: [test-backend, test-frontend, build-and-push-backend, build-and-push-frontend, api-test-luntan, api-test-lab, api-test-ziliao, api-test-gonggao, gui-test-cypress]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: Configure kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-            version: 'latest'
-            
-      - name: Setup Kubernetes context
-        uses: azure/k8s-set-context@v3
-        with:
-            method: kubeconfig
-            kubeconfig: ${{ secrets.KUBE_CONFIG }}
-            
-      - name: Deploy MySQL Secret
-        run: kubectl apply -f k8s/mysql-secret.yaml
-        
-      - name: Deploy Backend
-        run: kubectl apply -f k8s/backend-deployment.yaml
-        
-      - name: Deploy Frontend
-        run: kubectl apply -f k8s/frontend-deploy.yaml
-        
-      - name: Verify Deployment
+
+      # 生成部署脚本
+      - name: Generate Local Deployment Package
         run: |
-            kubectl get pods
-            kubectl get svc
-  test-secrets:
+          # 创建一键部署脚本
+          cat > deploy-to-local.sh << 'EOF'
+          #!/bin/bash
+          echo "开始部署到本地K8s环境..."
+          
+          # 1. 更新镜像版本
+          sed -i "s|image:.*backend:.*|image: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}|g" k8s/backend-deployment.yaml
+          sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
+          
+          # 2. 部署到K8s
+          kubectl apply -f k8s/
+          
+          # 3. 等待服务就绪
+          echo "等待服务启动..."
+          sleep 30
+          
+          # 4. 显示访问信息
+          echo "部署完成！"
+          echo "前端访问: http://127.0.0.1:30080"
+          echo "后端API: http://127.0.0.1:30080/api"
+          echo ""
+          echo "运行集成测试:"
+          echo "cd postman && newman run collection1-LunTan.json -e environment.json"
+          EOF
+          
+          chmod +x deploy-to-local.sh
+          echo "生成了一键部署脚本: deploy-to-local.sh"
+
+      # 上传部署包
+      - name: Upload Deployment Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-deployment-package
+          path: |
+            k8s/
+            deploy-to-local.sh
+          retention-days: 7
+
+  notify-deployment-ready:
     runs-on: ubuntu-latest
+    # 依赖部署脚本生成作业
+    needs: [generate-deployment-script] 
     steps:
-      - name: Test KUBE_CONFIG
+      - name: Notify Team
         run: |
-            echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > test-config
-            kubectl --kubeconfig=test-config get nodes
-            
-      - name: Test GHCR_PAT
-        run: |
-            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          echo "CI流程完成！"
+          echo ""
+          echo "请下载部署包并本地执行:"
+          echo "1. 从Artifacts下载 'local-deployment-package'"
+          echo "2. 解压后运行: chmod +x deploy-to-local.sh && ./deploy-to-local.sh"
+          echo "3. 访问 http://127.0.0.1:30080 验证部署"
+          echo ""
+          echo "注意: 确保本地Docker Desktop和Kubectl已正确配置"

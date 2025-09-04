@@ -8,10 +8,10 @@ vi.mock('axios', async () => {
     default: {
       ...actual.default,
       get: vi.fn((url) => {
-        if (url === '/experiments/sets/') {
+        if (url === '/api/experiments/sets/') {
           return Promise.resolve({ data: [{ id: 1, title: 'set1', deadline: '', students: [], questions: [] }] });
         }
-        if (url === '/experiments/sets/1/') {
+        if (url === '/api/experiments/sets/1/') {
           return Promise.resolve({ data: { id: 1, title: 'set1', deadline: '', students: [], questions: [] } });
         }
         return Promise.reject(new Error('获取失败'));

@@ -13,7 +13,7 @@ vi.mock('axios', async () => {
         const mockInstance: any = {
           post: vi.fn((url, data) => {
             if (
-              url === '/auth/login/' &&
+              url === '/api/auth/login/' &&
               data.username === 'user' &&
               data.password === 'pass'
             ) {

@@ -3,7 +3,7 @@ import type { AxiosResponse } from 'axios';
 import type { LoginForm } from '@/views/auth/Login.vue';
 
 // 配置后端基础 URL（根据你的实际后端地址修改）
-const BASE_URL = 'http://localhost:8000/api/'; // Django 后端地址
+const BASE_URL = import.meta.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8000/'; // 统一使用环境变量
 
 // 创建 axios 实例
 export const apiClient = axios.create({
@@ -19,6 +19,15 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   if (token && !config.headers.Authorization) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// 强制每次请求都从 localStorage/sessionStorage 获取最新 token
+apiClient.interceptors.request.use(config => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -64,7 +73,7 @@ export const authService = {
    */
   async login(formData: LoginForm): Promise<LoginResponse> {
     try {
-      const response = await apiClient.post<LoginResponse>('/auth/login/', {
+      const response = await apiClient.post<LoginResponse>('/api/auth/login/', {
         username: formData.username,
         password: formData.password,
       });
@@ -86,7 +95,7 @@ export const authService = {
   async register(formData: RegisterRequest): Promise<void> {
     try {
 
-      await apiClient.post('/auth/register/', {
+      await apiClient.post('/api/auth/register/', {
         username: formData.username,
         password: formData.password,
         email: formData.email,
@@ -109,7 +118,7 @@ export const authService = {
    */
   async getUserInfo(token: string): Promise<{ username: string; role: 'student' | 'teacher' }> {
     try {
-      const response = await apiClient.get('/auth/user', {
+      const response = await apiClient.get('/api/auth/user/', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -126,7 +135,7 @@ export const authService = {
    */
   async updateUserProfile(data: { student_id?: string; faculty?: string }) {
     try {
-      await apiClient.patch('/auth/user/profile/', data);
+      await apiClient.patch('/api/auth/user/profile/', data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const message = error.response?.data?.message || error.message;
@@ -144,7 +153,7 @@ export const forumService = {
    * @returns 问题列表
    */
   async getQuestions() {
-    const response = await apiClient.get('/forum/questions/');
+    const response = await apiClient.get('/api/forum/questions/');
     return response;
   },
   /**
@@ -153,7 +162,7 @@ export const forumService = {
    * @returns 创建的问题
    */
   async createQuestion(formData: { title: string; content: string}) {
-    const response = await apiClient.post('/forum/questions/', formData);
+    const response = await apiClient.post('/api/forum/questions/', formData);
     return response;
   },
   /**
@@ -161,14 +170,14 @@ export const forumService = {
    * @param questionId 问题ID
    */
   async deleteQuestion(questionId: number) {
-    await apiClient.delete(`/forum/questions/${questionId}/`);
+    await apiClient.delete(`/api/forum/questions/${questionId}/`);
   },
   /**
    * 切换问题置顶状态
    * @param questionId 问题ID
    */
   async toggleSticky(questionId: number) {
-    const response = await apiClient.patch(`/forum/questions/${questionId}/toggle-sticky/`);
+    const response = await apiClient.patch(`/api/forum/questions/${questionId}/toggle-sticky/`);
     return response;
   },
   /**
@@ -176,7 +185,7 @@ export const forumService = {
    * @param questionId 问题ID
    */
   async toggleLike(questionId: number) {
-    const response = await apiClient.patch(`/forum/questions/${questionId}/toggle-like/`);
+    const response = await apiClient.patch(`/api/forum/questions/${questionId}/toggle-like/`);
     return response;
   },
   /**
@@ -185,7 +194,7 @@ export const forumService = {
    * @param content 评论内容
    */
    async addComment(questionId: number, content: string) {
-    const response = await apiClient.post(`/forum/questions/${questionId}/comments/`, { content });
+    const response = await apiClient.post(`/api/forum/questions/${questionId}/comments/`, { content });
     return response;
    },
    /**
@@ -193,6 +202,6 @@ export const forumService = {
     * @param commentId 评论ID
     */
    async deleteComment(commentId: number) {
-    await apiClient.delete(`/forum/comments/${commentId}/`);
+    await apiClient.delete(`/api/forum/comments/${commentId}/`);
    },
 };
