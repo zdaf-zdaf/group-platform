@@ -21,7 +21,7 @@ describe('公告模块功能测试', () => {
     }).then((response) => {
       expect(response.status).to.eq(200)
       token = response.body.access || response.body.token || response.body.data?.token
-      expect(token, 'token should exist').to.not.be.null
+      expect(token, 'token should exist').to.not.equal(null)
 
       cy.visit('/profile', {
         onBeforeLoad(win) {
@@ -64,19 +64,24 @@ describe('公告模块功能测试', () => {
       cy.get('button').contains('发布公告').click({ force: true })
     })
     cy.wait('@anyPostApi')
-    cy.wait(2000)
-    // 用接口校验公告列表
-    cy.request({
-      method: 'GET',
-      url: `${API_BASE_URL}/api/notices/`,
-      headers: { Authorization: `Bearer ${token}` },
-      failOnStatusCode: false
-    }).then(res => {
-      cy.log('公告列表接口状态:', res.status)
-      cy.log('公告列表接口body:', JSON.stringify(res.body))
-      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(noticesArr.some(n => n.title === noticeTitle1)).to.be.true
-    })
+    // 轮询公告列表接口，直到新公告出现
+    function pollNoticeList1(retry = 10) {
+      if (retry <= 0) throw new Error('公告列表接口始终无新公告1');
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/api/notices/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(res => {
+        const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        if (noticesArr.some(n => n.title === noticeTitle1)) {
+          cy.log('公告列表接口包含新公告1')
+        } else {
+          cy.wait(1000).then(() => pollNoticeList1(retry - 1))
+        }
+      })
+    }
+    pollNoticeList1()
     cy.reload()
     cy.contains('公告发布成功').should('be.visible')
     cy.get('.notice-list').should('contain.text', noticeTitle1)
@@ -93,19 +98,24 @@ describe('公告模块功能测试', () => {
       cy.get('button').contains('发布公告').click({ force: true })
     })
     cy.wait('@anyPostApi')
-    cy.wait(2000)
-    // 用接口校验公告列表
-    cy.request({
-      method: 'GET',
-      url: `${API_BASE_URL}/api/notices/`,
-      headers: { Authorization: `Bearer ${token}` },
-      failOnStatusCode: false
-    }).then(res => {
-      cy.log('公告列表接口状态:', res.status)
-      cy.log('公告列表接口body:', JSON.stringify(res.body))
-      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(noticesArr.some(n => n.title === noticeTitle2)).to.be.true
-    })
+    // 轮询公告列表接口，直到新公告出现
+    function pollNoticeList2(retry = 10) {
+      if (retry <= 0) throw new Error('公告列表接口始终无新公告2');
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/api/notices/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(res => {
+        const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        if (noticesArr.some(n => n.title === noticeTitle2)) {
+          cy.log('公告列表接口包含新公告2')
+        } else {
+          cy.wait(1000).then(() => pollNoticeList2(retry - 1))
+        }
+      })
+    }
+    pollNoticeList2()
     cy.reload()
     cy.contains('公告发布成功').should('be.visible')
     cy.get('.notice-list').should('contain.text', noticeTitle2)
@@ -207,19 +217,24 @@ describe('公告模块功能测试', () => {
     cy.url().should('include', '/notices')
     cy.get('.notice-page').should('exist')
 
-    cy.wait(2000)
-    // 用接口校验公告列表
-    cy.request({
-      method: 'GET',
-      url: `${API_BASE_URL}/api/notices/`,
-      headers: { Authorization: `Bearer ${token}` },
-      failOnStatusCode: false
-    }).then(res => {
-      cy.log('公告列表接口状态:', res.status)
-      cy.log('公告列表接口body:', JSON.stringify(res.body))
-      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(noticesArr.length > 0).to.be.true
-    })
+    // 轮询公告列表接口，直到有公告
+    function pollNoticeList(retry = 10) {
+      if (retry <= 0) throw new Error('公告列表接口始终无数据');
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/api/notices/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(res => {
+        const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        if (noticesArr.length > 0) {
+          cy.log('公告列表接口有数据')
+        } else {
+          cy.wait(1000).then(() => pollNoticeList(retry - 1))
+        }
+      })
+    }
+    pollNoticeList()
     cy.reload()
     // 删除已编辑的公告
     cy.get('.notice-list .notice-item').contains(noticeEditTitle).parents('.notice-item').within(() => {
@@ -232,19 +247,24 @@ describe('公告模块功能测试', () => {
     cy.get('.notice-list').should('not.contain.text', noticeEditTitle)
 
     // 删除第二个公告
-    cy.wait(2000)
-    // 用接口校验公告列表
-    cy.request({
-      method: 'GET',
-      url: `${API_BASE_URL}/api/notices/`,
-      headers: { Authorization: `Bearer ${token}` },
-      failOnStatusCode: false
-    }).then(res => {
-      cy.log('公告列表接口状态:', res.status)
-      cy.log('公告列表接口body:', JSON.stringify(res.body))
-      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(noticesArr.length > 0).to.be.true
-    })
+    // 轮询公告列表接口，直到有公告
+    function pollNoticeList2(retry = 10) {
+      if (retry <= 0) throw new Error('公告列表接口始终无数据');
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/api/notices/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(res => {
+        const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        if (noticesArr.length > 0) {
+          cy.log('公告列表接口有数据')
+        } else {
+          cy.wait(1000).then(() => pollNoticeList2(retry - 1))
+        }
+      })
+    }
+    pollNoticeList2()
     cy.reload()
     cy.get('.notice-list .notice-item').contains(noticeTitle2).parents('.notice-item').within(() => {
       cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
