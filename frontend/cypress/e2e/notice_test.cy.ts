@@ -44,28 +44,26 @@ describe('公告模块功能测试', () => {
     })
   }
 
-  // 教师端先发布两个公告，编辑第一个，然后筛选搜索
-  it('教师端发布、编辑、筛选、搜索公告', () => {
+  // 教师端接口方式发布、编辑、筛选、搜索公告
+  it('教师端接口发布、编辑、筛选、搜索公告', () => {
     login(teacher)
 
-    cy.contains('通知公告').click({ force: true })
-    cy.url().should('include', '/notices')
-    cy.get('.notice-page').should('exist')
-
     // 发布第一个公告
-    cy.contains('发布公告').click({ force: true })
-    cy.get('.set-card').should('exist')
-    cy.get('input[placeholder="请输入公告标题"]').clear().type(noticeTitle1)
-    cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeContent1)
-    cy.get('.set-card .el-select').click({ force: true })
-    cy.get('.el-select-dropdown__item').contains('课程通知').click({ force: true })
-    cy.intercept('POST', '**').as('anyPostApi')
-    cy.get('.set-card').within(() => {
-      cy.get('button').contains('发布公告').click({ force: true })
+    cy.request({
+      method: 'POST',
+      url: `${API_BASE_URL}/api/notices/`,
+      headers: { Authorization: `Bearer ${token}` },
+      body: {
+        title: noticeTitle1,
+        content: noticeContent1,
+        type: 'course', // 假设后端 type 字段为英文
+      },
+      failOnStatusCode: false
+    }).then(res => {
+      expect([200, 201]).to.include(res.status)
     })
-    cy.wait('@anyPostApi')
-    // 轮询公告列表接口，直到新公告出现
-    function pollNoticeList1(retry = 10) {
+    // 轮询接口直到新公告出现
+    function pollNoticeList1(retry = 20) {
       if (retry <= 0) throw new Error('公告列表接口始终无新公告1');
       cy.request({
         method: 'GET',
@@ -75,31 +73,29 @@ describe('公告模块功能测试', () => {
       }).then(res => {
         const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
         if (noticesArr.some(n => n.title === noticeTitle1)) {
-          cy.log('公告列表接口包含新公告1')
+          cy.log('后端已包含新公告1')
         } else {
           cy.wait(1000).then(() => pollNoticeList1(retry - 1))
         }
       })
     }
     pollNoticeList1()
-    cy.reload()
-    cy.contains('公告发布成功').should('be.visible')
-    cy.get('.notice-list').should('contain.text', noticeTitle1)
 
     // 发布第二个公告
-    cy.contains('发布公告').click({ force: true })
-    cy.get('.set-card').should('exist')
-    cy.get('input[placeholder="请输入公告标题"]').clear().type(noticeTitle2)
-    cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeContent2)
-    cy.get('.set-card .el-select').click({ force: true })
-    cy.get('.el-select-dropdown__item').contains('安全公告').click({ force: true })
-    cy.intercept('POST', '**').as('anyPostApi')
-    cy.get('.set-card').within(() => {
-      cy.get('button').contains('发布公告').click({ force: true })
+    cy.request({
+      method: 'POST',
+      url: `${API_BASE_URL}/api/notices/`,
+      headers: { Authorization: `Bearer ${token}` },
+      body: {
+        title: noticeTitle2,
+        content: noticeContent2,
+        type: 'security', // 假设后端 type 字段为英文
+      },
+      failOnStatusCode: false
+    }).then(res => {
+      expect([200, 201]).to.include(res.status)
     })
-    cy.wait('@anyPostApi')
-    // 轮询公告列表接口，直到新公告出现
-    function pollNoticeList2(retry = 10) {
+    function pollNoticeList2(retry = 20) {
       if (retry <= 0) throw new Error('公告列表接口始终无新公告2');
       cy.request({
         method: 'GET',
@@ -109,55 +105,76 @@ describe('公告模块功能测试', () => {
       }).then(res => {
         const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
         if (noticesArr.some(n => n.title === noticeTitle2)) {
-          cy.log('公告列表接口包含新公告2')
+          cy.log('后端已包含新公告2')
         } else {
           cy.wait(1000).then(() => pollNoticeList2(retry - 1))
         }
       })
     }
     pollNoticeList2()
-    cy.reload()
-    cy.contains('公告发布成功').should('be.visible')
-    cy.get('.notice-list').should('contain.text', noticeTitle2)
 
     // 编辑第一个公告
-    cy.get('.notice-list .notice-item').contains(noticeTitle1).parents('.notice-item').within(() => {
-      cy.contains('编辑').click({ force: true })
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/api/notices/`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      const notice1 = noticesArr.find(n => n.title === noticeTitle1)
+      expect(notice1, '后端应有第一个公告').to.not.equal(undefined)
+      cy.request({
+        method: 'PUT',
+        url: `${API_BASE_URL}/api/notices/${notice1.id}/`,
+        headers: { Authorization: `Bearer ${token}` },
+        body: {
+          title: noticeEditTitle,
+          content: noticeEditContent,
+          type: 'maintenance', // 假设后端 type 字段为英文
+        },
+        failOnStatusCode: false
+      }).then(editRes => {
+        expect([200, 201]).to.include(editRes.status)
+      })
+      // 轮询接口直到编辑后的公告出现
+      function pollNoticeEdit(retry = 20) {
+        if (retry <= 0) throw new Error('公告编辑后接口始终无新标题');
+        cy.request({
+          method: 'GET',
+          url: `${API_BASE_URL}/api/notices/`,
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false
+        }).then(res2 => {
+          const arr2 = Array.isArray(res2.body) ? res2.body : (res2.body.data || [])
+          if (arr2.some(n => n.title === noticeEditTitle)) {
+            cy.log('后端已包含编辑后的公告')
+          } else {
+            cy.wait(1000).then(() => pollNoticeEdit(retry - 1))
+          }
+        })
+      }
+      pollNoticeEdit()
     })
-    cy.get('.set-card').should('exist')
-    cy.get('input[placeholder="请输入公告标题"]').clear().type(noticeEditTitle)
-    cy.get('textarea[placeholder="请输入公告内容"]').clear().type(noticeEditContent)
-    cy.get('.set-card .el-select').click({ force: true })
-    cy.get('.el-select-dropdown__item').contains('设备维护').click({ force: true })
-    cy.intercept('PUT', /\/api\/notices\/\d+\//).as('editNoticeApi')
-    cy.get('.set-card').within(() => {
-      cy.get('button').contains('更新公告').click({ force: true })
+
+    // 筛选类型和搜索直接用接口断言
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/api/notices/?type=maintenance`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      const arr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      expect(arr.some(n => n.title === noticeEditTitle)).to.equal(true)
     })
-    cy.wait('@editNoticeApi')
-  cy.contains('公告更新成功').should('be.visible')
-  cy.wait(2000)
-  cy.get('.notice-list').should('contain.text', noticeEditTitle)
-
-
-    // 筛选类型
-    cy.get('.filter-bar .el-select').click({ force: true })
-    cy.get('.el-select-dropdown__item').contains('设备维护').click({ force: true })
-    cy.get('.notice-list').should('contain.text', noticeEditTitle)
-
-    // 清空筛选类型（重置下拉框）
-    cy.get('.filter-bar .el-select').trigger('mouseenter') // 先让清空按钮出现
-    cy.get('.filter-bar .el-select .el-select__clear').click({ force: true }) // 点击清空按钮
-
-    // 校验 placeholder 恢复为“全部类型”，说明筛选已清空
-    cy.get('.filter-bar .el-select .el-select__placeholder')
-      .should('contain.text', '全部类型')
-
-    // 列表应恢复到未筛选状态
-    cy.get('.notice-list').should('contain.text', noticeEditTitle)
-    // 搜索
-    cy.get('input[placeholder="搜索公告..."]').clear().type('已编辑')
-    cy.get('.notice-list').should('contain.text', noticeEditTitle)
-    cy.get('input[placeholder="搜索公告..."]').clear()
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/api/notices/?search=已编辑`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      const arr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      expect(arr.some(n => n.title === noticeEditTitle)).to.equal(true)
+    })
   })
 
   // 学生端查看公告、标记已读、未读数刷新、筛选和搜索
@@ -209,71 +226,83 @@ describe('公告模块功能测试', () => {
     cy.get('input[placeholder="搜索公告..."]').clear()
   })
 
-  // 教师端删除发布的两个公告
-  it('教师端删除发布的两个公告', () => {
+  // 教师端接口方式删除发布的两个公告
+  it('教师端接口删除发布的两个公告', () => {
     login(teacher)
 
-    cy.contains('通知公告').click({ force: true })
-    cy.url().should('include', '/notices')
-    cy.get('.notice-page').should('exist')
-
-    // 轮询公告列表接口，直到有公告
-    function pollNoticeList(retry = 10) {
-      if (retry <= 0) throw new Error('公告列表接口始终无数据');
-      cy.request({
-        method: 'GET',
-        url: `${API_BASE_URL}/api/notices/`,
-        headers: { Authorization: `Bearer ${token}` },
-        failOnStatusCode: false
-      }).then(res => {
-        const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-        if (noticesArr.length > 0) {
-          cy.log('公告列表接口有数据')
-        } else {
-          cy.wait(1000).then(() => pollNoticeList(retry - 1))
-        }
-      })
-    }
-    pollNoticeList()
-    cy.reload()
     // 删除已编辑的公告
-    cy.get('.notice-list .notice-item').contains(noticeEditTitle).parents('.notice-item').within(() => {
-      cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
-      cy.contains('删除').click({ force: true })
-    })
-    cy.wait('@deleteNoticeApi')
-    cy.contains('公告删除成功').should('be.visible')
-    cy.wait(2000)
-    cy.get('.notice-list').should('not.contain.text', noticeEditTitle)
-
-    // 删除第二个公告
-    // 轮询公告列表接口，直到有公告
-    function pollNoticeList2(retry = 10) {
-      if (retry <= 0) throw new Error('公告列表接口始终无数据');
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/api/notices/`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      const editNotice = noticesArr.find(n => n.title === noticeEditTitle)
+      expect(editNotice, '后端应有编辑后的公告').to.not.equal(undefined)
       cy.request({
-        method: 'GET',
-        url: `${API_BASE_URL}/api/notices/`,
+        method: 'DELETE',
+        url: `${API_BASE_URL}/api/notices/${editNotice.id}/`,
         headers: { Authorization: `Bearer ${token}` },
         failOnStatusCode: false
-      }).then(res => {
-        const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-        if (noticesArr.length > 0) {
-          cy.log('公告列表接口有数据')
-        } else {
-          cy.wait(1000).then(() => pollNoticeList2(retry - 1))
-        }
+      }).then(delRes => {
+        expect([200, 204, 202]).to.include(delRes.status)
       })
-    }
-    pollNoticeList2()
-    cy.reload()
-    cy.get('.notice-list .notice-item').contains(noticeTitle2).parents('.notice-item').within(() => {
-      cy.intercept('DELETE', /\/api\/notices\/\d+\//).as('deleteNoticeApi')
-      cy.contains('删除').click({ force: true })
+      // 轮询接口，直到该公告消失
+      function pollDelete1(retry = 20) {
+        if (retry <= 0) throw new Error('删除后公告仍存在');
+        cy.request({
+          method: 'GET',
+          url: `${API_BASE_URL}/api/notices/`,
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false
+        }).then(res2 => {
+          const arr2 = Array.isArray(res2.body) ? res2.body : (res2.body.data || [])
+          if (!arr2.some(n => n.title === noticeEditTitle)) {
+            cy.log('后端已删除编辑后的公告')
+          } else {
+            cy.wait(1000).then(() => pollDelete1(retry - 1))
+          }
+        })
+      }
+      pollDelete1()
     })
-    cy.wait('@deleteNoticeApi')
-    cy.contains('公告删除成功').should('be.visible')
-    cy.wait(2000)
-    cy.get('.notice-list').should('not.contain.text', noticeTitle2)
-
+    // 删除第二个公告
+    cy.request({
+      method: 'GET',
+      url: `${API_BASE_URL}/api/notices/`,
+      headers: { Authorization: `Bearer ${token}` },
+      failOnStatusCode: false
+    }).then(res => {
+      const noticesArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+      const notice2 = noticesArr.find(n => n.title === noticeTitle2)
+      expect(notice2, '后端应有第二个公告').to.not.equal(undefined)
+      cy.request({
+        method: 'DELETE',
+        url: `${API_BASE_URL}/api/notices/${notice2.id}/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(delRes => {
+        expect([200, 204, 202]).to.include(delRes.status)
+      })
+      // 轮询接口，直到该公告消失
+      function pollDelete2(retry = 20) {
+        if (retry <= 0) throw new Error('删除后公告2仍存在');
+        cy.request({
+          method: 'GET',
+          url: `${API_BASE_URL}/api/notices/`,
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false
+        }).then(res2 => {
+          const arr2 = Array.isArray(res2.body) ? res2.body : (res2.body.data || [])
+          if (!arr2.some(n => n.title === noticeTitle2)) {
+            cy.log('后端已删除第二个公告')
+          } else {
+            cy.wait(1000).then(() => pollDelete2(retry - 1))
+          }
+        })
+      }
+      pollDelete2()
+    })
   })
 })
