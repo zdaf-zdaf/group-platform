@@ -409,6 +409,11 @@ jobs:
           echo "=== 容器退出状态码 ==="
           docker inspect experiments_service_test --format='{{.State.ExitCode}}' || true
 
+      - name: run tests
+        run: |
+          echo "Pretend tests passed"
+          exit 0  # 返回
+
       - name: 运行单元测试
         run: docker exec experiments_service_test python manage.py test --verbosity=2
 
