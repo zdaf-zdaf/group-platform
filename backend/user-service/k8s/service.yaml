@@ -6,6 +6,6 @@ spec:
   selector:
     app: user-service
   ports:
-    - protocol: TCP
-      port: 8000
-      targetPort: 8000
+  - port: 80
+    targetPort: 8000
+  type: ClusterIP
