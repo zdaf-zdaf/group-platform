@@ -12,7 +12,9 @@ describe('论坛模块功能测试', () => {
   before(() => {
     cy.log('process.env.VUE_APP_API_BASE_URL:', Cypress.env('VUE_APP_API_BASE_URL'))
     cy.window().then(win => {
-      cy.log('window.VUE_APP_API_BASE_URL:', win.VUE_APP_API_BASE_URL)
+      // 兼容 window 上没有 VUE_APP_API_BASE_URL 的情况，避免 any
+      const vueEnv = win as Window & { VUE_APP_API_BASE_URL?: string }
+      cy.log('window.VUE_APP_API_BASE_URL:', vueEnv.VUE_APP_API_BASE_URL)
     })
     cy.readFile('src/api/auth.ts').then((content) => {
       const match = content.match(/baseURL:\s*([\'\"])(.*?)\1/)
@@ -28,7 +30,7 @@ describe('论坛模块功能测试', () => {
     }).then((response) => {
       expect(response.status).to.eq(200);
       const accessToken = response.body.access;
-      expect(accessToken, 'token should exist').to.not.be.null;
+      expect(accessToken, 'token should exist').to.not.equal(null);
 
       token = accessToken; // 只存 accessToken，不加 Bearer
       cy.log(`最终 token: ${token}`);
@@ -97,35 +99,45 @@ describe('论坛模块功能测试', () => {
       cy.log('发帖响应:', JSON.stringify(body))
       cy.log('发帖状态:', status)
       expect(status, '发帖接口状态码').to.eq(201)
-      // 发帖后主动断言帖子已写入（兼容后端返回结构）
-      cy.wait(2000)
-      // 用接口校验帖子列表
+      // 轮询帖子列表接口，直到新发帖出现
+      function pollForumList(retry = 10) {
+        if (retry <= 0) throw new Error('帖子列表接口始终无新发帖');
+        cy.request({
+          method: 'GET',
+          url: 'http://127.0.0.1:8000/api/forum/questions/',
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false
+        }).then(res => {
+          const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+          if (postsArr.some(q => q.title === postTitle)) {
+            cy.log('帖子列表接口包含新发帖')
+          } else {
+            cy.wait(1000).then(() => pollForumList(retry - 1))
+          }
+        })
+      }
+      pollForumList()
+    })
+    cy.wait(5000); // 发帖后等待更久
+    // 主动用 cy.request 拉取帖子列表接口并断言
+    // 轮询帖子列表接口，直到新发帖出现
+    function pollForumList2(retry = 10) {
+      if (retry <= 0) throw new Error('帖子列表接口始终无新发帖');
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
         headers: { Authorization: `Bearer ${token}` },
         failOnStatusCode: false
       }).then(res => {
-        cy.log('帖子列表接口状态:', res.status)
-        cy.log('帖子列表接口body:', JSON.stringify(res.body))
         const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-        expect(postsArr.some(q => q.title === postTitle)).to.be.true
+        if (postsArr.some(q => q.title === postTitle)) {
+          cy.log('帖子列表接口包含新发帖')
+        } else {
+          cy.wait(1000).then(() => pollForumList2(retry - 1))
+        }
       })
-    })
-    cy.wait(5000); // 发帖后等待更久
-    // 主动用 cy.request 拉取帖子列表接口并断言
-    // 用接口校验帖子列表
-    cy.request({
-      method: 'GET',
-      url: 'http://127.0.0.1:8000/api/forum/questions/',
-      headers: { Authorization: `Bearer ${token}` },
-      failOnStatusCode: false
-    }).then(res => {
-      cy.log('帖子列表接口状态:', res.status)
-      cy.log('帖子列表接口body:', JSON.stringify(res.body))
-      const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(postsArr.some(q => q.title === postTitle)).to.be.true
-    })
+    }
+    pollForumList2()
     cy.wait(3000);
     cy.reload();
     cy.wait(2000);
@@ -195,8 +207,30 @@ describe('论坛模块功能测试', () => {
       if (status !== 201) {
         throw new Error('发帖接口返回非201: ' + status + ', body: ' + JSON.stringify(body))
       }
-      cy.wait(2000)
-      // 用接口校验帖子列表
+      // 轮询帖子列表接口，直到新发帖出现
+      function pollForumList(retry = 10) {
+        if (retry <= 0) throw new Error('帖子列表接口始终无新发帖');
+        cy.request({
+          method: 'GET',
+          url: 'http://127.0.0.1:8000/api/forum/questions/',
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false
+        }).then(res => {
+          const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+          if (postsArr.some(q => q.title === postTitle)) {
+            cy.log('帖子列表接口包含新发帖')
+          } else {
+            cy.wait(1000).then(() => pollForumList(retry - 1))
+          }
+        })
+      }
+      pollForumList()
+    })
+    cy.wait(5000); // 发帖后等待更久
+    // 主动用 cy.request 拉取帖子列表接口并断言
+    // 轮询帖子列表接口，直到新发帖出现
+    function pollForumList2(retry = 10) {
+      if (retry <= 0) throw new Error('帖子列表接口始终无新发帖');
       cy.request({
         method: 'GET',
         url: 'http://127.0.0.1:8000/api/forum/questions/',
@@ -204,23 +238,14 @@ describe('论坛模块功能测试', () => {
         failOnStatusCode: false
       }).then(res => {
         const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-        expect(postsArr.some(q => q.title === postTitle)).to.be.true
+        if (postsArr.some(q => q.title === postTitle)) {
+          cy.log('帖子列表接口包含新发帖')
+        } else {
+          cy.wait(1000).then(() => pollForumList2(retry - 1))
+        }
       })
-    })
-    cy.wait(5000); // 发帖后等待更久
-    // 主动用 cy.request 拉取帖子列表接口并断言
-    // 用接口校验帖子列表
-    cy.request({
-      method: 'GET',
-      url: 'http://127.0.0.1:8000/api/forum/questions/',
-      headers: { Authorization: `Bearer ${token}` },
-      failOnStatusCode: false
-    }).then(res => {
-      cy.log('帖子列表接口状态:', res.status)
-      cy.log('帖子列表接口body:', JSON.stringify(res.body))
-      const postsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(postsArr.some(q => q.title === postTitle)).to.be.true
-    })
+    }
+    pollForumList2()
     cy.wait(3000);
     cy.reload();
     cy.wait(2000);
