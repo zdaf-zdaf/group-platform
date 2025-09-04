@@ -1,9 +1,26 @@
 /// <reference types="cypress" />
 
+// ========================
+// 全局变量提升，保证所有用例一致
+// ========================
+const API_BASE_URL = 'http://127.0.0.1:8000'
+let token = ''
+const studentUsername = `stu${Date.now() % 10000}`
+const teacherUsername = `tch${Date.now() % 10000}`
+let teacherPwd = 'Test1234@'
+const experimentTitle = 'Cypress全流程实验'
+const experimentDescription = '自动化测试实验描述'
+const startTime = '2025-08-27 15:00:00'
+const deadlineTime = '2025-08-28 23:59:59'
+const codeSample =
+`
+a, b = map(int, input().split())
+print(a + b)
+`
+const password = 'Test1234@'
+
 describe('灵狐智验前端完整流程集成测试', () => {
   // 通用登录函数，直接请求后端并注入 token 和 userInfo
-  const API_BASE_URL = 'http://127.0.0.1:8000'
-  let token = ''
   function login(user) {
     cy.request('POST', `${API_BASE_URL}/api/auth/login/`, {
       username: user.username,
@@ -31,20 +48,6 @@ describe('灵狐智验前端完整流程集成测试', () => {
       cy.wait(1000)
     })
   }
-
-  const studentUsername = `stu${Date.now() % 10000}`
-  const teacherUsername = `tch${Date.now() % 10000}`
-  const experimentTitle = 'Cypress全流程实验'
-  const experimentDescription = '自动化测试实验描述'
-  const startTime = '2025-08-27 15:00:00'
-  const deadlineTime = '2025-08-28 23:59:59'
-  const codeSample =
-`
-a, b = map(int, input().split())
-print(a + b)
-
-`
-  const password = 'Test1234@'
 
   // ========================
   // 学生注册
@@ -94,7 +97,7 @@ print(a + b)
     cy.url({ timeout: 8000 }).should('include', '/login')
 
     // 登录（统一用 cy.request 注入 token）
-    login({ username: teacherUsername, password })
+    login({ username: teacherUsername, password: teacherPwd })
     cy.url({ timeout: 8000 }).should('include', '/profile')
 
     // 进入个人信息页
@@ -123,6 +126,8 @@ print(a + b)
     cy.get('input[placeholder="请再次输入新密码"]').type('TTest1234', { force: true })
     cy.contains('确认修改').click({ force: true })
     cy.contains('密码修改成功').should('be.visible')
+    // 密码修改后同步更新全局变量
+    teacherPwd = 'TTest1234'
 
   // 退出登录并用新密码登录验证
   cy.contains('退出登录').click({ force: true })
@@ -139,7 +144,7 @@ print(a + b)
     // 登录获取 token
     cy.request('POST', `${API_BASE_URL}/api/auth/login/`, {
       username: teacherUsername,
-      password: 'TTest1234'
+      password: teacherPwd
     }).then((response) => {
       expect(response.status).to.eq(200)
       const teacherToken = response.body.access || response.body.token || response.body.data?.token
@@ -248,7 +253,7 @@ print(a + b)
     // 登录获取 token
     cy.request('POST', `${API_BASE_URL}/api/auth/login/`, {
       username: teacherUsername,
-      password: 'TTest1234'
+      password: teacherPwd
     }).then((response) => {
       expect(response.status).to.eq(200)
       const teacherToken = response.body.access || response.body.token || response.body.data?.token
