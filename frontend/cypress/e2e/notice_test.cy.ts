@@ -47,6 +47,30 @@ describe('公告模块功能测试', () => {
   it('教师端接口发布、编辑、筛选、搜索公告', () => {
     login(teacher).then(() => {
       cy.log('token for teacher:', token)
+      // 先清理同名公告，保证幂等
+      function deleteIfExists(title) {
+        return cy.request({
+          method: 'GET',
+          url: `${API_BASE_URL}/api/notices/`,
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false
+        }).then(res => {
+          const arr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+          const dup = arr.find(n => n.title === title)
+          if (dup) {
+            return cy.request({
+              method: 'DELETE',
+              url: `${API_BASE_URL}/api/notices/${dup.id}/`,
+              headers: { Authorization: `Bearer ${token}` },
+              failOnStatusCode: false
+            })
+          }
+        })
+      }
+      // 先删同名公告
+      deleteIfExists(noticeTitle1)
+      deleteIfExists(noticeTitle2)
+      deleteIfExists(noticeEditTitle)
       // 发布第一个公告
       cy.request({
         method: 'POST',
@@ -55,13 +79,13 @@ describe('公告模块功能测试', () => {
         body: {
           title: noticeTitle1,
           content: noticeContent1,
-          type: 'course',
+          type: 2, // 课程通知
         },
         failOnStatusCode: false
       }).then(res => {
         cy.log('发布公告1返回', res.status, JSON.stringify(res.body))
         if (res.status === 400) {
-          cy.log('公告发布400错误详情:', JSON.stringify(res.body))
+          throw new Error('公告发布400错误详情: ' + JSON.stringify(res.body));
         }
         expect([200, 201]).to.include(res.status)
       }).then(() => {
@@ -92,13 +116,13 @@ describe('公告模块功能测试', () => {
           body: {
             title: noticeTitle2,
             content: noticeContent2,
-            type: 'security',
+            type: 1, // 安全公告
           },
           failOnStatusCode: false
         }).then(res => {
           cy.log('发布公告2返回', res.status, JSON.stringify(res.body))
           if (res.status === 400) {
-            cy.log('公告发布400错误详情:', JSON.stringify(res.body))
+            throw new Error('公告发布400错误详情: ' + JSON.stringify(res.body));
           }
           expect([200, 201]).to.include(res.status)
         }).then(() => {
@@ -137,7 +161,7 @@ describe('公告模块功能测试', () => {
               body: {
                 title: noticeEditTitle,
                 content: noticeEditContent,
-                type: 'maintenance',
+                type: 3, // 设备维护
               },
               failOnStatusCode: false
             }).then(editRes => {
