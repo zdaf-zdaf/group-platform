@@ -6,7 +6,6 @@ from django.http import JsonResponse
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
-from forum import views as forum_views
 from experiments import views
 from experiments.views import CodeJudgeApi, CodingProblemDetailApi
 from materials.views import LearningMaterialViewSet
