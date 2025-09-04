@@ -14,7 +14,7 @@ describe('学习资料模块功能测试', () => {
     }).then((response) => {
       expect(response.status).to.eq(200)
       token = response.body.access || response.body.token || response.body.data?.token
-      expect(token, 'token should exist').to.not.be.null
+      expect(token, 'token should exist').to.not.equal(null);
       cy.visit('/profile', {
         onBeforeLoad(win) {
           win.localStorage.setItem('token', token)
@@ -72,19 +72,24 @@ describe('学习资料模块功能测试', () => {
       cy.readFile(item.file, 'binary', { timeout: 10000 }).should('exist')
       cy.get('.el-upload input[type="file"]').selectFile(item.file, { force: true })
       cy.contains('发布资料').click({ force: true })
-      cy.wait(2000)
-      // 用接口校验资料列表
-      cy.request({
-        method: 'GET',
-        url: `${API_BASE_URL}/materials/`,
-        headers: { Authorization: `Bearer ${token}` },
-        failOnStatusCode: false
-      }).then(res => {
-        cy.log('资料列表接口状态:', res.status)
-        cy.log('资料列表接口body:', JSON.stringify(res.body))
-        const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-        expect(materialsArr.some(m => m.title === title)).to.be.true
-      })
+      // 轮询资料列表接口，直到新资料出现
+      function pollMaterialList(retry = 10) {
+        if (retry <= 0) throw new Error('资料列表接口始终无新资料');
+        cy.request({
+          method: 'GET',
+          url: `${API_BASE_URL}/materials/`,
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false
+        }).then(res => {
+          const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+          if (materialsArr.some(m => m.title === title)) {
+            cy.log('资料列表接口包含新资料')
+          } else {
+            cy.wait(1000).then(() => pollMaterialList(retry - 1))
+          }
+        })
+      }
+      pollMaterialList()
       cy.reload()
       cy.contains('资料发布成功').should('be.visible')
     })
@@ -100,19 +105,24 @@ describe('学习资料模块功能测试', () => {
     cy.url().should('include', '/studyfile')
     cy.get('.material-page').should('exist')
 
-    // 用接口校验资料列表
-    cy.request({
-      method: 'GET',
-      url: `${API_BASE_URL}/materials/`,
-      headers: { Authorization: `Bearer ${token}` },
-      failOnStatusCode: false
-    }).then(res => {
-      cy.log('资料列表接口状态:', res.status)
-      cy.log('资料列表接口body:', JSON.stringify(res.body))
-      const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(materialsArr.length > 0).to.be.true
-    })
-    cy.wait(2000)
+    // 轮询资料列表接口，直到有资料
+    function pollMaterialList(retry = 10) {
+      if (retry <= 0) throw new Error('资料列表接口始终无数据');
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/materials/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(res => {
+        const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        if (materialsArr.length > 0) {
+          cy.log('资料列表接口有数据')
+        } else {
+          cy.wait(1000).then(() => pollMaterialList(retry - 1))
+        }
+      })
+    }
+    pollMaterialList()
     cy.reload()
     // 依次预览四种类型（UI操作）
     const previewTypes = ['PDF文档', '文档资料', '图表素材', '视频教程']
@@ -138,19 +148,24 @@ describe('学习资料模块功能测试', () => {
     cy.url().should('include', '/studyfile')
     cy.get('.material-page').should('exist')
 
-    // 用接口校验资料列表
-    cy.request({
-      method: 'GET',
-      url: `${API_BASE_URL}/materials/`,
-      headers: { Authorization: `Bearer ${token}` },
-      failOnStatusCode: false
-    }).then(res => {
-      cy.log('资料列表接口状态:', res.status)
-      cy.log('资料列表接口body:', JSON.stringify(res.body))
-      const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
-      expect(materialsArr.length > 0).to.be.true
-    })
-    cy.wait(2000)
+    // 轮询资料列表接口，直到有资料
+    function pollMaterialList(retry = 10) {
+      if (retry <= 0) throw new Error('资料列表接口始终无数据');
+      cy.request({
+        method: 'GET',
+        url: `${API_BASE_URL}/materials/`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false
+      }).then(res => {
+        const materialsArr = Array.isArray(res.body) ? res.body : (res.body.data || [])
+        if (materialsArr.length > 0) {
+          cy.log('资料列表接口有数据')
+        } else {
+          cy.wait(1000).then(() => pollMaterialList(retry - 1))
+        }
+      })
+    }
+    pollMaterialList()
     cy.reload()
     // 删除自动化测试发布的四个资料（UI操作）
     const titles = [
