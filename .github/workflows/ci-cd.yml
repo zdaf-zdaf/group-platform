@@ -852,61 +852,61 @@ jobs:
             deploy-to-local.sh
           retention-days: 7
 
-  deploy-to-k8s:
-    name: 部署到 Kubernetes
-    runs-on: ubuntu-latest
-    needs: [build-forum-service, build-notice-service, build-materials-service, build-user-service, build-and-push-frontend]
-    steps:
-      - name: 检出代码
-        uses: actions/checkout@v3
+  # deploy-to-k8s:
+  #   name: 部署到 Kubernetes
+  #   runs-on: ubuntu-latest
+  #   needs: [build-forum-service, build-notice-service, build-materials-service, build-user-service, build-and-push-frontend]
+  #   steps:
+  #     - name: 检出代码
+  #       uses: actions/checkout@v3
 
-      - name: 安装 kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'v1.32.2'   # 你本地集群的 kubectl 版本，可改
+  #     - name: 安装 kubectl
+  #       uses: azure/setup-kubectl@v3
+  #       with:
+  #         version: 'v1.32.2'   # 你本地集群的 kubectl 版本，可改
 
-      - name: 设置 kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+  #     - name: 设置 kubeconfig
+  #       run: |
+  #         mkdir -p $HOME/.kube
+  #         echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
 
-      - name: 应用 Kubernetes 部署文件
-        run: |
-          kubectl apply -f k8s/
+  #     - name: 应用 Kubernetes 部署文件
+  #       run: |
+  #         kubectl apply -f k8s/
 
-  migrate:
-    name: 数据库迁移
-    runs-on: ubuntu-latest
-    needs: deploy-to-k8s   # 等 deploy 完成后再执行
-    steps:
-      - name: 安装 kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'v1.32.2'
+  # migrate:
+  #   name: 数据库迁移
+  #   runs-on: ubuntu-latest
+  #   needs: deploy-to-k8s   # 等 deploy 完成后再执行
+  #   steps:
+  #     - name: 安装 kubectl
+  #       uses: azure/setup-kubectl@v3
+  #       with:
+  #         version: 'v1.32.2'
 
-      - name: 设置 kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+  #     - name: 设置 kubeconfig
+  #       run: |
+  #         mkdir -p $HOME/.kube
+  #         echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
 
-      - name: 等待 Pod 启动
-        run: |
-          # 确保所有服务的 Pod 都已 ready
-          kubectl rollout status deployment/forum
-          kubectl rollout status deployment/notice
-          kubectl rollout status deployment/user
-          kubectl rollout status deployment/materials
+  #     - name: 等待 Pod 启动
+  #       run: |
+  #         # 确保所有服务的 Pod 都已 ready
+  #         kubectl rollout status deployment/forum
+  #         kubectl rollout status deployment/notice
+  #         kubectl rollout status deployment/user
+  #         kubectl rollout status deployment/materials
 
-      - name: 执行数据库迁移
-        run: |
-          # 对每个服务执行 migrate
-          for svc in forum notice user materials
-          do
-            POD_NAME=$(kubectl get pod -l app=$svc -o jsonpath="{.items[0].metadata.name}")
-            echo "正在为 $svc 执行 migrate ..."
-            kubectl exec $POD_NAME -- python manage.py migrate --noinput
-          done
-          echo "所有服务的数据库迁移已完成！"
+  #     - name: 执行数据库迁移
+  #       run: |
+  #         # 对每个服务执行 migrate
+  #         for svc in forum notice user materials
+  #         do
+  #           POD_NAME=$(kubectl get pod -l app=$svc -o jsonpath="{.items[0].metadata.name}")
+  #           echo "正在为 $svc 执行 migrate ..."
+  #           kubectl exec $POD_NAME -- python manage.py migrate --noinput
+  #         done
+  #         echo "所有服务的数据库迁移已完成！"
   
   
   # ================ GUI 测试 ================
