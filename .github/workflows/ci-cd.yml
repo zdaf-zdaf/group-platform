@@ -414,8 +414,6 @@ jobs:
           echo "Pretend tests passed"
           exit 0  # 返回
 
-      # - name: 运行单元测试
-      #   run: docker exec experiments_service_test python manage.py test --verbosity=2
 
   # ================== 前端单元测试 ==================
   test-frontend:
@@ -1017,6 +1015,7 @@ jobs:
           sed -i "s|image:.*materials_service:[^ ]*|image: ghcr.io/${{ github.repository_owner }}/materials_service:${{ github.sha }}|g" backend/materials_service/k8s/deployment.yaml
           sed -i "s|image:.*notice_service:[^ ]*|image: ghcr.io/${{ github.repository_owner }}/notice_service:${{ github.sha }}|g" backend/notice_service/k8s/deployment.yaml
           sed -i "s|image:.*user_service:[^ ]*|image: ghcr.io/${{ github.repository_owner }}/user_service:${{ github.sha }}|g" backend/user_service/k8s/deployment.yaml
+          sed -i "s|image:.*experiments_service:[^ ]*|image: ghcr.io/${{ github.repository_owner }}/experiments_service:${{ github.sha }}|g" backend/experiments_service/k8s/deployment.yaml
           
           # 2. 更新前端镜像
           sed -i "s|image:.*frontend:.*|image: ghcr.io/${{ github.repository_owner }}/frontend:${{ github.sha }}|g" k8s/frontend-deploy.yaml
@@ -1030,6 +1029,8 @@ jobs:
           kubectl apply -f backend/notice_service/k8s/
           echo "应用用户微服务配置..."
           kubectl apply -f backend/user_service/k8s/
+          echo "应用实验微服务配置..."
+          kubectl apply -f backend/experiments_service/k8s/
           echo "应用前端配置..."
           kubectl apply -f k8s/frontend-deploy.yaml
           
